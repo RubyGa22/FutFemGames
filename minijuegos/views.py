@@ -15,6 +15,15 @@ def loading(request):
 def futfemTrajectory(request):
         return render(request, 'minijuegos/trayectoria.html')
 
+def futfemGrid(request):
+        return render(request, 'minijuegos/grid.html')
+
+def futfemBingo(request):
+        return render(request, 'minijuegos/bingo.html')
+
+def futfemWordle(request):
+        return render(request, 'minijuegos/wordle.html')
+
 def juegoxid(request):
     id_juego = request.GET.get('id_juego')
 

@@ -8,15 +8,21 @@
     height: 100%;
 }
 #trayectoria {
-    margin-bottom: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: var(--color-texto);
-    border-radius: 20px;
     padding: 1rem 0;
-    border: 1px solid var(--color-detalles);
     max-width: 90%;
+    border-radius: 20px; /* Bordes redondeados */
+    text-align: center; /* Centrar el contenido dentro del botón */
+    background-color: rgba(128,0,128,0.45); /* Color de fondo primario */
+    color: white; /* Color del texto */
+    margin-bottom: 20px; /* Espaciado inferior entre botones */
+    transition: transform 0.2s; /* Suavizar el efecto de transformación */
+    border: 0.5px solid rgb(255, 255, 255);
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);
+
+    backdrop-filter: blur(10px);
 }
 #sugerencias{
     max-height: 125px;

@@ -37,7 +37,7 @@ function ponerBanderas(ids, posiciones) {
                         // Crear y configurar la imagen
                         const img = document.createElement('img');
                         img.alt = "Pais";
-                        img.src = `data:image/svg+xml;base64,${pais.bandera}`;
+                        img.src = pais.bandera;
                         img.id='logo';
                         img.style.width = "50px";
                         img.style.height = "auto";
@@ -92,7 +92,7 @@ function ponerClubes(ids, posiciones) {
                         // Crear y configurar la imagen
                         const img = document.createElement('img');
                         img.alt = "Club";
-                        img.src = `${pais.escudo}`;
+                        img.src = pais.escudo;
                         img.id='logo';
                         img.style.width = "50px";
                         img.style.height = "auto";
@@ -155,7 +155,7 @@ function ponerLigas(ids, posiciones) {
                         // Crear y configurar la imagen
                         const img = document.createElement('img');
                         img.alt = "Liga";
-                        img.src = `data:image/png;base64,${pais.bandera}`;
+                        img.src = pais.logo;
                         img.id='logo';
                         img.style.width = "50px";
                         img.style.height = "auto";
