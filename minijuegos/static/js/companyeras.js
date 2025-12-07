@@ -68,7 +68,7 @@ async function iniciar(dificultad) {
 
 async function loadCompanyerasJugadoraById(id) {
     try {
-        const response = await fetch(`../api/jugadora_compañeras?id_jugadora=${id}`);
+        const response = await fetch(`../api/jugadora_companyeras?id_jugadora=${id}`);
         if (!response.ok) {
             throw new Error(`Error en la solicitud: ${response.statusText}`);
         }

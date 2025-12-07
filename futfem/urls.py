@@ -10,4 +10,7 @@ urlpatterns = [
     path('ligasxid', views.ligasxid, name='ligasxid'),
     path('jugadora_aleatoria', views.jugadora_aleatoria, name='jugadora_aleatoria'),
     path('jugadora_apodo', views.jugadora_apodo, name='jugadora_apodo'),
+    path('jugadora_companyeras', views.jugadora_companeras, name='jugadora_companyeras'),
+    path('jugadoraxid', views.jugadoraxid, name='jugadoraxid'),
+    path('jugadora_datos', views.jugadora_datos, name='jugadora_datos'),
 ]
