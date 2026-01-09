@@ -1,0 +1,132 @@
+/* Estilos generales */
+body {
+  font-family: Arial, sans-serif;
+  color: white;
+  text-align: center;
+}
+
+#preguntas {
+    min-height: 300px;
+    max-height: 300px;
+    max-width: 700px;
+    margin: 0 auto;
+    border: 2px solid white;
+    overflow-y: auto;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+select{
+    padding: 10px;
+    font-size: 16px;
+    max-width: 250px;
+    background: rgba(128, 0, 128, 0.3);
+    border: 2px solid purple;
+    border-radius: 20px;
+    color: white;
+}
+#pregunta option{
+    padding: 10px;
+    font-size: 16px;
+    background: rgba(128, 0, 128, 0.3);
+    border: 2px solid purple;
+    border-radius: 20px;
+    color: white;
+}
+.oculto{
+    display: none;
+}
+
+.correct{
+    background: green;
+  border: 1px solid white;
+  border-radius: 5px;
+  padding: 5px;
+  margin-left: 5px;
+}
+
+.error{
+    background: red;
+  border: 1px solid white;
+  border-radius: 5px;
+  padding: 5px;
+  margin-left: 5px;
+}
+
+ #vidas{
+  display: flex;
+  height: 40px;
+  justify-content: end;  
+  margin-right: 100px;
+} 
+
+.player {
+  margin-bottom: 20px;
+}
+
+.player img {
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+  background: white;
+  border: 1px solid rgba(128,0,128,0.5);
+  object-fit: contain;
+}
+
+.player-name {
+  font-size: 24px;
+  margin-top: 10px;
+}
+
+/*Animacion Escribir a máquina*/
+/* #lifeLeft { 
+	position: relative; 
+	float: left;
+	background: tomato;
+	color: #fff;
+	font-size: 2.5em;
+}
+
+#lifeLeft span {
+    position:absolute;
+    right:0;
+    width:0;
+    background: tomato;
+    border-left: 1px solid #000;
+    animation: escribir 5s steps(30) infinite alternate;
+}
+
+@keyframes escribir {
+    from { width: 100% }
+    to { width:0 }
+} */
+ 
+#player-name{
+  display: block;
+  font-family: monospace;
+  white-space: nowrap;
+  border-right: 4px solid;
+   width: 600px;  
+  margin: 0 auto;
+
+ animation: typing 2s steps(12), blink .5s infinite step-end alternate;
+ overflow: hidden;
+}
+#sugerencias{
+    max-height: 125px;
+    overflow-y: scroll;
+}
+#sugerencias::-webkit-scrollbar{
+    color: var(--color-primario);
+}
+@keyframes typing{
+ from {
+   width: 0
+ } 
+}
+
+@keyframes blink{
+ 50% {
+   border-color:transparent
+ }
+}

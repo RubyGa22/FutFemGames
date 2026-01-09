@@ -27,17 +27,12 @@ async function iniciar() {
         await loadJugadoraApodo(jugadora.idJugadora, false);
 
         if (!userAnswer || userAnswer.trim() === '') {
-            /*startCounter(segundos, "wordle", async () => {
-                console.log("El contador llegó a 0. Ejecutando acción...");
-                //await trayectoriaPerder();
-            });*/
+            await wordlePerder();
+
         } else if (userAnswer === 'loss') {
-            //await trayectoriaPerder();
+            await wordlePerder();
         } else {
-            /*startCounter(segundos, "wordle", async () => {
-                console.log("El contador llegó a 0. Ejecutando acción...");
-                //await trayectoriaPerder();
-            });*/
+            await wordlePerder();
         }
     }   
 }
@@ -168,6 +163,7 @@ function updateActiveRow() {
             tile.disabled = i !== currentRow; // Solo habilitar la fila actual
         }
     }
+    if(currentRow >= maxRows) return; // Si ya se alcanzó el máximo de filas, no hacer nada
     const firstTile = document.getElementById(`row-${currentRow}-tile-0`);
     firstTile.focus(); // Mover el foco a la primera casilla de la fila activa
 }
@@ -270,17 +266,16 @@ function colocarRespuestas(palabra, results, row) {
 
 async function wordlePerder() {
     // Bloquear el botón y el input
-    lockAllRows();
+    //lockAllRows();
     
-    const resultDiv = document.getElementById('result');
+    const resultDiv = document.getElementById('message');
     const jugadora = await sacarJugadora(jugadoraId);
 
-
-    resultDiv.textContent = 'Has perdido, era: '+jugadora[0].Nombre_Completo;
+    resultDiv.textContent = 'Has perdido, era: '+jugadora.Nombre_Completo;
     const div = document.getElementById('trayectoria');
-    const jugadora_id = 'loss';
-    localStorage.setItem('Attr2', jugadora_id);
-    await loadJugadoraById(jugadoraId, true);
+    /*const jugadora_id = 'loss';
+    localStorage.setItem('Attr2', jugadora_id);*/
+    //await loadJugadoraById(jugadoraId, true);
     // Agregar un delay de 2 segundos (2000 ms)
     if(localStorage.length>0){
         await updateRacha(1, 0);
@@ -292,11 +287,10 @@ async function wordlePerder() {
 
 
 const texto = 'Adivina la Jugadora de Fútbol es un juego de trivia donde debes identificar a una futbolista según los equipos en los que ha jugado. Usa las pistas, demuestra tu conocimiento y compite para ver quién acierta más.';
-const imagen = '../img/trayectoria.jpg';
+const imagen = "{% static 'img/Captura de pantalla 2024-09-01 201329.png' %}";
 play().then(r => r);
 async function play() {
     let jugadora = await fetchData(2);
-    console.log(jugadora)
     jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
     const res = localStorage.getItem('res2');
     if(res !== jugadoraId || !res){

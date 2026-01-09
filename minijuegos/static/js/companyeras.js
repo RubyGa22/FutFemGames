@@ -86,6 +86,8 @@ async function loadCompanyerasJugadoraById(id) {
         document.getElementById('result').textContent = 'Error al cargar los datos.';
     }
 }
+
+
 async function getJugadora(id) {
     try {
         const response = await fetch(`../api/jugadora_datos?id=${id}`);
@@ -108,6 +110,8 @@ async function getJugadora(id) {
         document.getElementById('result').textContent = 'Error al cargar los datos.';
     }
 }
+
+
 function displayCompanyeras(data) {
     const compisDiv = document.getElementById('compañeras');
     compisDiv.innerHTML = ''; // Limpiar contenido previo
@@ -140,14 +144,16 @@ function displayCompanyeras(data) {
         // Crear y añadir el lado trasero
         const back = document.createElement('div');
         back.classList.add('back');
-
+        const jugadoraImg = document.createElement('img');
         if (item.imagen) {
-            const jugadoraImg = document.createElement('img');
-            jugadoraImg.src = item.imagen;
-            jugadoraImg.alt = 'Imagen de la Jugadora';
-            back.appendChild(jugadoraImg);
+            
+                jugadoraImg.src = item.imagen;            
+                jugadoraImg.alt = 'Imagen de la Jugadora';
+                
+        }else{
+           jugadoraImg.src = '/static/img/predeterm.jpg';
         }
-
+        back.appendChild(jugadoraImg);
         flipper.appendChild(front);
         flipper.appendChild(back);
         flipContainer.appendChild(flipper);

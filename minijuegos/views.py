@@ -24,10 +24,14 @@ def futfemBingo(request):
 def futfemWordle(request):
         return render(request, 'minijuegos/wordle.html')
 
-
-
 def futfemMates(request):
         return render(request, 'minijuegos/companyeras.html')
+
+def futfemGuess(request):
+        return render(request, 'minijuegos/adivina.html')
+
+def futfemXIClubs(request):
+        return render(request, 'minijuegos/XI_Clubs.html')
 
 def juegoxid(request):
     id_juego = request.GET.get('id_juego')
@@ -44,3 +48,4 @@ def juegoxid(request):
     valor = pista.valor
 
     return JsonResponse({'success': valor})
+

@@ -9,5 +9,7 @@ urlpatterns = [
     path('bingo', views.futfemBingo),
     path('wordle', views.futfemWordle),
     path('mates', views.futfemMates),
-    path('api/juegoxid', views.juegoxid, name='juegoxid')
+    path('guess', views.futfemGuess),
+    path('api/juegoxid', views.juegoxid, name='juegoxid'),
+    path('XI_Clubs', views.futfemXIClubs, name='futfemXIClubs'),
 ]

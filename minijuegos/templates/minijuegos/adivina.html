@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Fútbol</title>
+    <link rel="icon" href="{% static 'img/prueba logo.png' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/adivina.css' %}">
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/combo.css' %}">
+</head>
+
+<body>
+  {% include 'partials/header.html' %}
+    <div class="container-fluid">
+        <div id="vidas">
+            <img id="vida1" src="{% static 'img/vida.png' %}" alt="Vida 1">
+            <img id="vida2" src="{% static 'img/vida.png' %}" alt="Vida 2">
+            <img id="vida3" src="{% static 'img/vida.png' %}" alt="Vida 3">
+        </div>
+
+        <!-- Imagen y nombre del jugador -->
+        <div class="player">
+            <img id="player-image" src="{% static 'img/predeterm.jpg' %}" alt="Jugador">
+            <div id="player-name" class="player-name"></div>
+            <p id="msgResultado"></p>
+        </div>
+
+        <!-- Preguntas -->
+        <label for="pregunta"></label><select name="pregunta" id="pregunta">
+            <option value="">Selecciona una pregunta</option>
+            <option value="1">¿ Juega actualmente en ___ ?</option>
+            <option value="2">¿ Ha jugado alguna vez en ___ ?</option>
+            <option value="3">¿ Ella es de ___ ?</option>
+            <option value="4">¿ Juega como ___ ?</option>
+            <option value="5">¿ Tiene ___ años de edad ?</option>
+            <option value="6">¿ Es mayor que ___ ?</option>
+            <option value="7">¿ Es más joven que ___ ?</option>
+            <option value="8">¿ Juega en la liga ___ ?</option>
+            <option value="9">¿ Ha jugado alguna vez en la liga ___ ?</option>
+        </select>
+
+        <!--Pais, Liga y Equipo -->
+        <label for="opciones"></label><select class="oculto" name="opciones" id="opciones">
+            <option value=""> Selecciona ... </option>
+        </select>
+
+        <div class="oculto">
+            <span id="showAgeText"></span>
+            <label for="edad"></label><input type="range" name="edad" id="edad" min="16" max="40">
+        </div>
+
+        <button id="askQuestion" class="skip-button" onclick="askQuestion()">Preguntar</button>
+        <h4 id="questionsLeft"> Te quedan 10 preguntas: </h4>
+
+        <div id="preguntas">
+
+        </div>
+
+        <div class="container">
+            <label for="input">
+                <input type="text" id="nombre" placeholder="Escribe el nombre de la jugadora">
+                <div id="sugerencias-container">
+                    <ul id="sugerencias"></ul>
+                </div>
+            </label>
+            <button onclick="validarJugadora()" id="botonVerificar">Verificar</button>
+            <button>Rendirse</button>
+            <span id="lifeLeft"></span>
+            <!-- <div class="contenedor">
+                <h1 id="lifeLeft">Efecto de máquina de escribir.<span>&#160;</span></h1>
+            </div> -->
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/admin.js' %}"></script>
+    <script src="{% static 'js/funciones-tablas.js' %}"></script>
+    <script src="{% static 'js/adivinajugadora.js' %}"></script>
+    <script>
+        // Añadir el evento de input al campo de texto
+        const textoInput = document.getElementById("nombre");
+        textoInput.addEventListener('input', debounce(handleAutocompletePlayer, 1000)); // Debounce de 300ms
+    </script>
+</body>
+
+</html>

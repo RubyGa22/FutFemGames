@@ -263,31 +263,37 @@ async function obtenerPosicion(id) {
         console.log("Respuesta del servidor:", data); // Ver el array completo
 
         // Asegurarse de que el dato devuelto es un array y contiene el campo 'Posicion'
-        if (Array.isArray(data) && data.length > 0 && data[0].Posicion !== undefined) {
-            const posicion = parseInt(data[0].Posicion); // Acceder al valor 'Posicion' del primer objeto
+        //if (Array.isArray(data) && data.length > 0 && data[0].Posicion !== undefined) {
+            const posicion = parseInt(data.success[0].Posicion); // Acceder al valor 'Posicion' del primer objeto
             if (isNaN(posicion)) {
                 console.error('Error: la posición obtenida no es un número válido.');
                 return null;
             }
 
             return posicion; // Devolver la posición como número
-        } else {
+        } /*else {
             console.error('Error: La estructura de los datos recibidos no es la esperada.');
             return null;
         }
 
-    } catch (error) {
+    }*/ catch (error) {
         console.error('Error al obtener la posición de la jugadora:', error);
         return null; // En caso de error, devolver null
     }
 }
 
-function numeroAleatorioArray(valores) {
-    // Generar un índice aleatorio basado en la longitud del array
-    const indiceAleatorio = Math.floor(Math.random() * valores.length);
+async function paisesAll() {
+    try {
+        const response = await fetch('../api/paisesall');
+        const data = await response.json();
 
-    // Devolver el valor correspondiente al índice aleatorio
-    return valores[indiceAleatorio];
+        console.log(data.success);  
+        return data.success;
+
+    } catch (error) {
+        console.error("Error fetching paises:", error);
+        return [];
+    }    
 }
 
 const resultDiv = document.getElementById('result');
@@ -305,12 +311,12 @@ function Ganaste(modo) {
     //if(modo!=='grid') localStorage.setItem('nombre',resultDiv.textContent)
     // Llamar a la función que cambia la imagen con flip
     if(modo==='grid'){
-    const input = document.querySelector('input');
-    const result = document.getElementById('resultado');
-    const button = document.querySelector('button');
-    result.textContent = '¡Has Ganado!';
-    button.disabled=true;
-    input.disabled=true;
+        const input = document.querySelector('input');
+        const result = document.getElementById('resultado');
+        const button = document.querySelector('button');
+        result.textContent = '¡Has Ganado!';
+        button.disabled=true;
+        input.disabled=true;
     }
     if(modo==='bingo'){
         const result = document.getElementById('resultado');
@@ -319,15 +325,27 @@ function Ganaste(modo) {
         button.disabled=true;
         button.style.pointerEvents = 'none';
     }else if(modo==='trayectoria'){
+        const input = document.getElementById('jugadoraInput');
         const div = document.getElementById('trayectoria');
         const jugadora_id = div.getAttribute('Attr1');
         localStorage.setItem('Attr1', jugadora_id);
+        input.disabled=true;
         cambiarImagenConFlip();
     }else if(modo==='compañeras'){
         const div = document.getElementById('compañeras');
         const jugadora_id = div.getAttribute('Attr8');
         localStorage.setItem('Attr8', jugadora_id);
         cambiarImagenConFlip();
+    }else if(modo === 'Guess Player'){
+        const input = document.querySelector('input');
+        const result = document.getElementById('resultado');
+        const button = document.querySelector('button');
+        result.textContent = '¡Has Ganado!';
+        button.disabled=true;
+        input.disabled=true;
+    }else if(modo === 'wordle'){
+        const textoDiv = document.getElementById('message');
+        textoDiv.textContent = '¡Has Ganado!';
     }
 }
 
@@ -591,6 +609,7 @@ function crearPopupInicialJuego(titulo, explicacion, imagen, tipo) {
     // Añadir la imagen y la explicación al contenedor "explicar"
     explicar.appendChild(imagenDiv);
     explicar.appendChild(textoExplicacion);
+    popup.appendChild(explicar);
 
     if(tipo){
         // BOTÓN ÚNICO DE INICIAR
@@ -635,7 +654,7 @@ function crearPopupInicialJuego(titulo, explicacion, imagen, tipo) {
     selectorDificultad.appendChild(botonesSelectorDificultad);
 
     // Añadir los contenedores de la explicación y los botones al popup
-    popup.appendChild(explicar);
+    
     popup.appendChild(selectorDificultad);
     }
     // Añadir el popup al cuerpo del documento o a un contenedor específico

@@ -2,11 +2,183 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.db import connection
 from django.db.models import Q
-from datetime import date
+from datetime import date, datetime
 from .models import Jugadora, Trayectoria, Equipo, Pais, Liga
 from random import shuffle
 
 # Create your views here.
+#################################################################################################
+######################################JUGADORAS##################################################
+#################################################################################################
+def jugadora_apodo(request):
+    id_jugadora = request.GET.get("id_jugadora")
+
+    if not id_jugadora:
+        return JsonResponse({"error": "No se proporcionó id_jugadora."}, status=400)
+
+    try:
+        id_jugadora = int(id_jugadora)
+    except ValueError:
+        return JsonResponse({"error": "id_jugadora inválido."}, status=400)
+
+    # Buscar la jugadora
+    try:
+        jugadora = Jugadora.objects.get(id_jugadora=id_jugadora)
+    except Jugadora.DoesNotExist:
+        return JsonResponse({"error": "No existe una jugadora con ese ID."}, status=404)
+
+    # Obtener el apodo (si es null → devolver cadena vacía)
+    apodo = jugadora.Apodo if jugadora.Apodo else ""
+
+    return JsonResponse(apodo, safe=False)
+
+def jugadoraxid(request):
+    id_jugadora = request.GET.get('id')
+    
+    try:
+        id_jugadora = int(id_jugadora)
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "ID de jugadora no proporcionado o inválido"}, status=400)
+
+    try:
+        j = Jugadora.objects.get(id_jugadora=id_jugadora)
+    except Jugadora.DoesNotExist:
+        return JsonResponse({"error": "No se encontraron jugadoras con ese ID."}, status=404)
+
+    # Si no hay imagen, usar predeterminada
+    if j.imagen:
+        imagen = j.imagen.url if hasattr(j.imagen, 'url') else j.imagen
+    else:
+        from django.templatetags.static import static
+        imagen = static('img/predeterm.jpg')
+
+    data = {
+        "id_jugadora": j.id_jugadora,
+        "Nombre_Completo": f"{j.Nombre} {j.Apellidos}",
+        "Imagen": imagen,
+        "Apodo": j.Apodo,
+        "Nombre": j.Nombre,
+        "Apellidos": j.Apellidos,
+        "Nacimiento": j.Nacimiento,
+        "Nacionalidad": j.Nacionalidad.id_pais if j.Nacionalidad else None,
+        "Posicion": j.Posicion.idPosicion if j.Posicion else None,
+        "Retiro": j.retiro,
+    }
+
+    return JsonResponse(data)
+
+def jugadora_companeras(request):
+    id_jugadora = request.GET.get('id_jugadora')
+    try:
+        id_jugadora = int(id_jugadora)
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "ID de jugadora no proporcionado o inválido"}, status=400)
+
+    query = """
+    WITH distinct_teams AS (
+        SELECT j2.*, ROW_NUMBER() OVER (PARTITION BY j2.equipo ORDER BY j2.jugadora) as rn
+        FROM trayectoria j1
+        JOIN trayectoria j2
+        ON j1.equipo = j2.equipo
+        AND j1.jugadora != j2.jugadora
+        AND (SUBSTRING_INDEX(j1.años, '-', 1) <= SUBSTRING_INDEX(REPLACE(j2.años, 'act', '2024'), '-', -1)
+        AND SUBSTRING_INDEX(REPLACE(j1.años, 'act', '2024'), '-', -1) >= SUBSTRING_INDEX(j2.años, '-', 1))
+        WHERE j1.jugadora = %s
+    ),
+    additional_jugadoras AS (
+        SELECT j2.*, 0 as rn
+        FROM trayectoria j1
+        JOIN trayectoria j2
+        ON j1.equipo = j2.equipo
+        AND j1.jugadora != j2.jugadora
+        AND (SUBSTRING_INDEX(j1.años, '-', 1) <= SUBSTRING_INDEX(REPLACE(j2.años, 'act', '2024'), '-', -1)
+        AND SUBSTRING_INDEX(REPLACE(j1.años, 'act', '2024'), '-', -1) >= SUBSTRING_INDEX(j2.años, '-', 1))
+        WHERE j1.jugadora = %s
+        AND j2.jugadora NOT IN (SELECT jugadora FROM distinct_teams WHERE rn = 1)
+    ),
+    combined_results AS (
+        SELECT jugadora, equipo, años, imagen, rn 
+        FROM distinct_teams
+        WHERE rn = 1
+        UNION ALL
+        SELECT jugadora, equipo, años, imagen, rn
+        FROM additional_jugadoras
+    )
+    SELECT jugadora, equipo, años, imagen
+    FROM combined_results
+    ORDER BY rn DESC, jugadora
+    LIMIT 5
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(query, [id_jugadora, id_jugadora])
+        columns = [col[0] for col in cursor.description]
+        results = [
+            dict(zip(columns, row))
+            for row in cursor.fetchall()
+        ]
+
+    # Convertir la imagen a base64 si existe
+    for r in results:
+        if r.get('imagen'):
+            import base64
+            r['imagen'] = f"data:image/jpeg;base64,{base64.b64encode(r['imagen']).decode()}"
+
+    return JsonResponse(results, safe=False)
+
+def jugadora_datos(request):
+    id_jugadora = request.GET.get('id')
+
+    try:
+        id_jugadora = int(id_jugadora)
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "ID de jugadora no proporcionado o inválido"}, status=400)
+
+    try:
+        j = Jugadora.objects.select_related('Posicion', 'Nacionalidad').get(id_jugadora=id_jugadora)
+    except Jugadora.DoesNotExist:
+        return JsonResponse({"error": "No se encontraron jugadoras con ese ID."}, status=404)
+
+    # Calcular edad
+    hoy = date.today()
+    edad = hoy.year - j.Nacimiento.year - ((hoy.month, hoy.day) < (j.Nacimiento.month, j.Nacimiento.day))
+
+    # Trayectorias de la jugadora
+    trayectorias = Trayectoria.objects.filter(jugadora=j).select_related('equipo', 'equipo__liga')
+
+    equipo_actual = None
+    equipos_previos = []
+    ligas_previas = []
+    liga_actual = None
+
+    for t in trayectorias:
+        if t.equipo_actual:  # Asumimos que hay un campo booleano 'equipo_actual'
+            equipo_actual = t.equipo.id_equipo
+            liga_actual = t.equipo.liga.id_liga if t.equipo.liga else 0
+        else:
+            if t.equipo.id_equipo not in equipos_previos:
+                equipos_previos.append(t.equipo.id_equipo)
+            if t.equipo.liga and t.equipo.liga.id_liga not in ligas_previas:
+                ligas_previas.append(t.equipo.liga.id_liga)
+
+    data = {
+        "id": j.id_jugadora,
+        "nombre": f"{j.Nombre} {j.Apellidos}",
+        "apodo": j.Apodo,
+        "pais": j.Nacionalidad.id_pais if j.Nacionalidad else None,
+        "imagen": j.imagen,
+        "posicion": j.Posicion.idPosicion if j.Posicion else j.Posicion.idPosicion,
+        "edad": edad,
+        "equipo": equipo_actual,
+        "liga": liga_actual,
+        "equipos": equipos_previos,
+        "ligas": ligas_previas,
+        "Nacimiento": j.Nacimiento,
+        "Retiro": j.retiro,
+    }
+
+    return JsonResponse({"success": data})
+
 def jugadoraxnombre(request):
     nombre = request.GET.get('nombre', '').strip()
     if not nombre:
@@ -104,102 +276,6 @@ def jugadora_pais(request):
         "NCompleto": f"{jugadora.Nombre} {jugadora.Apellidos}"
     })
 
-def equiposxid(request):
-    ids = request.GET.getlist('id[]')  # Recupera id[]=1&id[]=2&id[]=3
-
-    if not ids:
-        return JsonResponse({"error": "Faltan parámetros o no se encontraron resultados."}, status=400)
-
-    # Convertir a enteros
-    try:
-        ids = [int(i) for i in ids]
-    except ValueError:
-        return JsonResponse({"error": "IDs inválidos."}, status=400)
-
-    # Consulta
-    equipos = Equipo.objects.filter(id_equipo__in=ids)
-
-    salida = []
-    for e in equipos:
-        escudo_base64 = None
-        if e.escudo: 
-            try:
-                escudo_base64 = e.escudo
-            except Exception:
-                escudo_base64 = None
-
-        salida.append({
-            "club": e.id_equipo,
-            "nombre": e.nombre,
-            "escudo": escudo_base64
-        })
-
-    return JsonResponse({"success": salida})
-
-def paisesxid(request):
-    ids = request.GET.getlist('id[]')  # Recupera id[]=1&id[]=2&id[]=3
-
-    if not ids:
-        return JsonResponse({"error": "Faltan parámetros o no se encontraron resultados."}, status=400)
-
-    # Convertir a enteros
-    try:
-        ids = [int(i) for i in ids]
-    except ValueError:
-        return JsonResponse({"error": "IDs inválidos."}, status=400)
-
-    # Consulta
-    paises = Pais.objects.filter(id_pais__in=ids)
-
-    salida = []
-    for p in paises:
-        escudo_base64 = None
-        if p.bandera: 
-            try:
-                escudo_base64 = p.bandera
-            except Exception:
-                escudo_base64 = None
-
-        salida.append({
-            "pais": p.id_pais,
-            "nombre": p.nombre,
-            "bandera": escudo_base64
-        })
-
-    return JsonResponse({"success": salida})
-
-def ligasxid(request):
-    ids = request.GET.getlist('id[]')  # Recupera id[]=1&id[]=2&id[]=3
-
-    if not ids:
-        return JsonResponse({"error": "Faltan parámetros o no se encontraron resultados."}, status=400)
-
-    # Convertir a enteros
-    try:
-        ids = [int(i) for i in ids]
-    except ValueError:
-        return JsonResponse({"error": "IDs inválidos."}, status=400)
-
-    # Consulta
-    ligas = Liga.objects.filter(id_liga__in=ids)
-
-    salida = []
-    for l in ligas:
-        escudo_base64 = None
-        if l.logo: 
-            try:
-                escudo_base64 = l.logo
-            except Exception:
-                escudo_base64 = None
-
-        salida.append({
-            "liga": l.id_liga,
-            "nombre": l.nombre,
-            "logo": escudo_base64
-        })
-
-    return JsonResponse({"success": salida})
-
 def jugadora_aleatoria(request):
     nacionalidades = request.GET.getlist("nacionalidades[]")
     equipos = request.GET.getlist("equipos[]")
@@ -267,171 +343,266 @@ def jugadora_aleatoria(request):
 
     return JsonResponse(jugadoras, safe=False)
 
-def jugadora_apodo(request):
-    id_jugadora = request.GET.get("id_jugadora")
+def jugadoras_por_equipo_y_temporada(request):
+    equipo_id = request.GET.get("equipo")
+    temporada = request.GET.get("temporada")
 
-    if not id_jugadora:
-        return JsonResponse({"error": "No se proporcionó id_jugadora."}, status=400)
+    if not equipo_id or not temporada:
+        return JsonResponse({"success": [], "error": "Faltan parámetros"}, status=400)
 
+    temporada = int(temporada)
+    año_actual = datetime.now().year   # ← año actual
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                j.*,
+                tc.años
+            FROM trayectoria tc
+            JOIN jugadoras j ON j.id_jugadora = tc.jugadora
+            WHERE tc.equipo = %s
+        """, [equipo_id])
+
+        columnas = [col[0] for col in cursor.description]
+        filas = cursor.fetchall()
+
+    jugadoras = []
+
+    for fila in filas:
+        fila_dict = dict(zip(columnas, fila))
+
+        años = fila_dict["años"].strip()
+
+        # -----------------------------
+        #  🔥 PROCESAR RANGO DE AÑOS
+        # -----------------------------
+
+        if "-" in años:
+            inicio, fin = años.split("-")
+
+            # Convertir inicio
+            inicio = int(inicio)
+
+            # Si fin es "act", reemplazarlo por año actual
+            if fin.lower() == "act":
+                fin = año_actual
+            else:
+                fin = int(fin)
+
+        else:
+            # Ejemplo raro: "act"
+            if años.lower() == "act":
+                inicio = año_actual
+                fin = año_actual
+            else:
+                inicio = fin = int(años)
+
+        # -----------------------------
+        #  🔥 FILTRAR POR TEMPORADA
+        # -----------------------------
+        if inicio <= temporada <= fin:
+
+            # si quieres mantener la imagen binaria tal cual:
+            if fila_dict.get("imagen"):
+                fila_dict["imagen"] = fila_dict["imagen"]
+
+            jugadoras.append(fila_dict)
+
+    return JsonResponse({"success": jugadoras})
+#################################################################################################
+########################################EQUIPOS##################################################
+#################################################################################################
+
+def equiposxid(request):
+    ids = request.GET.getlist('id[]')  # Recupera id[]=1&id[]=2&id[]=3
+
+    if not ids:
+        return JsonResponse({"error": "Faltan parámetros o no se encontraron resultados."}, status=400)
+
+    # Convertir a enteros
     try:
-        id_jugadora = int(id_jugadora)
+        ids = [int(i) for i in ids]
     except ValueError:
-        return JsonResponse({"error": "id_jugadora inválido."}, status=400)
+        return JsonResponse({"error": "IDs inválidos."}, status=400)
 
-    # Buscar la jugadora
+    # Consulta
+    equipos = Equipo.objects.filter(id_equipo__in=ids)
+
+    salida = []
+    for e in equipos:
+        escudo_base64 = None
+        if e.escudo: 
+            try:
+                escudo_base64 = e.escudo
+            except Exception:
+                escudo_base64 = None
+
+        salida.append({
+            "club": e.id_equipo,
+            "nombre": e.nombre,
+            "escudo": escudo_base64
+        })
+
+    return JsonResponse({"success": salida})
+
+def equiposAll(request):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_equipo AS id, nombre, escudo 
+            FROM equipos 
+            ORDER BY nombre
+        """)
+        filas = cursor.fetchall()
+
+    equipos = []
+    for id_equipo, nombre, escudo in filas:
+        equipos.append({
+            "nombre": nombre,
+            "id": id_equipo,
+            "escudo": escudo
+        })
+    
+    return JsonResponse({"success": equipos})
+#################################################################################################
+#########################################PAISES##################################################
+#################################################################################################
+
+def paisesxid(request):
+    ids = request.GET.getlist('id[]')  # Recupera id[]=1&id[]=2&id[]=3
+
+    if not ids:
+        return JsonResponse({"error": "Faltan parámetros o no se encontraron resultados."}, status=400)
+
+    # Convertir a enteros
     try:
-        jugadora = Jugadora.objects.get(id_jugadora=id_jugadora)
-    except Jugadora.DoesNotExist:
-        return JsonResponse({"error": "No existe una jugadora con ese ID."}, status=404)
+        ids = [int(i) for i in ids]
+    except ValueError:
+        return JsonResponse({"error": "IDs inválidos."}, status=400)
 
-    # Obtener el apodo (si es null → devolver cadena vacía)
-    apodo = jugadora.Apodo if jugadora.Apodo else ""
+    # Consulta
+    paises = Pais.objects.filter(id_pais__in=ids)
 
-    return JsonResponse(apodo, safe=False)
+    salida = []
+    for p in paises:
+        escudo_base64 = None
+        if p.bandera: 
+            try:
+                escudo_base64 = p.bandera
+            except Exception:
+                escudo_base64 = None
 
-def jugadora_companeras(request):
-    id_jugadora = request.GET.get('id_jugadora')
+        salida.append({
+            "pais": p.id_pais,
+            "nombre": p.nombre,
+            "bandera": escudo_base64
+        })
+
+    return JsonResponse({"success": salida})
+
+def paisesall(request):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_pais AS id, nombre, bandera 
+            FROM paises 
+            ORDER BY nombre
+        """)
+        filas = cursor.fetchall()
+
+    paises = []
+    for id_pais, nombre, bandera in filas:
+        paises.append({
+            "nombre": nombre,
+            "id": id_pais,
+            "bandera": bandera
+        })
+    
+    return JsonResponse({"success": paises})
+#################################################################################################
+#########################################LIGAS###################################################
+#################################################################################################
+
+def ligasxid(request):
+    ids = request.GET.getlist('id[]')  # Recupera id[]=1&id[]=2&id[]=3
+
+    if not ids:
+        return JsonResponse({"error": "Faltan parámetros o no se encontraron resultados."}, status=400)
+
+    # Convertir a enteros
     try:
-        id_jugadora = int(id_jugadora)
-    except (TypeError, ValueError):
-        return JsonResponse({"error": "ID de jugadora no proporcionado o inválido"}, status=400)
+        ids = [int(i) for i in ids]
+    except ValueError:
+        return JsonResponse({"error": "IDs inválidos."}, status=400)
+
+    # Consulta
+    ligas = Liga.objects.filter(id_liga__in=ids)
+
+    salida = []
+    for l in ligas:
+        escudo_base64 = None
+        if l.logo: 
+            try:
+                escudo_base64 = l.logo
+            except Exception:
+                escudo_base64 = None
+
+        salida.append({
+            "liga": l.id_liga,
+            "nombre": l.nombre,
+            "logo": escudo_base64
+        })
+
+    return JsonResponse({"success": salida})
+
+#################################################################################################
+#######################################POSICIONES################################################
+#################################################################################################
+
+def posicionesall(request): 
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT idPosicion AS id, nombre, abreviatura, idPosicionPadre 
+            FROM posiciones 
+            ORDER BY nombre
+        """)
+        filas = cursor.fetchall()
+
+    posiciones = []
+    for idPosicion, nombre, abreviatura, idPosicionPadre in filas:
+        posiciones.append({
+            "nombre": nombre,
+            "id": idPosicion,
+            "abreviatura": abreviatura,
+            "idPosicionPadre": idPosicionPadre
+        })
+    
+    return JsonResponse({"success": posiciones})
+
+def posicion_por_jugadora(request):
+    jugadora_id = request.GET.get("id")
+
+    if not jugadora_id:
+        return JsonResponse({"error": "ID de jugadora no proporcionado"}, status=400)
+
+    try:
+        jugadora_id = int(jugadora_id)
+    except ValueError:
+        return JsonResponse({"error": "ID inválido"}, status=400)
 
     query = """
-    WITH distinct_teams AS (
-        SELECT j2.*, ROW_NUMBER() OVER (PARTITION BY j2.equipo ORDER BY j2.jugadora) as rn
-        FROM trayectoria j1
-        JOIN trayectoria j2
-        ON j1.equipo = j2.equipo
-        AND j1.jugadora != j2.jugadora
-        AND (SUBSTRING_INDEX(j1.años, '-', 1) <= SUBSTRING_INDEX(REPLACE(j2.años, 'act', '2024'), '-', -1)
-        AND SUBSTRING_INDEX(REPLACE(j1.años, 'act', '2024'), '-', -1) >= SUBSTRING_INDEX(j2.años, '-', 1))
-        WHERE j1.jugadora = %s
-    ),
-    additional_jugadoras AS (
-        SELECT j2.*, 0 as rn
-        FROM trayectoria j1
-        JOIN trayectoria j2
-        ON j1.equipo = j2.equipo
-        AND j1.jugadora != j2.jugadora
-        AND (SUBSTRING_INDEX(j1.años, '-', 1) <= SUBSTRING_INDEX(REPLACE(j2.años, 'act', '2024'), '-', -1)
-        AND SUBSTRING_INDEX(REPLACE(j1.años, 'act', '2024'), '-', -1) >= SUBSTRING_INDEX(j2.años, '-', 1))
-        WHERE j1.jugadora = %s
-        AND j2.jugadora NOT IN (SELECT jugadora FROM distinct_teams WHERE rn = 1)
-    ),
-    combined_results AS (
-        SELECT jugadora, equipo, años, imagen, rn 
-        FROM distinct_teams
-        WHERE rn = 1
-        UNION ALL
-        SELECT jugadora, equipo, años, imagen, rn
-        FROM additional_jugadoras
-    )
-    SELECT jugadora, equipo, años, imagen
-    FROM combined_results
-    ORDER BY rn DESC, jugadora
-    LIMIT 5
+        SELECT posiciones.idPosicion
+        FROM posiciones
+        INNER JOIN jugadoras j
+            ON posiciones.idPosicion = j.Posicion
+        WHERE j.id_jugadora = %s;
     """
 
     with connection.cursor() as cursor:
-        cursor.execute(query, [id_jugadora, id_jugadora])
-        columns = [col[0] for col in cursor.description]
-        results = [
-            dict(zip(columns, row))
-            for row in cursor.fetchall()
-        ]
+        cursor.execute(query, [jugadora_id])
+        filas = cursor.fetchall()
 
-    # Convertir la imagen a base64 si existe
-    for r in results:
-        if r.get('imagen'):
-            import base64
-            r['imagen'] = f"data:image/jpeg;base64,{base64.b64encode(r['imagen']).decode()}"
+    if not filas:
+        return JsonResponse({"error": "No se encontró ninguna jugadora con ese ID"}, safe=False)
 
-    return JsonResponse(results, safe=False)
+    resultado = [{"Posicion": fila[0]} for fila in filas]
 
-def jugadoraxid(request):
-    id_jugadora = request.GET.get('id')
-    
-    try:
-        id_jugadora = int(id_jugadora)
-    except (TypeError, ValueError):
-        return JsonResponse({"error": "ID de jugadora no proporcionado o inválido"}, status=400)
-
-    try:
-        j = Jugadora.objects.get(id_jugadora=id_jugadora)
-    except Jugadora.DoesNotExist:
-        return JsonResponse({"error": "No se encontraron jugadoras con ese ID."}, status=404)
-
-    # Si no hay imagen, usar predeterminada
-    if j.imagen:
-        imagen = j.imagen.url if hasattr(j.imagen, 'url') else j.imagen
-    else:
-        from django.templatetags.static import static
-        imagen = static('img/predeterm.jpg')
-
-    data = {
-        "id_jugadora": j.id_jugadora,
-        "Nombre_Completo": f"{j.Nombre} {j.Apellidos}",
-        "Imagen": imagen,
-        "Apodo": j.Apodo,
-        "Nombre": j.Nombre,
-        "Apellidos": j.Apellidos,
-        "Nacimiento": j.Nacimiento,
-        "Nacionalidad": j.Nacionalidad.id_pais if j.Nacionalidad else None,
-        "Posicion": j.Posicion.idPosicion if j.Posicion else None,
-        "Retiro": j.retiro,
-    }
-
-    return JsonResponse(data)
-
-def jugadora_datos(request):
-    id_jugadora = request.GET.get('id')
-
-    try:
-        id_jugadora = int(id_jugadora)
-    except (TypeError, ValueError):
-        return JsonResponse({"error": "ID de jugadora no proporcionado o inválido"}, status=400)
-
-    try:
-        j = Jugadora.objects.select_related('Posicion', 'Nacionalidad').get(id_jugadora=id_jugadora)
-    except Jugadora.DoesNotExist:
-        return JsonResponse({"error": "No se encontraron jugadoras con ese ID."}, status=404)
-
-    # Calcular edad
-    hoy = date.today()
-    edad = hoy.year - j.Nacimiento.year - ((hoy.month, hoy.day) < (j.Nacimiento.month, j.Nacimiento.day))
-
-    # Trayectorias de la jugadora
-    trayectorias = Trayectoria.objects.filter(jugadora=j).select_related('equipo', 'equipo__liga')
-
-    equipo_actual = None
-    equipos_previos = []
-    ligas_previas = []
-    liga_actual = None
-
-    for t in trayectorias:
-        if t.equipo_actual:  # Asumimos que hay un campo booleano 'equipo_actual'
-            equipo_actual = t.equipo.id_equipo
-            liga_actual = t.equipo.liga.id_liga if t.equipo.liga else 0
-        else:
-            if t.equipo.id_equipo not in equipos_previos:
-                equipos_previos.append(t.equipo.id_equipo)
-            if t.equipo.liga and t.equipo.liga.id_liga not in ligas_previas:
-                ligas_previas.append(t.equipo.liga.id_liga)
-
-    data = {
-        "id": j.id_jugadora,
-        "nombre": f"{j.Nombre} {j.Apellidos}",
-        "apodo": j.Apodo,
-        "pais": j.Nacionalidad.id_pais if j.Nacionalidad else None,
-        "imagen": j.imagen,
-        "posicion": j.Posicion.idPosicion if j.Posicion else j.Posicion.idPosicion,
-        "edad": edad,
-        "equipo": equipo_actual,
-        "liga": liga_actual,
-        "equipos": equipos_previos,
-        "ligas": ligas_previas,
-        "Nacimiento": j.Nacimiento,
-        "Retiro": j.retiro,
-    }
-
-    return JsonResponse({"success": data})
+    return JsonResponse({"success": resultado})
