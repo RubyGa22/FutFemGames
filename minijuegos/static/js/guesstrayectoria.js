@@ -34,7 +34,7 @@ async function iniciar(dificultad) {
     let segundos;
     switch (dificultad) {
         case "facil":
-            segundos = 100090;
+            segundos = 120;
             break;
         case "medio":
             segundos = 60;

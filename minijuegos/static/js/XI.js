@@ -291,3 +291,42 @@ async function play() {
         await iniciar('');
     }
 }
+
+
+
+
+
+// A ordenar
+async function obtenerIdPais(nombre) {
+    try {
+        // Realizar la solicitud fetch
+        const response = await fetch(`../api/jugadora_pais?nombre=${encodeURIComponent(nombre)}`);
+
+        // Verificar que la solicitud fue exitosa
+        if (!response.ok) {
+            throw new Error(`Error en la solicitud: ${response.statusText}`);
+        }
+
+        // Convertir la respuesta a JSON
+        const data = await response.json();
+        console.log("Respuesta del servidor:", data);
+
+        // Verificar si hubo un error en el JSON recibido
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        // Comprobar si data es un array y contiene al menos un objeto
+        if (Array.isArray(data) && data.length > 0 && data[0].Pais) {
+            return parseInt(data[0].Pais, 10); // Convertir a entero
+        } else if(data){
+            return data;
+        } else {
+            console.warn('ID del país no proporcionado en la respuesta:', data);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error al obtener el ID del país:', error);
+        return null;
+    }
+}
