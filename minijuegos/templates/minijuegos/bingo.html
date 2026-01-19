@@ -18,11 +18,11 @@
     <div id="cabecera-bingo">
     <!-- Imagen y nombre del jugador -->
     <div class="player">
-        <img id="player-image" src="../img/predeterm.jpg" alt="Jugador">
+        <img id="player-image" src="{% static '/img/predeterm.jpg' %}" alt="Jugador">
         <div id="player-name" class="player-name">Jugadora</div>
         <!-- Botón de Skip -->
     </div>
-    <button class="skip-button" onclick="skipPlayer(paises,equipos,ligas)">SKIP</button>
+    <button class="skip-button">SKIP</button>
     </div>
     <div id="reloj"></div>
     <div id="resultado"></div>
@@ -52,8 +52,7 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="{% static 'js/funciones-tablas.js' %}"></script>
-<script src="{% static 'js/verificar.js' %}"></script>
 <script src="{% static 'js/admin.js' %}"></script>
-<script src="{% static 'js/bingo.js' %}"></script>
+<script type="module" src="{% static 'js/games/bingo.js' %}"></script>
 </body>
 </html>

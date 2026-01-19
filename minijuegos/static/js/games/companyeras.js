@@ -1,18 +1,26 @@
+import { fetchJugadoraCompanyerasById } from "../api/jugadora.js";
+import { updateRacha } from "../user/rachas.js";
+
 let jugadoraId;
 
 // Función principal que controla el flujo de carga
 async function iniciar(dificultad) {
     const popup = document.getElementById('popup-ex'); // Selecciona el primer elemento con la clase 'popup-ex'
     const name = await sacarJugadora(jugadoraId);
+
     if (popup) {
         popup.style.display = 'none'; // Cambia el estilo para ocultarlo
     }
+    const btn = document.getElementById('botonVerificar');
+    
+    if (btn) {
+        btn.addEventListener('click', checkJugadora); // Habilitar el botón al iniciar el juego
+    }
+
     let jugadora = await fetchData(5);
     jugadoraId = jugadora.idJugadora;
     //jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
     localStorage.setItem('res8', jugadoraId);
-
-    const player = await getJugadora(jugadoraId);
 
     // Definir los segundos según la dificultad
     let segundos;
@@ -67,48 +75,15 @@ async function iniciar(dificultad) {
 }
 
 async function loadCompanyerasJugadoraById(id) {
-    try {
-        const response = await fetch(`../api/jugadora_companyeras?id_jugadora=${id}`);
-        if (!response.ok) {
-            throw new Error(`Error en la solicitud: ${response.statusText}`);
-        }
 
-        const data = await response.json();
-        console.log('Datos recibidos:', data);
-
-        if (Array.isArray(data) && data.length > 0) {
-            displayCompanyeras(data);
-        } else {
-            console.warn('No hay datos de la jugadora disponibles.');
-        }
-    } catch (error) {
-        console.error('Error al cargar la jugadora:', error);
-        document.getElementById('result').textContent = 'Error al cargar los datos.';
+    const companyeras = await fetchJugadoraCompanyerasById(id);
+    console.log(companyeras);
+    if (companyeras.length > 0) {
+        displayCompanyeras(companyeras);
+    } else {
+        console.warn('No se encontraron datos de compañeras para la jugadora con ID:', id);
     }
-}
 
-
-async function getJugadora(id) {
-    try {
-        const response = await fetch(`../api/jugadora_datos?id=${id}`);
-        if (!response.ok) {
-            throw new Error(`Error en la solicitud: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log('Datos recibidos:', data);
-
-        if (data) {
-            const mystery = document.getElementById('jugadora');
-            mystery.src = data['success'].imagen;
-            return data;
-        } else {
-            console.warn('No hay datos de la jugadora disponibles.');
-        }
-    } catch (error) {
-        console.error('Error al cargar la jugadora:', error);
-        document.getElementById('result').textContent = 'Error al cargar los datos.';
-    }
 }
 
 
@@ -175,10 +150,14 @@ async function checkJugadora() {
     if (found) {
         resultDiv.textContent = `${texto}`;
         //cambiarImagenConFlip();
+        updateRacha(5, 1);
         Ganaste('compañeras');
+        stopCounter("Futfem Relations");
     }else {
         cambiarImagenFlipRonda(div);
     }
+
+
 }
 
 let currentIndex = 0;
@@ -228,11 +207,11 @@ async function companyerasPerder() {
     resultDiv.textContent = 'Has perdido, era: '+jugadora[0].Nombre_Completo;
     const div = document.getElementById('trayectoria');
     const jugadora_id = 'loss';
-    localStorage.setItem('Attr3', jugadora_id);
+    localStorage.setItem('Attr8', jugadora_id);
     //await loadJugadoraById(jugadoraId, true);
     // Agregar un delay de 2 segundos (2000 ms)
     if(localStorage.length>0){
-        await updateRacha(1, 0);
+        await updateRacha(5, 0);
     }
     setTimeout(() => {
         cambiarImagenConFlip();
@@ -240,15 +219,19 @@ async function companyerasPerder() {
 }
 
 const texto = '"Futfem Relations" es un juego de trivia en el que los jugadores deben adivinar el nombre de una jugadora de fútbol basándose en los equipos en los que ha jugado a lo largo de su carrera. El juego presenta una serie de pistas sobre los clubes y selecciones nacionales en los que la jugadora ha jugado, y el objetivo es identificar correctamente a la jugadora lo más rápido posible. A medida que avanzas, las pistas se hacen más desafiantes y los jugadores deben demostrar su conocimiento sobre el fútbol femenino y sus estrellas. ¡Pon a prueba tus conocimientos y compite para ver quién adivina más jugadoras correctamente!';
-const imagen = '../img/ComingSoon.png';
+const imagen = '/static/img/ComingSoon.png';
 play().then(r => r);
 async function play() {
+    const lastAnswer= localStorage.getItem('Attr8');
     let jugadora = await fetchData(5);
     jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
     const res = localStorage.getItem('res8');
     if(res !== jugadoraId || !res){
+        if(lastAnswer !== res || !lastAnswer){
+            await updateRacha(5, 0);
+        }
         localStorage.removeItem('Attr8');
-        crearPopupInicialJuego('Futfem Relations', texto, imagen);
+        crearPopupInicialJuego('Futfem Relations', texto, imagen, '', iniciar);
     } else {
         await iniciar('');
     }

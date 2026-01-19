@@ -1,8 +1,17 @@
+import { fetchJugadoraNacionalidadById, fetchJugadoraTrayectoriaById } from "../api/jugadora.js";
+
 let idres;
 let paises, equipos, ligas;
+let lastPlayer;
 async function iniciar(dificultad) {
     const popup = document.getElementById('popup-ex'); // Selecciona el primer elemento con la clase 'popup-ex'
     const answer = localStorage.getItem('Attr6');
+    const btn = document.getElementsByClassName('skip-button')[0];
+    lastPlayer = localStorage.getItem('last-player-bingo');
+
+    if (btn) {
+        btn.addEventListener('click', () => skipPlayer(paises, equipos, ligas)); // Habilitar el botón al iniciar el juego
+    }
     if (popup) {
         popup.style.display = 'none'; // Cambia el estilo para ocultarlo
     }
@@ -11,6 +20,11 @@ async function iniciar(dificultad) {
     equipos = valor.equipos;
     ligas = valor.ligas;
     idres = paises.map(String).concat(equipos.map(String), ligas.map(String)).join('');
+    if (lastPlayer) {
+        mostrarJugadora(JSON.parse(lastPlayer), paises, equipos, ligas);
+    }else{
+        skipPlayer(paises, equipos, ligas);
+    }
     // Definir los segundos según la dificultad
     let segundos;
     switch (dificultad) {
@@ -77,7 +91,7 @@ function handleCellClick(event, jugador) {
     console.log(cell.id);
     const cellId = cell.id;
     const paisJugadora = jugador.pais;
-
+    console.log(jugador)
     // Obtener la imagen dentro de la celda clicada
     const img = event.currentTarget.querySelector('img');
     if (!img) {
@@ -91,7 +105,7 @@ function handleCellClick(event, jugador) {
     let hasMatch = false;
 
     // Verificar si es un país o un club según el atributo alt de la imagen
-    if (img.alt === "Pais") {
+    if (img.className.toLowerCase().includes("pais")) {
         if (imgClass === `pais${paisJugadora.Pais}`) { // Compara con el campo de país del jugador
             //console.log("¡Coincidencia de país encontrada!");
             bloquearCeldaEstilo(cell, jugador.foto); // Usar la imagen correcta
@@ -101,7 +115,7 @@ function handleCellClick(event, jugador) {
             console.log("No hay coincidencia de país.");
         }
     }
-    if (img.alt === "Liga") {
+    if (img.className.toLowerCase().includes("Liga")) {
         if (Array.isArray(jugador.liga)) { // Verificar que trayectoria sea un array
             const ligaMatch = jugador.liga.some(liga => `liga${liga}` === imgClass);
 
@@ -119,7 +133,7 @@ function handleCellClick(event, jugador) {
     }
 
 
-    if (img.alt === "Club") {
+    if (img.className.toLowerCase().includes("Club")) {
         if (Array.isArray(jugador.trayectoria)) { // Verificar que trayectoria sea un array
             const clubMatch = jugador.trayectoria.some(club => `club${club}` === imgClass);
 
@@ -135,7 +149,7 @@ function handleCellClick(event, jugador) {
             console.log("La trayectoria no es un array o está vacía.");
         }
     }
-    if (img.alt.includes("Edad")) {
+    if (img.className.toLowerCase().includes("Edad")) {
         // Verificar si la clase contiene 'EdadMenor'
         const claseEdadMenor = Array.from(img.classList).find(cls => cls.startsWith('EdadMenor'));
         const claseEdadMayor = Array.from(img.classList).find(cls => cls.startsWith('EdadMayor'));
@@ -231,15 +245,16 @@ function skipPlayer(paises, clubes, ligas) {
 async function mostrarJugadora(jugadora, paises, clubes, ligas) {
     document.getElementById("player-name").textContent = jugadora.nombre;
     const img = document.getElementById("player-image");
-
+    localStorage.setItem('last-player-bingo', JSON.stringify(jugadora));
     img.src = (!jugadora.imagend)
-        ? "{% static 'img/predeterm.jpg' %}"
+        ? "/static/img/predeterm.jpg"
         : jugadora.imagen;
     img.className = jugadora.id;
 
     const edad = calcularEdad(jugadora.Nacimiento);
-    const pais = await obtenerIdPais(jugadora.id);
-    const equipos = await obtenerEquipos(jugadora.id);
+    const pais = await fetchJugadoraNacionalidadById(jugadora.id);
+    const equipos = await fetchJugadoraTrayectoriaById(jugadora.id);
+    console.log(pais)
 
     if (equipos && equipos.length > 0) {
         const nombresEquipos = equipos.map(e => e.equipo);
@@ -383,7 +398,8 @@ async function play() {
     const res = localStorage.getItem('res6');
     if(res !== idres || !res){
         localStorage.removeItem('Attr6');
-        crearPopupInicialJuego('Futfem Bingo', texto, imagen);
+        localStorage.removeItem('last-player-bingo');
+        crearPopupInicialJuego('Futfem Bingo', texto, imagen, '', iniciar);
     } else {
         await iniciar('');
     }
@@ -393,10 +409,12 @@ async function bingoPerder() {
     // Bloquear el botón y el input
     const boton = document.querySelector('.skip-button');
     const resultDiv = document.getElementById('resultado');
+    const celdas = document.querySelectorAll('td');
+    celdas.disabled = true;
     boton.disabled = true;
     resultDiv.textContent = 'Has perdido';
-    const jugadora_id = 'loss';
-    localStorage.setItem('Attr6', jugadora_id);
+    //const jugadora_id = 'loss';
+    //localStorage.setItem('Attr6', jugadora_id);
     // Agregar un delay de 2 segundos (2000 ms)
     if(localStorage.length>0){
         //await updateRacha(1, 0);

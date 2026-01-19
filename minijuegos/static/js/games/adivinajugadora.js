@@ -1,10 +1,19 @@
+import { updateRacha } from "../user/rachas.js";
+
 let jugadora;
 let preguntas = 10;
 let vidas = 3;
 let player;
+let jugadoraId, id;
 async function iniciar(dificultad) {
     const popup = document.getElementById('popup-ex'); // Selecciona el primer elemento con la clase 'popup-ex'
     const answer = localStorage.getItem('Attr3');
+    const btn = document.getElementById('botonVerificar');
+    const btnAsk = document.getElementById('askQuestion');
+
+    btn.addEventListener('click', validarJugadora); // Habilitar el botón al iniciar el juego
+
+    btnAsk.addEventListener('click', askQuestion); // Habilitar el botón al iniciar el juego
     const name = await sacarJugadora(jugadoraId);
     if (popup) {
         popup.style.display = 'none'; // Cambia el estilo para ocultarlo
@@ -41,17 +50,12 @@ async function iniciar(dificultad) {
         await cargarJugadora(jugadoraId, false);
 
         if (!answer || answer.trim() === '') {
-            startCounter(segundos, "Guess Player", async () => {
-                console.log("El contador llegó a 0. Ejecutando acción...");
-                await adivinaJugadoraPerder();
-            });
+            console.log("El usuario no ha respondido aún.");
+            return; // Esperar a que el usuario responda
         }else if (answer === 'loss') {
-            await trayectoriaPerder();
+            await adivinaJugadoraPerder();
         } else {
-            startCounter(segundos, "Guess Player", async () => {
-                console.log("El contador llegó a 0. Ejecutando acción...");
-                await adivinaJugadoraPerder();
-            });
+            await adivinaJugadoraPerder();
         }
     }
 }
@@ -425,9 +429,11 @@ function AdivinaJugadora(idJugadora) {
         imgPlayer.src = player.imagen;
 
         namePlayer.innerHTML = player.nombre;
-
+        
         lifeLeft.innerHTML = "Ehorabuena";
         lifeLeft.style.display = "block";
+                updateRacha(3, 1);
+        Ganaste('Guess Player');
     } else {
         let idVida = "#vida" + vidas;
         let img = document.querySelector(idVida);
@@ -458,7 +464,7 @@ async function adivinaJugadoraPerder() {
     await loadJugadoraById(jugadoraId, true);
     // Agregar un delay de 2 segundos (2000 ms)
     if(localStorage.length>0){
-        await updateRacha(1, 0);
+        await updateRacha(3, 0);
     }
     setTimeout(() => {
         cambiarImagenConFlip();
@@ -466,7 +472,7 @@ async function adivinaJugadoraPerder() {
 }
 
 const texto = 'Guess Player" es un juego de trivia en el que los jugadores deben adivinar el nombre de una jugadora de fútbol basándose en los equipos en los que ha jugado a lo largo de su carrera. El juego presenta una serie de pistas sobre los clubes y selecciones nacionales en los que la jugadora ha jugado, y el objetivo es identificar correctamente a la jugadora lo más rápido posible. A medida que avanzas, las pistas se hacen más desafiantes y los jugadores deben demostrar su conocimiento sobre el fútbol femenino y sus estrellas. ¡Pon a prueba tus conocimientos y compite para ver quién adivina más jugadoras correctamente!';
-const imagen = '../img/ComingSoon.png';
+const imagen = '/static/img/ComingSoon.png';
 play().then(r => r);
 async function play() {
     let jugadora = await fetchData(3);
@@ -474,7 +480,7 @@ async function play() {
     const res = localStorage.getItem('res3');
     if(res !== jugadoraId || !res){
         localStorage.removeItem('Attr3');
-        crearPopupInicialJuego('Guess Player', texto, imagen);
+        crearPopupInicialJuego('Guess Player', texto, imagen, '', iniciar);
     } else {
         await iniciar('');
     }

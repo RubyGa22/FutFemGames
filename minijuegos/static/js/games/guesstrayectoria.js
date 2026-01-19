@@ -9,6 +9,10 @@ let trayectoriaDiv;
 let myst;
 let jugadoraInput;
 let boton;
+let answer;
+
+import { fetchJugadoraTrayectoriaById } from "../api/jugadora.js";
+import { updateRacha } from "../user/rachas.js";
 // Función principal que controla el flujo de carga
 async function iniciar(dificultad) {
 
@@ -21,6 +25,11 @@ async function iniciar(dificultad) {
     boton = document.getElementById('botonVerificar');
     answer = localStorage.getItem('Attr1');
     const name = localStorage.getItem('nombre');
+    const btn = document.getElementById('botonVerificar');
+    
+    if (btn) {
+        btn.addEventListener('click', checkAnswer); // Habilitar el botón al iniciar el juego
+    }
     
     if (popup) {
         popup.style.display = 'none'; // Cambia el estilo para ocultarlo
@@ -76,23 +85,11 @@ async function iniciar(dificultad) {
 }
 
 async function loadJugadoraById(id, ganaste) {
-    try {
-        const response = await fetch(`/api/jugadora_trayectoria?id=${id}`);
-        if (!response.ok) {
-            throw new Error(`Error en la solicitud: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log('Datos recibidos:', data);
-
-        if (Array.isArray(data) && data.length > 0) {
-            displayTrayectoria(data, ganaste);
-        } else {
-            console.warn('No hay datos de la jugadora disponibles.');
-        }
-    } catch (error) {
-        console.error('Error al cargar la jugadora:', error);
-        resultText.textContent = 'Error al cargar los datos.';
+    const data = await fetchJugadoraTrayectoriaById(id);
+    if (data.length > 0) {
+        displayTrayectoria(data, ganaste);
+    } else {
+        console.warn('No se encontraron datos de trayectoria para la jugadora con ID:', id);
     }
 }
 
@@ -130,7 +127,11 @@ function displayTrayectoria(data, acertaste) {
             anyos.textContent = item.años;
             anyos.style.textAlign = 'center';
             front.appendChild(anyos);
-        }
+        }else{
+            const escudoImg = document.createElement('img');
+            //escudoImg.src = "/static/img/predeterm.jpg";
+            escudoImg.alt = item.nombre;
+            front.appendChild(escudoImg);}
 
         flipper.appendChild(front);
 
@@ -183,7 +184,7 @@ async function checkAnswer() {
         return;
     }else if(trayectoriaDiv.getAttribute('Attr1')===idJugadora){
         if(!localStorage.getItem('Attr1')){
-            await updateRacha(1, 2);
+            await updateRacha(1, 1);
         }else{
             //await updateRacha(1, 1);
     }
@@ -206,7 +207,7 @@ async function trayectoriaPerder() {
     boton.disabled = true;
     jugadoraInput.disabled = true;
 
-    resultText.textContent = 'Has perdido, era: '+jugadora[0].Nombre_Completo;
+    //resultText.textContent = 'Has perdido, era: '+jugadora[0].Nombre_Completo;
     const jugadora_id = 'loss';
     localStorage.setItem('Attr1', jugadora_id);
     await loadJugadoraById(jugadoraId, true);
@@ -220,16 +221,20 @@ async function trayectoriaPerder() {
 }
 
 const texto = 'Adivina la Jugadora de Fútbol es un juego de trivia donde debes identificar a una futbolista según los equipos en los que ha jugado. Usa las pistas, demuestra tu conocimiento y compite para ver quién acierta más.';
-const imagen = '../img/trayectoria.jpg';
+const imagen = '/static/img/trayectoria.jpg';
 play().then(r => r);
 async function play() {
+    const lastAnswer= localStorage.getItem('Attr1');
     let jugadora = await fetchData(1);
     console.log(jugadora)
     jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
     const res = localStorage.getItem('res1');
     if(res !== jugadoraId || !res){
+        if(lastAnswer !== res || !lastAnswer){
+            updateRacha(1, 0);
+        }
         localStorage.removeItem('Attr1');
-        crearPopupInicialJuego('Guess Trayectoria', texto, imagen);
+        crearPopupInicialJuego('Guess Trayectoria', texto, imagen, '', iniciar);
     } else {
         await iniciar('');
     }

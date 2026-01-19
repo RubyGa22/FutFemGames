@@ -40,10 +40,17 @@
 <link rel="" href="app/widgets/language.html">
 <script src="{% static 'js/redireccion.js' %}"></script>
 <script src="{% static 'js/funciones-tablas.js' %}"></script>
+<script type="module" src="{% static 'js/user/rachas.js' %}"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-    //obtenerRacha(1)
+<script type="module">
+    import { obtenerRacha } from '{% static "js/user/rachas.js" %}';
+    await obtenerRacha(1);
+    await obtenerRacha(2);
+    await obtenerRacha(3);
+    await obtenerRacha(4);  
+    await obtenerRacha(5);
+    await obtenerRacha(6);
 </script>
 </body>
 </html>

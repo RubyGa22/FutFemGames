@@ -1,3 +1,5 @@
+import { updateRacha } from "../user/rachas.js";
+
 let answer = "";
 let currentRow = 0;
 let jugadora;
@@ -112,7 +114,7 @@ function quitarAcentos(str) {
 }
 
 
-function checkWord() {
+async function checkWord() {
     const guess = [];
     for (let i = 0; i < 5; i++) {
         const input = document.getElementById(`row-${currentRow}-tile-${i}`);
@@ -124,6 +126,10 @@ function checkWord() {
 
     if (guessSanitized === answerSanitized) {
         displayMessage("¡Correcto! Has ganado.");
+        if(localStorage.length>0){
+            await updateRacha(2, 1);
+            localStorage.setItem('Attr2', jugadora.idJugadora);
+        }
         localStorage.setItem('hasWon2', jugadora.idJugadora);
         colorTiles(guess);
         fillRowWithAnswer();
@@ -282,7 +288,7 @@ async function wordlePerder() {
     //await loadJugadoraById(jugadoraId, true);
     // Agregar un delay de 2 segundos (2000 ms)
     if(localStorage.length>0){
-        await updateRacha(1, 0);
+        await updateRacha(2, 0);
     }
     setTimeout(() => {
         cambiarImagenConFlip();
@@ -291,15 +297,19 @@ async function wordlePerder() {
 
 
 const texto = 'Adivina la Jugadora de Fútbol es un juego de trivia donde debes identificar a una futbolista según los equipos en los que ha jugado. Usa las pistas, demuestra tu conocimiento y compite para ver quién acierta más.';
-const imagen = "{% static 'img/Captura de pantalla 2024-09-01 201329.png' %}";
+const imagen = "static/img/wordle.png";
 play().then(r => r);
 async function play() {
+    const lastAnswer= localStorage.getItem('Attr2');
     let jugadora = await fetchData(2);
-    jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
+    let jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
     const res = localStorage.getItem('res2');
     if(res !== jugadoraId || !res){
+        if(lastAnswer !== res || !lastAnswer){
+            await updateRacha(2, 0);
+        }
         localStorage.removeItem('Attr2');
-        crearPopupInicialJuego('Wordle', texto, imagen, 'wordle');
+        crearPopupInicialJuego('Wordle', texto, imagen, 'wordle', iniciar);
     } else {
         await iniciar();
     }

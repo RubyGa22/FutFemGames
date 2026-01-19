@@ -259,7 +259,7 @@ def jugadora_trayectoria(request):
     return JsonResponse(data, safe=False)
 
 def jugadora_pais(request):
-    nombre = request.GET.get('nombre', '').strip()  # Realmente es el ID
+    nombre = request.GET.get('id', '').strip()  # Realmente es el ID
 
     if not nombre:
         return JsonResponse({"error": "Nombre de jugadora no proporcionado"}, status=400)
