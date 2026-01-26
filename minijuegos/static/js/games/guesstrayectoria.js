@@ -158,7 +158,7 @@ function displayTrayectoria(data, acertaste) {
                 flipper.appendChild(back);
             }else{
                 const jugadoraImg = document.createElement('img');
-                jugadoraImg.src = "/static/img/predeterm.jpg";
+                jugadoraImg.src = data[0].ImagenJugadora;
                 jugadoraImg.alt = 'Imagen de la Jugadora';
                 back.appendChild(jugadoraImg);
 

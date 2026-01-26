@@ -97,12 +97,16 @@ function ponerClubes(ids, posiciones) {
                         img.style.width = "50px";
                         img.style.height = "auto";
                         img.classList.add('club'+club.club);
-                        // Crear y configurar el texto (si se desea incluir)
-                        /*
-                        const text = document.createElement('p');
-                        text.textContent = pais.nombre;
-                        text.style.margin = "0";
-                        */
+                          // Aplicar degradado usando los colores de la BD
+                        const colorPrimario = club.color || 'var(--color-primario)'; // fallback
+                        const colorSecundario = club.colorSecundario || 'transparent'; // fallback
+                        th.style.background = `
+                            linear-gradient(
+                                to bottom,
+                                color-mix(in srgb, ${colorPrimario} 30%, transparent),
+                                color-mix(in srgb, ${colorSecundario} 30%, transparent)
+                            )
+                        `;
 
                         // Añadir imagen y texto al elemento th
                         th.appendChild(img);

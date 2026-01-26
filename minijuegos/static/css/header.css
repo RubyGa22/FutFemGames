@@ -27,6 +27,28 @@ header .container{
     transition: max-height 0.5s ease-in-out; /* transición suave */
 }
 
+header .container .user-profile-link{
+    transition: all 0.4s ease-in-out;
+}
+
+header .container .user-profile-link:hover{
+    transform: scale(1.1);
+    color: var(--color-detalles);
+}
+
+header .container .avatar{
+    border-radius: 20px;
+    border: 0.25px solid rgba(227, 163, 249, 0.838);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-primario) 30%, transparent),
+        color-mix(in srgb, var(--color-secundario) 30%, transparent)
+    );
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
 header #header-izquierda{
     display: flex;
     flex-direction: row;
@@ -121,6 +143,21 @@ header .container .iniciar-sesion-button {
     border-radius: 25px;
     transition: transform 0.3s ease-in-out;
 
+}
+
+header .container .logout-button{
+    font-size: x-large;
+    transition: all 0.3s ease-in-out;
+}
+
+header .container .logout-button:hover{
+    color: red;
+    transform: scale(1.1); /* ligera expansión */
+    text-shadow: 0 0 10px red; /* glow sobre el texto */
+}
+
+header .container .logout-button:hover::before{
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
 }
 
 

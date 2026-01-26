@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de {{ usuario.usuario }}</title>
+    <link rel="icon" href="{% static 'img/prueba logo.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+</head>
+<body>
+    {% load static %}
+    {% include 'partials/header.html' %}
+    <div class="container-perfil">
+        <div id="datos-personales" class="glass">
+            <img src="/{{ jugadora_favorita.imagen }}" alt="Avatar" style="width:150px; height:auto;">
+            <h1>Perfil de {{ usuario.usuario }}</h1>
+            <p>Nombre: {{ usuario.Nombre }} {{ usuario.Apellidos }}</p>
+            {% if jugadora_favorita %}
+            <h2>Jugadora favorita:</h2> <span> {{jugadora_favorita.Apodo}} </span>
+            {% else %}
+                <p>No has seleccionado aún una jugadora favorita.</p>
+            {% endif %}
+        </div>
+        <div class="right">
+        <div id="rachas" class="glass">
+            <h3>Rachas actuales</h3>
+            <ul>
+                <li>Wordle: 🔥 3 aciertos consecutivos</li>
+                <li>Bingo: 🔥 5 aciertos consecutivos</li>
+                <li>Trayectoria: 🔥 2 aciertos consecutivos</li>
+                <li>XI: 🔥 4 aciertos consecutivos</li>
+                <li>Guess Country: 🔥 1 acierto consecutivo</li>
+                <li>Trivia: 🔥 0 aciertos consecutivos</li>
+            </ul>
+        </div>
+        <div id="amigos" class="glass">
+            <h3>Amigos conectados</h3>
+            <ul>
+                <li>Laura 💖</li>
+                <li>María ⚽</li>
+                <li>Raquel 🌟</li>
+                <li>Elena 🎯</li>
+                <li>Sofía 🏆</li>
+            </ul>
+        </div>
+        </div>
+    </div>
+<script type="module" src="{% static 'js/user/control-acceso.js' %}"></script>
+
+<script type="module">
+    import { obtenerRacha } from '{% static "js/user/rachas.js" %}';
+    const rachas = await obtenerRacha();
+    const rachasDiv = document.getElementById('rachas');
+    rachasDiv.innerHTML = '';
+    console.log(rachas);
+    const ul = document.createElement('ul');
+    rachas.forEach(racha => {
+        const li = document.createElement('li');
+        const pJuego = document.createElement('p');
+        pJuego.textContent = racha.juego.nombre;
+        const pRacha = document.createElement('p');
+        pRacha.textContent = racha.racha_actual;
+        li.appendChild(pJuego)
+        li.appendChild(pRacha)
+        ul.appendChild(li)
+    });
+    rachasDiv.appendChild(ul)
+</script>
+</body>
+</html>

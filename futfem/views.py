@@ -1,10 +1,12 @@
-from django.shortcuts import render
 from django.http import JsonResponse
-from django.db import connection
+from django.db import connection, IntegrityError
 from django.db.models import Q
 from datetime import date, datetime
 from .models import Jugadora, Trayectoria, Equipo, Pais, Liga
 from random import shuffle
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import render, redirect
+from django.contrib.auth.hashers import make_password, check_password
 
 # Create your views here.
 #################################################################################################
@@ -485,17 +487,12 @@ def equiposxid(request):
 
     salida = []
     for e in equipos:
-        escudo_base64 = None
-        if e.escudo: 
-            try:
-                escudo_base64 = e.escudo
-            except Exception:
-                escudo_base64 = None
 
         salida.append({
             "club": e.id_equipo,
             "nombre": e.nombre,
-            "escudo": escudo_base64
+            "escudo": e.escudo,
+            "color": e.color
         })
 
     return JsonResponse({"success": salida})

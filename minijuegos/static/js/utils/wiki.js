@@ -39,7 +39,7 @@ function inicializarWiki() {
     
 
     botonConfirmar.addEventListener('click', async () => {
-        const paisId = inputPaises.getAttribute('data-id');
+        const paisId = Number(inputPaises[0].dataset.id);
         if (paisId) {
             await ligasxpais(paisId);
         } else {
@@ -118,9 +118,14 @@ function displayJugadoras(jugadoras){
             )
         `;
         }
+
+        div.addEventListener('click', () => {
+            window.location.href = `/wiki/jugadora/${jugadora.id_jugadora}/`;
+        });
+
         div.appendChild(img);
-        div.appendChild(imgClub);
         div.appendChild(pNombre);
+        div.appendChild(imgClub);
         div.appendChild(pNacionalidad);
         div.appendChild(pNacimiento);
         div.appendChild(pPosicion);

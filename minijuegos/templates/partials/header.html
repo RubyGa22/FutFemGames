@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 {% load static %}
 <header class="navbar">
   <div class="container">
@@ -33,14 +34,32 @@
         </ul>
       </nav>
       <div>
-        <button class="iniciar-sesion-button">Iniciar Sesión</button> <!-- Enlace a la página de inicio de sesión -->
-        <button class="registro-button">Registrarse</button> <!-- Enlace a la página de registro -->
+          {% if usuario_sesion %}
+              <span class="user-name">Hola, {{ usuario_sesion.usuario }}</span>
+              {% if usuario_sesion.jugadora_favorita %}
+                  <img src="/{{ usuario_sesion.jugadora_favorita.imagen }}" class="avatar">
+              {% endif %}
+              <a href="{% url 'logout' %}" class="logout-button"><i class="bi bi-power"></i></a>
+          {% else %}
+              <a href="{% url 'login' %}" class="iniciar-sesion-button">Iniciar sesión</a>
+              <a href="{% url 'registro' %}" class="registro-button">Registrarse</a>
+          {% endif %}
       </div>
     </div>
     <!-- Botones de inicio de sesión y registro -->
     <div class="botones">
-      <button class="iniciar-sesion-button">Iniciar Sesión</button> <!-- Enlace a la página de inicio de sesión -->
-      <button class="registro-button">Registrarse</button> <!-- Enlace a la página de registro -->
+        {% if usuario_sesion %}
+          <a href="{% url 'perfil' %}" class="user-profile-link">
+              <span class="user-name">{{ usuario_sesion.usuario }}</span>
+              {% if usuario_sesion.jugadora_favorita %}
+                  <img src="/{{ usuario_sesion.jugadora_favorita.imagen }}" class="avatar">
+              {% endif %}
+          </a>
+              <a href="{% url 'logout' %}" class="logout-button"><i class="bi bi-power"></i></a>
+          {% else %}
+              <a href="{% url 'login' %}" class="iniciar-sesion-button">Iniciar sesión</a>
+              <a href="{% url 'registro' %}" class="registro-button">Registrarse</a>
+          {% endif %}
     </div>
   </div>
 </header>

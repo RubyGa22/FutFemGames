@@ -81,7 +81,7 @@ class Jugadora(models.Model):
             managed = False  # Si la tabla ya existe y no quieres que Django la reescriba
 
     def __str__(self):
-        return f"{self.Nombre} {self.Apellidos}"
+        return self.Jugadora
 
 
 class Trayectoria(models.Model):
@@ -98,3 +98,23 @@ class Trayectoria(models.Model):
 
     def __str__(self):
         return f"{self.jugadora} - {self.equipo} ({self.años})"
+
+class Juego(models.Model):
+    nombre = models.CharField(max_length=100)
+    slug = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        db_table = 'juegos'
+        managed = False
+    
+    def __str__(self):
+        return self.Juego
+
+class Pista(models.Model):
+    juego = models.ForeignKey(Juego, on_delete=models.CASCADE, db_column='id_juego')
+    descripcion = models.TextField()
+    valor = models.TextField()
+
+    class Meta:
+        db_table = 'pistas'
+        managed = False

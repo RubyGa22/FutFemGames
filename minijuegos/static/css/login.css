@@ -1,0 +1,61 @@
+body{
+    background-image: url("../img/fondo cesped.jpg.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: rgba(37, 0, 37, 0.65); /* Color negro con transparencia */
+    background-blend-mode: color-dodge; /* Modo de mezcla */
+    min-height: 100vh;
+}
+
+.container{
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+}
+
+.container form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 25px;
+    width: 30%;
+    border: 0.5px solid color-mix(in srgb, var(--color-primario) 50%, transparent),
+
+}
+
+.container form h2{
+    margin-bottom: unset;
+}
+
+.container form div{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    align-items: center;
+    width: 100%;
+}
+
+.container form div label{
+    width: 90%;
+}
+.container form div input{
+    width: 90%;
+    align-self: center;
+    border: 0.75px solid color-mix(in srgb, var(--color-primario) 50%, transparent),
+
+}
+
+@media (max-width: 990px){
+    .container form{
+        width: 45%;
+    }
+}
+
+@media (max-width: 768px){
+    .container form{
+        width: 60%;
+    }
+}

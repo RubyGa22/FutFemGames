@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-tylyd1o(l$na1k@hd!vw!6e767zw$$v5b_02p$$wbuv+f9wk7p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.177.53.107']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.236', '192.168.1.130']
 
 
 # Application definition
@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'minijuegos',
-    'futfem'
+    'futfem',
+    'usuarios'
 ]
 
 MIDDLEWARE = [
@@ -67,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'usuarios.context_processors.usuario_sesion',
             ],
         },
     },

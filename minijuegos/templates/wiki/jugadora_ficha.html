@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ jugadora }}</title>
+    <link rel="icon" href="{% static 'img/prueba logo.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tarjeta-jugadora.css' %}">
+</head>
+<body>
+    
+    {% include 'partials/header.html' %}
+    <h3>{{ jugadora }}</h3>
+    <div id="mostrador-tarjetas">
+    <div id="tarjeta-jugadora" class="glass tarjeta-jugadora">
+        <img id="imagen-jugadora" src="/{{ jugadora.imagen }} ">
+        <p id="nombre" class="nombre">{{ jugadora.Apodo }}</p>
+        <div id="detalles" class="detalles">
+            <img src="/{{ jugadora.Nacionalidad.bandera }}" alt="{{ jugadora.Nacionalidad.nombre }}">
+            <p id="edad">{{ jugadora.Nacimiento }}<span></span></p>
+            <p> {{ jugadora.Posicion.abreviatura }} </p>
+        </div>
+    </div>
+    </div>
+<script type="module">
+    import {calcularEdad, fetchJugadoraTrayectoriaById} from '{% static "js/api/jugadora.js" %}'; 
+    import {fetchEquipoById} from '{% static "js/api/equipos.js" %}'; 
+    const edad = document.getElementById('edad');
+    const mostrador = document.getElementById('mostrador-tarjetas');
+    edad.textContent = '{{ jugadora.Nacimiento }}' + '(' + calcularEdad('{{ jugadora.Nacimiento }}') + ')'
+
+    const trayectorias = await fetchJugadoraTrayectoriaById('{{ jugadora.id_jugadora }}')
+    for(const trayectoria of trayectorias){
+        const equipo = await fetchEquipoById(trayectoria.equipo);
+        console.log(equipo)
+        const tarjeta = document.createElement('div');
+
+        // Si es el equipo 83 → vintage
+        if (equipo[0].club === 83) {
+            tarjeta.classList.add('vintage');
+        }
+        tarjeta.classList.add('glass');
+        tarjeta.classList.add('tarjeta-jugadora')
+        const imgSrc = trayectoria.imagen
+        ? `/${trayectoria.imagen}`
+        : `/{{ jugadora.imagen }}`;
+
+        tarjeta.innerHTML = `
+            <img class="imagen-jugadora" src="${imgSrc}" alt="{{ jugadora.Apodo }}">
+
+            <p class="nombre">{{ jugadora.Apodo }}</p>
+
+            <div class="detalles">
+                <div class="equipo-pais">
+                <p>{{ jugadora.Posicion.abreviatura }}</p>
+                <img src="/${equipo[0].escudo}" alt="${equipo.nombre}">
+                <img src="/{{ jugadora.Nacionalidad.bandera }}" alt="{{ jugadora.Nacionalidad.nombre }}">
+                </div>
+                <p>${trayectoria.años}</p>
+            </div>
+            
+        `;
+
+        const detalles = tarjeta.querySelector('.detalles');
+        const nombre = tarjeta.querySelector('.nombre');
+
+        if (detalles && nombre) {
+            detalles.style.background = `
+                linear-gradient(
+                    to right,
+                    ${equipo[0].color},
+                    transparent
+                )
+            `;
+            nombre.style.background = `
+                linear-gradient(
+                    to right,
+                    ${equipo[0].color},
+                    transparent
+                )
+            `;
+        }
+
+
+        mostrador.appendChild(tarjeta);
+    }
+</script>
+</body>
+</html>

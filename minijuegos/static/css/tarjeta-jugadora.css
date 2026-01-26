@@ -1,0 +1,141 @@
+#mostrador-tarjetas{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+
+    overflow-x: auto;     /* scroll horizontal */
+    padding: 40px;
+
+    align-items: center;
+}
+.tarjeta-jugadora .imagen-jugadora{
+    filter: contrast(1);
+}
+/* Efecto vintage B/N */
+.tarjeta-jugadora.vintage .imagen-jugadora {
+    filter:
+        grayscale(100%)
+        contrast(1.1)
+        brightness(0.95)
+        sepia(1);
+}
+
+/* Grano suave opcional */
+.tarjeta-jugadora.vintage::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+    mix-blend-mode: overlay;
+}
+
+.tarjeta-jugadora{
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 400px;
+    width: 250px;
+    border-radius: 20px;
+    text-align: center;
+    padding-inline: unset;
+
+    /* 3D */
+    transform-style: preserve-3d;
+    perspective: 1000px;
+
+    /* Glass / profundidad */
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    box-shadow:
+        0 20px 40px rgba(0,0,0,0.35),
+        inset 0 0 0 1px rgba(255,255,255,0.15);
+
+    overflow: hidden;
+}
+
+/* Brillo */
+.tarjeta-jugadora::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    background: linear-gradient(
+        120deg,
+        transparent 30%,
+        rgba(255,255,255,0.6) 50%,
+        transparent 70%
+    );
+    transform: translateX(-100%) rotate(25deg);
+    animation: shine 6s infinite;
+    pointer-events: none;
+}
+
+/* Animación brillo */
+@keyframes shine {
+    0% {
+        transform: translateX(-120%) rotate(25deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    40% {
+        transform: translateX(120%) rotate(25deg);
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Hover 3D (opcional pero brutal) */
+.tarjeta-jugadora:hover {
+    transform: rotateX(6deg) rotateY(-6deg) scale(1.03);
+    transition: transform 0.4s ease;
+}
+
+
+.tarjeta-jugadora .nombre{
+    width: 100%;
+    background: var(--color-terciario);
+    font-size: x-large;
+    margin-bottom: 0;
+    border: none;
+}
+
+.detalles{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    background: var(--color-terciario);
+    height: 100%;
+    border-radius: 0px 0px 20px 20px;
+}
+
+.detalles .equipo-pais{
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    justify-items: center;
+    height: 100%;
+    border-radius: 0px 0px 20px 20px;
+}
+
+.detalles img{
+    width: 50px;
+}
+
+.tarjeta-jugadora p{
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px){
+    .tarjeta-jugadora{
+        height: 400px;
+        width: 250px;
+    }
+}
