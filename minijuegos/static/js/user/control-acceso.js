@@ -23,12 +23,13 @@ import { getSesion } from '/static/js/user/rachas.js';
         // Si el rol del usuario no está permitido → redirige
         if (!allowedRoles.includes(userRole)) {
             console.warn(`Acceso denegado para rol ${userRole}`);
-            window.location.href = ''; // o página "no autorizado"
+            window.location.href = '/accounts/login'; // o página "no autorizado"
             return;
         }
 
         // Acceso permitido
         console.log(`Acceso permitido para rol ${userRole}`);
+        document.body.classList.remove('loading');
 
     } catch (error) {
         console.error('Error al comprobar sesión:', error);

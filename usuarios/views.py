@@ -77,6 +77,8 @@ def perfil_view(request):
     """
     Muestra la página de perfil del usuario logueado.
     """
+    if request.session.get('rol_id') not in [1,2]:
+        return redirect('/')  # o HttpResponseForbidden()
     # Verificamos si hay sesión activa
     usuario_obj = None
     if 'usuario_id' in request.session:
@@ -161,9 +163,12 @@ def juego_racha(request):
         - user: id del usuario
     """
     try:
+        print("POST DATA:", request.POST)
+
         racha_actual = int(request.POST.get('racha', 0))
         juego_id = int(request.POST.get('juego'))
         usuario_id = int(request.POST.get('user'))
+        ultima_respuesta = request.POST.get('last_answer')
 
         # Obtener instancias
         usuario = Usuario.objects.get(id=usuario_id)
@@ -175,16 +180,18 @@ def juego_racha(request):
         if racha_obj:
             # Actualizar racha existente
             racha_obj.racha_actual = racha_actual
-            racha_obj.save(update_fields=['racha_actual'])
+            racha_obj.ultima_respuesta = ultima_respuesta
+            racha_obj.save(update_fields=['racha_actual', 'ultima_respuesta'] if ultima_respuesta else ['racha_actual'])
         else:
             # Crear nueva racha sin campo id
-            Racha.objects.create(usuario=usuario, juego=juego, racha_actual=racha_actual)
+            Racha.objects.create(usuario=usuario, juego=juego, racha_actual=racha_actual, ultima_respuesta=ultima_respuesta if ultima_respuesta else None)
 
         return JsonResponse({
             'success': True,
             'usuario': usuario.id,
             'juego': juego.id,
             'racha_actual': racha_actual,
+            'ultima_respuesta': ultima_respuesta
         })
 
     except Usuario.DoesNotExist:
@@ -193,3 +200,29 @@ def juego_racha(request):
         return JsonResponse({'error': 'Juego no encontrado'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+def obtener_ultima_respuesta(request):
+    """
+    Devuelve la última respuesta de un usuario para un juego concreto.
+    """
+    usuario_id = request.GET.get('usuario')
+    juego_id = request.GET.get('juego')
+
+    if not usuario_id or not juego_id:
+        return JsonResponse(
+            {'error': 'Faltan parámetros usuario o juego'},
+            status=400
+        )
+
+    racha = (
+        Racha.objects
+        .filter(usuario_id=usuario_id, juego_id=juego_id)
+        .values('ultima_respuesta')
+        .first()
+    )
+
+    return JsonResponse({
+        'usuario_id': int(usuario_id),
+        'juego_id': int(juego_id),
+        'ultima_respuesta': racha['ultima_respuesta'] if racha else None
+    })

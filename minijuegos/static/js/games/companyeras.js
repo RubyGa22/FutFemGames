@@ -1,5 +1,5 @@
 import { fetchJugadoraCompanyerasById } from "../api/jugadora.js";
-import { updateRacha } from "../user/rachas.js";
+import { updateRacha, obtenerUltimaRespuesta } from "../user/rachas.js";
 
 let jugadoraId;
 
@@ -7,6 +7,7 @@ let jugadoraId;
 async function iniciar(dificultad) {
     const popup = document.getElementById('popup-ex'); // Selecciona el primer elemento con la clase 'popup-ex'
     const name = await sacarJugadora(jugadoraId);
+    const ultima = await obtenerUltimaRespuesta(5);
 
     if (popup) {
         popup.style.display = 'none'; // Cambia el estilo para ocultarlo
@@ -21,6 +22,16 @@ async function iniciar(dificultad) {
     jugadoraId = jugadora.idJugadora;
     //jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
     localStorage.setItem('res8', jugadoraId);
+
+    if(ultima === jugadoraId){
+        console.log('Se ha guardado la respuesta'); 
+        localStorage.setItem('Attr8', ultima);
+    }
+
+    if(ultima === 'loss'+jugadoraId){
+        console.log('Se ha guardado la perdida'); 
+        localStorage.setItem('Attr8', 'loss');
+    }
 
     // Definir los segundos según la dificultad
     let segundos;
@@ -150,7 +161,7 @@ async function checkJugadora() {
     if (found) {
         resultDiv.textContent = `${texto}`;
         //cambiarImagenConFlip();
-        updateRacha(5, 1);
+        updateRacha(5, 1, idJugadora);
         Ganaste('compañeras');
         stopCounter("Futfem Relations");
     }else {
@@ -211,7 +222,7 @@ async function companyerasPerder() {
     //await loadJugadoraById(jugadoraId, true);
     // Agregar un delay de 2 segundos (2000 ms)
     if(localStorage.length>0){
-        await updateRacha(5, 0);
+        await updateRacha(5, 0, 'loss'+jugadoraId);
     }
     setTimeout(() => {
         cambiarImagenConFlip();
@@ -227,9 +238,9 @@ async function play() {
     jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
     const res = localStorage.getItem('res8');
     if(res !== jugadoraId || !res){
-        if(lastAnswer !== res || !lastAnswer){
+        /*if(lastAnswer !== res || !lastAnswer){
             await updateRacha(5, 0);
-        }
+        }*/
         localStorage.removeItem('Attr8');
         crearPopupInicialJuego('Futfem Relations', texto, imagen, '', iniciar);
     } else {

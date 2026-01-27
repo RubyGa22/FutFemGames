@@ -12,7 +12,7 @@ let boton;
 let answer;
 
 import { fetchJugadoraTrayectoriaById } from "../api/jugadora.js";
-import { updateRacha } from "../user/rachas.js";
+import { updateRacha, obtenerUltimaRespuesta } from "../user/rachas.js";
 // Función principal que controla el flujo de carga
 async function iniciar(dificultad) {
 
@@ -23,7 +23,7 @@ async function iniciar(dificultad) {
     myst = document.getElementById('jugadora');
     jugadoraInput = document.getElementById('jugadoraInput');
     boton = document.getElementById('botonVerificar');
-    answer = localStorage.getItem('Attr1');
+    const ultima = await obtenerUltimaRespuesta(1);
     const name = localStorage.getItem('nombre');
     const btn = document.getElementById('botonVerificar');
     
@@ -38,6 +38,17 @@ async function iniciar(dificultad) {
     let jugadora = await fetchData(1);
     jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
     localStorage.setItem('res1', jugadoraId);
+    console.log('Jugadora ID asignada:', localStorage.getItem('res1'), ultima);
+
+    if(ultima === jugadoraId){
+        console.log('Se ha guardado la respuesta'); 
+        localStorage.setItem('Attr1', ultima);
+    }
+
+    if(ultima === 'loss'+jugadoraId){
+        console.log('Se ha guardado la perdida'); 
+        localStorage.setItem('Attr1', 'loss');
+    }
 
     // Definir los segundos según la dificultad
     let segundos;
@@ -56,6 +67,7 @@ async function iniciar(dificultad) {
     }
 
     // Verificar si el usuario ha ganado
+    answer = localStorage.getItem('Attr1');
     const isAnswerTrue = (answer === jugadoraId);
     console.log('Has won:', isAnswerTrue);
 
@@ -84,7 +96,7 @@ async function iniciar(dificultad) {
     }
 }
 
-async function loadJugadoraById(id, ganaste) {
+export async function loadJugadoraById(id, ganaste) {
     const data = await fetchJugadoraTrayectoriaById(id);
     if (data.length > 0) {
         displayTrayectoria(data, ganaste);
@@ -185,7 +197,8 @@ async function checkAnswer() {
         return;
     }else if(trayectoriaDiv.getAttribute('Attr1')===idJugadora){
         if(!localStorage.getItem('Attr1')){
-            await updateRacha(1, 1);
+            console.log('Actualizando racha con última respuesta:', idJugadora);
+            await updateRacha(1, 1, idJugadora);
         }else{
             //await updateRacha(1, 1);
     }
@@ -214,7 +227,7 @@ async function trayectoriaPerder() {
     await loadJugadoraById(jugadoraId, true);
     // Agregar un delay de 2 segundos (2000 ms)
     if(localStorage.length>0){
-        await updateRacha(1, 0);
+        await updateRacha(1, 0, 'loss'+jugadoraId);
     }
     setTimeout(() => {
         cambiarImagenConFlip();
@@ -227,16 +240,15 @@ play().then(r => r);
 async function play() {
     const lastAnswer= localStorage.getItem('Attr1');
     let jugadora = await fetchData(1);
-    console.log(jugadora)
     jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
     const res = localStorage.getItem('res1');
     if(res !== jugadoraId || !res){
-        if(lastAnswer !== res || !lastAnswer){
-            updateRacha(1, 0);
-        }
+        /*if(lastAnswer !== res || !lastAnswer){
+            updateRacha(1, 0, 'loss'+jugadoraId);
+        }*/
         localStorage.removeItem('Attr1');
         crearPopupInicialJuego('Guess Trayectoria', texto, imagen, '', iniciar);
-    } else {
+    } else {       
         await iniciar('');
     }
 }

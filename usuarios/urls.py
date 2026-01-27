@@ -8,5 +8,6 @@ urlpatterns = [
     path('sesion/', views.sesion_view, name='sesion'),
     path('perfil/', views.perfil_view, name='perfil'),
     path('racha/', views.obtener_rachas, name='racha'),
-    path('juego_racha/', views.juego_racha, name='juego_racha')
+    path('juego_racha/', views.juego_racha, name='juego_racha'),
+    path('ultima_respuesta/', views.obtener_ultima_respuesta, name='ultima_respuesta')
  ]

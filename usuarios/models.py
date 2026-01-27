@@ -24,6 +24,7 @@ class Racha(models.Model):
     juego = models.ForeignKey(Juego, db_column='juego', on_delete=models.CASCADE, primary_key=False)
     racha_actual = models.IntegerField(default=0)
     mejor_racha = models.IntegerField(default=0)
+    ultima_respuesta = models.TextField(null=True, blank=True)
 
     class Meta:
         db_table = 'rachas'

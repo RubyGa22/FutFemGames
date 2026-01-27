@@ -1,6 +1,5 @@
 let usuario = await getSesion();
 usuario = usuario.id;
-console.log(usuario)
 export async function getSesion() {
     try {
         const respuesta = await fetch('/accounts/sesion/');
@@ -30,12 +29,12 @@ export async function obtenerRacha(juego){
     
 }
 
-export async function updateRacha(juego, condicion) {
+export async function updateRacha(juego, condicion, ultima_respuesta){
 
     if (!usuario) {
         updateRachaCookies(juego, condicion);
     }else{
-        await updateRachaUser(juego, condicion);
+        await updateRachaUser(juego, condicion, ultima_respuesta);
     }
 }
 
@@ -97,7 +96,7 @@ function updateRachaCookies(juego, condicion) {
     }
 }
 
-async function updateRachaUser(juego, condicion) {
+async function updateRachaUser(juego, condicion, ultima_respuesta) {
     try {
         let rachaActual;
 
@@ -114,6 +113,7 @@ async function updateRachaUser(juego, condicion) {
         formData.append('racha', rachaActual);
         formData.append('juego', juego);
         formData.append('user', parseInt(usuario, 10));
+        formData.append('last_answer', ultima_respuesta);
 
         // POST al endpoint
         const response = await fetch('/accounts/juego_racha/', {
@@ -134,6 +134,15 @@ async function updateRachaUser(juego, condicion) {
         return null;
     }
 }
+
+export async function obtenerUltimaRespuesta(juego) {
+    const res = await fetch(
+        `/accounts/ultima_respuesta/?usuario=${usuario}&juego=${juego}`
+    );
+    const data = await res.json();
+    return data.ultima_respuesta; // number | null
+}
+
 
 
 export function displayRacha(racha, juego){
