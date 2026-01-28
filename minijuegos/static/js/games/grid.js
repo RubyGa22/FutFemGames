@@ -1,5 +1,5 @@
 import { fetchJugadoraTrayectoriaById } from "../api/jugadora.js";
-import { updateRacha } from "../user/rachas.js";
+import { updateRacha, obtenerUltimaRespuesta } from "../user/rachas.js";
 
 let idres;
 let jugadorasProhibidas = [];
@@ -10,7 +10,6 @@ async function iniciar(dificultad) {
     if (btn) {
         btn.addEventListener('click', Verificar); // Habilitar el botón al iniciar el juego
     }
-    const answer = localStorage.getItem('Attr4');
     if (popup) {
         popup.style.display = 'none'; // Cambia el estilo para ocultarlo
     }
@@ -18,6 +17,22 @@ async function iniciar(dificultad) {
     let paises = [valor.pais1, valor.pais2, valor.pais3];
     let clubes = [valor.club1, valor.club2, valor.club3];
     idres = paises.map(String).concat(clubes.map(String)).join('');
+
+    const ultima = await obtenerUltimaRespuesta(4);
+
+    let ultimaArray = JSON.parse(ultima);
+    let usuarioAnswer = null;   // ← AQUÍ sí
+    if(Array.isArray(ultimaArray)){usuarioAnswer = ultimaArray[ultimaArray.length - 1].answer || null;}
+
+    if(usuarioAnswer === idres){
+        console.log('Se ha guardado la respuesta'); 
+        localStorage.setItem('Attr4', ultima);
+    }
+    
+    if(usuarioAnswer === 'loss'+idres){
+        console.log('Se ha guardado la perdida'); 
+        localStorage.setItem('Attr4', ultima);
+    }
 
     // Definir los segundos según la dificultad
     let segundos;
@@ -36,11 +51,17 @@ async function iniciar(dificultad) {
     }
     ponerClubes(paises, ["Equipo4", "Equipo5", "Equipo6"]);
     ponerClubes(clubes, ["Equipo1", "Equipo2", "Equipo3"]);
+    let userAnswer = JSON.parse(localStorage.getItem('Attr4')) || [];
+    let userRes = null;
+    if(userAnswer.length > 0){
+        userRes = userAnswer[userAnswer.length - 1].answer || null;
+    }
     localStorage.setItem('res4', idres);
     await colocarAciertos();
+    const isAnswerTrue = (idres === userRes);
     //startCounter(segundos, 'grid')
     const celdas = comprobarFotosEnCeldas();
-    if (celdas) {
+    if (isAnswerTrue && celdas) {
         console.log("Deteniendo contador..."); // Verificar si llega aquí
         //await loadJugadoraById(jugadoraId, true);
         stopCounter("grid");  // ⬅️ Detenemos el temporizador si el usuario gana
@@ -48,12 +69,12 @@ async function iniciar(dificultad) {
         //document.getElementById('result').textContent = nombre;
     } else {
         //await loadJugadoraById(jugadoraId, false);
-        if (!answer || answer.trim() === '') {
+        if (!userRes || userRes.trim() === '') {
             startCounter(segundos, "grid", async () => {
                 console.log("El contador llegó a 0. Ejecutando acción...");
                 await gridPerder();
             });
-        } else if (answer === 'loss') {
+        } else if (userRes === 'loss'+idres) {
             await gridPerder();
         } else {
             startCounter(segundos, "grid", async () => {
@@ -129,7 +150,7 @@ async function Verificar() {
             if (comprobarFotosEnCeldas()) {
                 console.log("Deteniendo contador...");
                 stopCounter("grid");
-                updateRacha(4, 1);
+                updateRacha(4, 1, localStorage.getItem('Attr4'));
                 Ganaste('grid');
             }
 
@@ -341,8 +362,13 @@ function gestionarAciertos(celda, foto) {
 
     // Asegurarse de que retrievedGrid es un array
     let retrievedGrid = grid ? JSON.parse(grid) : [];
+    let item;
 
-    let item = { celda, foto };
+    if (retrievedGrid.length === 8) {
+        item = { celda, foto, "answer": idres };
+    }else{
+        item = { celda, foto };
+    }
     retrievedGrid.push(item); // Agregar el nuevo objeto
 
     // Guardar de nuevo en localStorage
@@ -451,11 +477,16 @@ async function gridPerder() {
     resultDiv.textContent = 'Has perdido';//+jugadora[0].Nombre_Completo;
     //const div = document.getElementById('trayectoria');
     const jugadora_id = 'loss';
-    localStorage.setItem('Attr4', jugadora_id);
+    let grid = localStorage.getItem('Attr4');
+    grid = grid ? JSON.parse(grid) : [];
+    grid.push({ "answer": 'loss'+idres });
+    localStorage.setItem('Attr4', JSON.stringify(grid));
+    
+    //localStorage.setItem('Attr4', jugadora_id);
     //await loadJugadoraById(jugadoraId, true);
     // Agregar un delay de 2 segundos (2000 ms)
     if(localStorage.length>0){
-        await updateRacha(4, 0);
+        await updateRacha(4, 0, localStorage.getItem('Attr4'));
     }
 }
 
