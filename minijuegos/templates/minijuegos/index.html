@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
     <link rel="stylesheet" href="{% static 'css/glow-border.css' %}">
 </head>
-<body>
+<body class="loading">
 {% include 'partials/header.html' %}
 <section class="juegos">
 <div class="container mt-5 sibling-fade">
@@ -40,10 +40,25 @@
 <link rel="" href="app/widgets/language.html">
 <script src="{% static 'js/redireccion.js' %}"></script>
 <script src="{% static 'js/funciones-tablas.js' %}"></script>
+<script type="module" src="{% static 'js/user/rachas.js' %}"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-    //obtenerRacha(1)
+<script type="module" id="control-acceso" src="{% static 'js/user/control-acceso.js' %}" data-allowed-roles="1,2"></script>
+<script type="module">
+    import { obtenerRacha, displayRacha } from '{% static "js/user/rachas.js" %}';
+    const racha1 = await obtenerRacha(1);
+    const racha2 = await obtenerRacha(2);
+    const racha3 = await obtenerRacha(3);
+    const racha4 = await obtenerRacha(4);  
+    const racha5 = await obtenerRacha(5);
+    const racha6 = await obtenerRacha(6);
+    
+    displayRacha(racha1[0].racha_actual, racha1[0].juego.id);
+    displayRacha(racha2[0].racha_actual, racha2[0].juego.id);
+    displayRacha(racha3[0].racha_actual, racha3[0].juego.id);
+    displayRacha(racha4[0].racha_actual, racha4[0].juego.id);
+    displayRacha(racha5[0].racha_actual, racha5[0].juego.id);
+    displayRacha(racha6[0].racha_actual, racha6[0].juego.id);
 </script>
 </body>
 </html>

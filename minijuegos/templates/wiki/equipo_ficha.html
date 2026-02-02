@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ equipo.nombre }}</title>
+    <link rel="icon" href="/{{ equipo.escudo }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/combo.css' %}">
+    <link rel="stylesheet" href="{% static 'css/ficha-equipo.css' %}">
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    
+    <h1>{{ equipo.nombre }}</h1>
+
+    <img src="/{{ equipo.escudo }}" alt="{{ equipo.nombre }}">
+
+    <!--<p>País: {{ equipo.pais.nombre }}</p>
+    <p>Fundado: {{ equipo.fundacion }}</p>
+    <p>Estadio: {{ equipo.estadio }}</p>-->
+    
+    <section id="jugadoras-actuales">
+        <div id="tabla-jugadoras-actuales" class="tabla-jugadoras">
+            <div id="cabecera-tabla" class="cabecera-tabla">
+                <h3>Plantilla</h3>
+                <a id="ver-jugadoras-actuales" href="#">Ver Más</a>
+            </div>
+            <div id="jugadoras-actuales-container" class="container-jugadoras"></div>
+        </div>
+    </section>
+    <section id="jugadoras-alltime">
+        <div id="tabla-jugadoras" class="tabla-jugadoras">
+            <div id="cabecera-tabla-alltime" class="cabecera-tabla">
+                <h3>Jugadoras All Time</h3>
+                <a id="ver-jugadoras-all-time" href="#">Ver Más</a>
+            </div>
+            <div id="jugadoras-container" class="container-jugadoras"></div>
+        </div>
+    </section>
+<script type="module" src="{% static 'js/utils/ficha-equipo.js' %}"></script>
+<script>
+    /*const body = document.body;
+
+   
+    body.style.backgroundColor = "black";
+
+    body.style.setProperty(
+        "background",
+        `
+        linear-gradient(
+            to bottom,
+            color-mix(in srgb, {{ equipo.color }} 100%, transparent),
+            rgba(0, 0, 0, 0.9)
+        )
+        `,
+        "important"
+    );
+
+    body.style.backgroundSize = "contain";
+    body.style.backgroundPosition = "center";
+    body.style.backgroundRepeat = "no-repeat";
+    body.style.backgroundAttachment = "fixed";
+
+   
+    body.style.backgroundBlendMode = "multiply";*/
+
+
+
+
+    function actualizarHeader() {
+        const headerEscudo = document.querySelector('.navbar-brand1 img');
+
+        if (headerEscudo) {
+            headerEscudo.src = "/{{ equipo.escudo }}";
+            headerEscudo.alt = "{{ equipo.nombre }}";
+        }
+    }
+    actualizarHeader();
+
+    
+    function activarPopup(tablaId, botonId) {
+        const tabla = document.getElementById(tablaId);
+        const boton = document.getElementById(botonId);
+
+        boton.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            if (!tabla.classList.contains('fullscreen')) {
+                abrir(tabla, boton);
+            } else {
+                cerrar(tabla, boton);
+            }
+        });
+    }
+
+    function abrir(tabla, boton) {
+        const rect = tabla.getBoundingClientRect();
+
+        // Guardamos estado original
+        tabla.dataset.top = rect.top;
+        tabla.dataset.left = rect.left;
+        tabla.dataset.width = rect.width;
+        tabla.dataset.height = rect.height;
+
+        tabla.style.position = 'fixed';
+        tabla.style.top = rect.top + 'px';
+        tabla.style.left = rect.left + 'px';
+        tabla.style.width = rect.width + 'px';
+        tabla.style.height = rect.height + 'px';
+        tabla.style.margin = 0;
+        tabla.style.transition = 'all 0.45s ease';
+
+        requestAnimationFrame(() => {
+            tabla.classList.add('fullscreen');
+            tabla.style.top = '0';
+            tabla.style.left = '0';
+            tabla.style.width = '100vw';
+            tabla.style.height = '100vh';
+        });
+
+        document.body.classList.add('no-scroll');
+        boton.textContent = 'Atrás';
+    }
+
+    function cerrar(tabla, boton) {
+        tabla.classList.remove('fullscreen');
+
+        tabla.style.top = tabla.dataset.top + 'px';
+        tabla.style.left = tabla.dataset.left + 'px';
+        tabla.style.width = tabla.dataset.width + 'px';
+        tabla.style.height = tabla.dataset.height + 'px';
+
+        tabla.addEventListener('transitionend', () => {
+            tabla.style = '';
+            delete tabla.dataset.top;
+            delete tabla.dataset.left;
+            delete tabla.dataset.width;
+            delete tabla.dataset.height;
+        }, { once: true });
+
+        document.body.classList.remove('no-scroll');
+        boton.textContent = 'Ver más';
+    }
+
+    // Inicialización
+    activarPopup('tabla-jugadoras-actuales', 'ver-jugadoras-actuales');
+    activarPopup('tabla-jugadoras', 'ver-jugadoras-all-time');
+
+
+
+
+</script>
+<script type="module">
+    import { crearFichaJugadorasActuales, crearFichaJugadorasDeSiempre } from '{% static "js/utils/ficha-equipo.js" %}';
+    const color = '{{equipo.color}}';
+    console.log(color);
+
+    actualizarHeader();
+
+    crearFichaJugadorasActuales("{{ equipo.id_equipo }}", color);
+    crearFichaJugadorasDeSiempre("{{ equipo.id_equipo }}", color);
+</script>
+</body>
+</html>

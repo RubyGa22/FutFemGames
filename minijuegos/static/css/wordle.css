@@ -1,10 +1,10 @@
-body{
-    background-image: url("../img/fondo cesped.jpg.png");
+/*body{
+    /*background-image: url("../img/fondo cesped.jpg.png");
     background-size: cover;
     background-repeat: no-repeat;
     background-color: rgba(128, 0, 128, 0.5); /* Color negro con transparencia */
-    background-blend-mode: color-dodge; /* Modo de mezcla */
-}
+    /*background-blend-mode: color-dodge; 
+}*/
 
 .container-wordle {
     text-align: center;

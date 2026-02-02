@@ -1,0 +1,198 @@
+img{
+    width: 10%;
+}
+#jugadoras-actuales{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-block: 10px;
+}
+
+#jugadoras-alltime{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-block: 10px;
+}
+
+.tabla-jugadoras{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 20px; /* Bordes redondeados */
+    text-align: center; /* Centrar el contenido dentro del botón */
+    color: white; /* Color del texto */
+    margin-bottom: 10px; /* Espaciado inferior entre botones */
+    transition: transform 0.2s; /* Suavizar el efecto de transformación */
+    border: 0.5px solid rgb(255, 255, 255);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    align-items: center;
+    height: 150px;
+    /* Glass base */
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    width: 90%;
+    transform: translateY(10px);
+    cursor: pointer;
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease,
+        box-shadow 0.3s ease,
+        scale 0.3s ease,
+        width 0.3s ease,
+        height 0.3s ease;
+    height: auto;
+}
+
+.cabecera-tabla{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    text-align: start;
+    border-bottom: 0.5px solid rgb(255, 255, 255);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    padding-inline: 10px;
+
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-primario) 30%, transparent),
+        color-mix(in srgb, var(--color-secundario) 30%, transparent)
+    );
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    border-radius: 20px 20px 0px 0px;
+}
+
+.cabecera-tabla h3{
+    margin-bottom: unset;
+}
+
+.container-jugadoras {
+    display: flex;
+    flex-direction: row;
+    width: 100%;             /* ocupar todo el ancho posible */
+    overflow-x: auto;            /* habilita scroll horizontal */
+    -webkit-overflow-scrolling: touch; /* scroll suave en iOS */
+    scroll-behavior: smooth;     /* scroll suave también en PC */
+    gap: 15px;                   /* opcional: espacio entre items */
+    padding-bottom: 10px;        /* opcional: espacio interior inferior */
+    padding-inline: 10px;
+}
+
+.container-jugadoras::-webkit-scrollbar {
+    height: 8px;                 /* altura del scroll horizontal */
+}
+
+.container-jugadoras::-webkit-scrollbar-thumb {
+    /*background-color: rgba(79, 78, 79, 0.36);  /* color del scroll */
+    background-color: var(--color-primario);
+    border-radius: 4px;
+}
+
+.container-jugadoras::-webkit-scrollbar-track {
+    background: transparent;     /* fondo del track */
+}
+
+
+.jugadora-item{
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    border-radius: 20px; /* Bordes redondeados */
+    text-align: center; /* Centrar el contenido dentro del botón */
+    padding-inline: 10px; /* Espaciado interior */
+        /* Glass base */
+    /*background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-primario) 30%, transparent),
+        color-mix(in srgb, var(--color-secundario) 30%, transparent)
+    );*/
+
+    color: white; /* Color del texto */
+    margin-bottom: 10px; /* Espaciado inferior entre botones */
+    transition: transform 0.2s; /* Suavizar el efecto de transformación */
+    border: 0.5px solid rgb(255, 255, 255);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    align-items: center;
+    max-height: 150px;
+    /* Glass base */
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transform: translateY(10px);
+    cursor: pointer;
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease,
+        box-shadow 0.3s ease;
+    min-height: 200px;
+    min-width: 150px;
+    background-color: linear-gradient(
+                to bottom,
+                color-mix(in srgb, var(--color-primario) 30%, transparent),
+                color-mix(in srgb, var(--color-secundario) 30%, transparent)
+            );
+    background-blend-mode: overlay;
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transform: translateY(10px);
+}
+
+.jugadora-item:hover {
+    transform: translateY(0) scale(1.02);
+
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.35),
+        0 0 20px rgba(255, 255, 255, 0.25);
+
+    border-color: rgba(255, 255, 255, 0.45);
+}
+
+.tabla-jugadoras.fullscreen {
+    z-index: 9999;
+    /*background: rgba(15, 15, 20, 0.96);*/
+    border-radius: 20px;
+}
+
+.tabla-jugadoras.fullscreen .container-jugadoras {
+    flex: 1;
+    overflow-y: auto;
+    display: grid;
+
+    grid-template-columns: repeat(6, 1fr); /* 6 columnas */
+    grid-template-rows: repeat(4, 1fr);    /* 4 filas */
+    gap: 16px;
+
+    padding: 10px;
+}
+
+.tabla-jugadoras.fullscreen .container-jugadoras::-webkit-scrollbar {                 
+    width: 8px;
+}
+
+body.no-scroll {
+    overflow: hidden;
+}
+
+
+/* Botón */
+.cabecera-tabla a {
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--color-terciario);
+    transition: all 0.3s ease;
+}
+
+.cabecera-tabla a:hover{
+    color: aqua;
+    transform: scale(1.1);
+
+}

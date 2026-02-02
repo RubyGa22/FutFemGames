@@ -1,15 +1,48 @@
-from django.shortcuts import render
 from django.http import JsonResponse
-from django.db import connection
+from django.db import connection, IntegrityError
 from django.db.models import Q
 from datetime import date, datetime
 from .models import Jugadora, Trayectoria, Equipo, Pais, Liga
 from random import shuffle
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import render, redirect
+from django.contrib.auth.hashers import make_password, check_password
 
 # Create your views here.
 #################################################################################################
 ######################################JUGADORAS##################################################
 #################################################################################################
+def jugadoras_All(request):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                j.*,
+                t.equipo AS equipo_actual_id
+            FROM jugadoras j
+            JOIN trayectoria t 
+                ON t.jugadora = j.id_jugadora
+            WHERE t.equipo_actual = TRUE
+            ORDER BY j.id_jugadora;
+        """)
+        filas = cursor.fetchall()
+
+    jugadoras = []
+    for id_jugadora, nombre, apellido, apodo, nacimiento, nacionalidad, posicion, imagen, retiro, equipo in filas:
+        jugadoras.append({
+            "id_jugadora": id_jugadora,
+            "nombre": nombre,
+            "apellido": apellido,
+            "apodo": apodo,
+            "nacimiento": nacimiento,
+            "nacionalidad": nacionalidad,
+            "posicion": posicion,
+            "imagen": imagen,
+            "retiro": retiro,
+            "equipo": equipo,
+        })
+    
+    return JsonResponse({"success": jugadoras})
+
 def jugadora_apodo(request):
     id_jugadora = request.GET.get("id_jugadora")
 
@@ -259,7 +292,7 @@ def jugadora_trayectoria(request):
     return JsonResponse(data, safe=False)
 
 def jugadora_pais(request):
-    nombre = request.GET.get('nombre', '').strip()  # Realmente es el ID
+    nombre = request.GET.get('id', '').strip()  # Realmente es el ID
 
     if not nombre:
         return JsonResponse({"error": "Nombre de jugadora no proporcionado"}, status=400)
@@ -345,13 +378,25 @@ def jugadora_aleatoria(request):
 
 def jugadoras_por_equipo_y_temporada(request):
     equipo_id = request.GET.get("equipo")
-    temporada = request.GET.get("temporada")
+    temporada = request.GET.get("temporada")  # puede ser None o ""
 
-    if not equipo_id or not temporada:
-        return JsonResponse({"success": [], "error": "Faltan parámetros"}, status=400)
+    if not equipo_id:
+        return JsonResponse(
+            {"success": [], "error": "Falta el equipo"},
+            status=400
+        )
 
-    temporada = int(temporada)
-    año_actual = datetime.now().year   # ← año actual
+    filtrar_por_temporada = bool(temporada)
+    año_actual = datetime.now().year
+
+    if filtrar_por_temporada:
+        try:
+            temporada = int(temporada)
+        except ValueError:
+            return JsonResponse(
+                {"success": [], "error": "Temporada inválida"},
+                status=400
+            )
 
     with connection.cursor() as cursor:
         cursor.execute("""
@@ -370,48 +415,60 @@ def jugadoras_por_equipo_y_temporada(request):
 
     for fila in filas:
         fila_dict = dict(zip(columnas, fila))
-
         años = fila_dict["años"].strip()
 
         # -----------------------------
-        #  🔥 PROCESAR RANGO DE AÑOS
+        # PROCESAR RANGO DE AÑOS
         # -----------------------------
-
         if "-" in años:
             inicio, fin = años.split("-")
-
-            # Convertir inicio
             inicio = int(inicio)
 
-            # Si fin es "act", reemplazarlo por año actual
             if fin.lower() == "act":
                 fin = año_actual
             else:
                 fin = int(fin)
-
         else:
-            # Ejemplo raro: "act"
             if años.lower() == "act":
-                inicio = año_actual
-                fin = año_actual
+                inicio = fin = año_actual
             else:
                 inicio = fin = int(años)
 
         # -----------------------------
-        #  🔥 FILTRAR POR TEMPORADA
+        # FILTRADO
         # -----------------------------
-        if inicio <= temporada <= fin:
-
-            # si quieres mantener la imagen binaria tal cual:
-            if fila_dict.get("imagen"):
-                fila_dict["imagen"] = fila_dict["imagen"]
-
+        if filtrar_por_temporada:
+            if inicio <= temporada <= fin:
+                jugadoras.append(fila_dict)
+        else:
+            # 🔥 SIN temporada → todas
             jugadoras.append(fila_dict)
 
     return JsonResponse({"success": jugadoras})
 #################################################################################################
 ########################################EQUIPOS##################################################
 #################################################################################################
+
+def equipoxid(request):
+    id = request.GET.get('id')
+
+    if not id:
+        return JsonResponse({"error": "Faltan parámetros o no se encontraron resultados."}, status=400)
+
+    # Consulta
+    equipos = Equipo.objects.filter(id_equipo=id)
+
+    salida = []
+    for e in equipos:
+
+        salida.append({
+            "club": e.id_equipo,
+            "nombre": e.nombre,
+            "escudo": e.escudo,
+            "color": e.color
+        })
+
+    return JsonResponse({"success": salida})
 
 def equiposxid(request):
     ids = request.GET.getlist('id[]')  # Recupera id[]=1&id[]=2&id[]=3
@@ -430,17 +487,12 @@ def equiposxid(request):
 
     salida = []
     for e in equipos:
-        escudo_base64 = None
-        if e.escudo: 
-            try:
-                escudo_base64 = e.escudo
-            except Exception:
-                escudo_base64 = None
 
         salida.append({
             "club": e.id_equipo,
             "nombre": e.nombre,
-            "escudo": escudo_base64
+            "escudo": e.escudo,
+            "color": e.color
         })
 
     return JsonResponse({"success": salida})
@@ -455,14 +507,71 @@ def equiposAll(request):
         filas = cursor.fetchall()
 
     equipos = []
-    for id_equipo, nombre, escudo in filas:
+    for id_equipo, nombre, escudo, iso in filas:
         equipos.append({
             "nombre": nombre,
             "id": id_equipo,
-            "escudo": escudo
+            "escudo": escudo,
+            "Iso": iso
         })
     
     return JsonResponse({"success": equipos})
+
+def equiposxliga(request):
+    id_liga = request.GET.get('liga')
+
+    if not id_liga:
+        return JsonResponse({"error": "Faltan parámetros o no se encontraron resultados."}, status=400)
+
+    try:
+        id_liga = int(id_liga)
+    except ValueError:
+        return JsonResponse({"error": "ID de liga inválido."}, status=400)
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT e.id_equipo, e.nombre, e.escudo, e.color
+            FROM equipos e
+            JOIN ligas l ON e.liga = l.id_liga
+            WHERE l.id_liga = %s
+            ORDER BY e.nombre
+        """, [id_liga])
+        filas = cursor.fetchall()
+
+    equipos = []
+    for id_equipo, nombre, escudo, color in filas:
+        equipos.append({
+            "nombre": nombre,
+            "id": id_equipo,
+            "escudo": escudo,
+            "color": color
+        })
+
+    return JsonResponse({"success": equipos})
+
+def equipoxnombre(request):
+    nombre = request.GET.get('nombre', '').strip()
+
+    if not nombre:
+        return JsonResponse(
+            {"error": "Falta el nombre del equipo"},
+            status=400
+        )
+
+    equipos = Equipo.objects.filter(nombre__icontains=nombre)
+
+    salida = []
+    for e in equipos:
+
+        salida.append({
+            "id_equipo": e.id_equipo,
+            "liga": e.liga.id_liga,
+            "nombre": e.nombre,
+            "escudo": e.escudo,
+            "color": e.color
+        })
+
+    return JsonResponse(salida, safe=False)
 #################################################################################################
 #########################################PAISES##################################################
 #################################################################################################
@@ -517,6 +626,28 @@ def paisesall(request):
         })
     
     return JsonResponse({"success": paises})
+
+def paisxnombre(request):
+    nombre = request.GET.get('nombre', '').strip()
+
+    if not nombre:
+        return JsonResponse(
+            {"error": "Falta el nombre del país"},
+            status=400
+        )
+
+    paises = Pais.objects.filter(nombre__icontains=nombre)
+
+    salida = []
+    for p in paises:
+
+        salida.append({
+            "pais": p.id_pais,
+            "nombre": p.nombre,
+            "bandera": p.bandera
+        })
+
+    return JsonResponse(salida, safe=False)
 #################################################################################################
 #########################################LIGAS###################################################
 #################################################################################################
@@ -553,6 +684,37 @@ def ligasxid(request):
 
     return JsonResponse({"success": salida})
 
+def ligasxpais(request):
+    pais_id = request.GET.get('pais')
+
+    if not pais_id:
+        return JsonResponse(
+            {"error": "Falta el parámetro 'pais'."},
+            status=400
+        )
+
+    try:
+        pais_id = int(pais_id)
+    except ValueError:
+        return JsonResponse(
+            {"error": "ID de país inválido."},
+            status=400
+        )
+
+
+    # Consulta
+    ligas = Liga.objects.filter(pais=pais_id)
+
+    salida = []
+    for l in ligas:
+
+        salida.append({
+            "liga": l.id_liga,
+            "nombre": l.nombre,
+            "logo": l.logo
+        })
+
+    return JsonResponse({"success": salida})
 #################################################################################################
 #######################################POSICIONES################################################
 #################################################################################################

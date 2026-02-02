@@ -1,0 +1,38 @@
+body{
+    background-image: url("/static/img/fondo cesped.jpg.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: rgb(37, 0, 37); /* Color negro con transparencia */
+    background-blend-mode: color-dodge; /* Modo de mezcla */
+}
+.container-perfil{
+    display: flex;
+    flex-direction: row;
+    height: 80vh;
+    width: 70%;
+    align-items: center;
+    gap: 40px;
+    padding: 80px;
+}
+.glass{
+    border: 0.25px solid rgba(227, 163, 249, 0.838);
+}
+
+.container-perfil div{
+    width: 100%;
+    height: 100%;
+}
+
+.container-perfil .right{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.container-perfil .right div{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

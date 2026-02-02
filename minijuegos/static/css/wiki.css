@@ -1,0 +1,244 @@
+#sugerencias{
+    max-height: 125px;
+    overflow-y: scroll;
+}
+
+#items-container.jugadoras{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+}
+
+#items-container.equipos {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas iguales */
+    gap: 15px; /* espacio entre filas y columnas */
+    justify-items: center; /* centra horizontalmente los items */
+    margin-bottom: 30px;
+    margin-top: 20px;
+    max-width: 80%;
+}
+
+.jugadora-item{
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 6 columnas iguales */
+    grid-template-rows: 1fr;              /* 1 fila */
+
+    width: 80%;
+    height: 60px;
+    overflow: hidden; /* recorta lo que sobresalga */
+    align-items: center;
+    justify-items: center;
+}
+
+.jugadora-item:hover {
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.35),
+        0 0 20px rgba(255, 255, 255, 0.25);
+
+    border-color: rgba(255, 255, 255, 0.45);
+}
+
+.jugadora-item .jugadora-imagen{
+    /*border-radius: 0px 0px 0px 10px;*/
+    width: 20%;       /* ocupa todo el ancho de la celda */
+    /*height: 100%;      /* ocupa todo el alto de la celda */
+    object-fit: cover; /* mantiene proporción y recorta si hace falta */
+}
+
+.jugadora-item .equipo-imagen{
+    width: 15%;       /* ocupa todo el ancho de la celda */
+    /*height: 100%;      /* ocupa todo el alto de la celda */
+    object-fit: cover; /* mantiene proporción y recorta si hace falta */
+}
+
+.jugadora-item p{
+    width: 100%;
+}
+
+#wiki-equipos{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#cabecera-wiki-equipos{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 2px solid var(--color-detalles);
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+#cabecera-wiki-equipos #selector nav ul{
+    display: flex;
+    list-style: none;
+    padding: 0%;
+}
+
+#cabecera-equipo, #cabecera-jugadora{
+    display: none;
+    flex-direction: column;
+    align-items: center;
+}
+
+#input-y-boton{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+#ligas-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 15px; /* espacio entre items */
+    flex-wrap: nowrap; /* no se envuelven */
+    max-width: 90%;
+}
+
+.liga-item{
+    display: flex;
+    flex-direction: row;
+    border-radius: 20px; /* Bordes redondeados */
+    text-align: center; /* Centrar el contenido dentro del botón */
+    padding-inline: 10px; /* Espaciado interior */
+    background-color: rgba(128,0,128,0.45); /* Color de fondo primario */
+    color: white; /* Color del texto */
+    margin-bottom: 20px; /* Espaciado inferior entre botones */
+    transition: transform 0.2s; /* Suavizar el efecto de transformación */
+    border: 0.5px solid rgb(255, 255, 255);
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);
+    align-items: center;
+
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.liga-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.liga-item:hover {
+    transform: scale(1.05); /* Aumenta ligeramente el tamaño al pasar el ratón */
+    color: var(--color-texto); /* Cambiar el color del texto en hover */
+    background: var(--color-detalles);
+    
+}
+
+.liga-item:hover p{
+    color: var(--color-texto);}
+
+.liga-item h3{
+    font-size: 15px;
+}
+
+.liga-item img{
+    width: 20%;
+    height: fit-content;
+}
+
+.liga-info{
+    display: flex;
+    flex-direction: column;
+    text-align: justify;
+    justify-content: center;
+    margin-left: 15px;
+    width: 100%;
+}
+
+.equipo-item{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 20px; /* Bordes redondeados */
+    text-align: center; /* Centrar el contenido dentro del botón */
+    padding-inline: 10px; /* Espaciado interior */
+        /* Glass base */
+    /*background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-primario) 30%, transparent),
+        color-mix(in srgb, var(--color-secundario) 30%, transparent)
+    );*/
+
+    color: white; /* Color del texto */
+    margin-bottom: 10px; /* Espaciado inferior entre botones */
+    transition: transform 0.2s; /* Suavizar el efecto de transformación */
+    border: 0.5px solid rgb(255, 255, 255);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    align-items: center;
+    max-height: 150px;
+    /* Glass base */
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    width: 90%;
+    opacity: 0;
+    transform: translateY(10px);
+    cursor: pointer;
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease,
+        box-shadow 0.3s ease;
+
+    /*background: rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);*/
+}
+
+.equipo-item:hover {
+    transform: translateY(0) scale(1.02);
+
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.35),
+        0 0 20px rgba(255, 255, 255, 0.25);
+
+    border-color: rgba(255, 255, 255, 0.45);
+}
+
+
+.equipo-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.equipo-item img{
+    width: fit-content;
+    height: 40%;
+}
+
+@media (max-width: 992px) {
+    #equipos-container {
+        grid-template-columns: repeat(3, 1fr); /* 2 columnas en pantallas medianas */
+    }
+}
+
+@media (max-width: 750px) {
+    #ligas-container {
+        max-width: 90vw;
+        overflow-x: auto;       /* habilita scroll horizontal */
+        -webkit-overflow-scrolling: touch; /* scroll suave en iOS */
+        justify-content: flex-start; /* alinea items a la izquierda */
+        padding-inline: 10px;   /* un poco de padding lateral */
+    }
+
+    #ligas-container .liga-item {
+        flex: 0 0 auto; /* cada item mantiene su ancho, no se encoge */
+        width: 200px;   /* o el ancho que quieras mostrar en móvil */
+    }
+
+    #items-container.equipos {
+        grid-template-columns: repeat(2, 1fr); /* 1 columna en pantallas pequeñas */
+    }
+
+}

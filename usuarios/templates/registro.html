@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link rel="icon" href="{% static 'img/prueba logo.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+    <div class="container">
+        <form class="glass" method="post">
+            {% csrf_token %}
+            <h2>Registro</h2>
+            <div id="div-usuario">
+                <label for="usuario">User:</label>
+                <input type="text" name="usuario" placeholder="User" required>
+            </div>
+            <div id="div-contraseña">
+                <label for="password">Password:</label>
+                <input type="password" name="password" placeholder="password" required>
+                <input type="password" name="password2" placeholder="Repite contraseña" required>
+            </div>
+
+            <button type="submit">Registrar</button>
+            {% if error %}
+                <p>{{ error }}</p>
+            {% endif %}
+        </form>
+    </div>
+</body>
+</html>

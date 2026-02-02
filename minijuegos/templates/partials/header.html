@@ -1,30 +1,65 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 {% load static %}
 <header class="navbar">
   <div class="container">
 
-    <!-- Logo de GTI -->
-    <a href="{% url 'index' %}" class="navbar-brand1"><img src="{% static 'img/logo.png' %}" alt="logo futfem"></a>
+    <!-- Logo de vSports -->
+    <div id="header-izquierda"> 
+      <a href="{% url 'index' %}" class="navbar-brand1"><img src="{% static 'img/logo.png' %}" alt="logo futfem"></a>
+      <nav id="main-nav">
+        <ul>
+          <li><a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
+          <li><a href="{% url 'wiki' %}" class="{% if request.resolver_match.url_name == 'wiki' %}active{% endif %}">Wiki</a></li>
+          <li><a href="#nosotros">Nosotros</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+      </nav>
+    </div>
     <!-- Barra de navegación -->
     <a href="{% url 'index' %}" class="navbar-brand"><img src="{% static 'img/logo 1.png' %}" alt="logo futfem"></a>
-    <!-- Botones de inicio de sesión y registro -->
-    <div class="botones">
-      <a href="#login">Iniciar Sesión</a> <!-- Enlace a la página de inicio de sesión -->
-      <a href="#registro">Registrarse</a> <!-- Enlace a la página de registro -->
-    </div>
     <!-- Botón de menú hamburguesa -->
     <div class="hamburger-menu" onclick="toggleMenu()">
       <div class="bar"></div>
       <div class="bar"></div>
       <div class="bar"></div>
     </div>
-    <!-- Menú desplegable -->
+        <!-- Menú desplegable -->
     <div class="dropdown-menu">
+      <nav>
+        <ul>
+          <li><a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
+          <li><a href="{% url 'wiki' %}" class="{% if request.resolver_match.url_name == 'wiki' %}active{% endif %}">Wiki</a></li>
+          <li><a href="#nosotros">Nosotros</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+      </nav>
       <div>
-        <a href="login">Iniciar Sesión</a>
+          {% if usuario_sesion %}
+              <span class="user-name">Hola, {{ usuario_sesion.usuario }}</span>
+              {% if usuario_sesion.jugadora_favorita %}
+                  <img src="/{{ usuario_sesion.jugadora_favorita.imagen }}" class="avatar">
+              {% endif %}
+              <a href="{% url 'logout' %}" class="logout-button"><i class="bi bi-power"></i></a>
+          {% else %}
+              <a href="{% url 'login' %}" class="iniciar-sesion-button">Iniciar sesión</a>
+              <a href="{% url 'registro' %}" class="registro-button">Registrarse</a>
+          {% endif %}
       </div>
-      <div>
-        <a href="registro">Registrarse</a>
-      </div>
+    </div>
+    <!-- Botones de inicio de sesión y registro -->
+    <div class="botones">
+        {% if usuario_sesion %}
+          <a href="{% url 'perfil' %}" class="user-profile-link">
+              <span class="user-name">{{ usuario_sesion.usuario }}</span>
+              {% if usuario_sesion.jugadora_favorita %}
+                  <img src="/{{ usuario_sesion.jugadora_favorita.imagen }}" class="avatar">
+              {% endif %}
+          </a>
+              <a href="{% url 'logout' %}" class="logout-button"><i class="bi bi-power"></i></a>
+          {% else %}
+              <a href="{% url 'login' %}" class="iniciar-sesion-button">Iniciar sesión</a>
+              <a href="{% url 'registro' %}" class="registro-button">Registrarse</a>
+          {% endif %}
     </div>
   </div>
 </header>
@@ -32,8 +67,19 @@
   function toggleMenu() {
     const menu = document.querySelector('.dropdown-menu');
     const hamburger = document.querySelector('.hamburger-menu');
+    const header = document.querySelector('header');
     hamburger.classList.toggle('open');
-    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+    menu.classList.toggle('open');
+    header.style.background = menu.classList.contains('open') ?  'var(--color-secundario)' : 'transparent';
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        menu.classList.remove('open');
+        hamburger.classList.remove('open');
+        header.style.background = 'transparent';
+      }
+    });
+
   }
 </script>
 

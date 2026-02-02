@@ -36,7 +36,7 @@ function ponerBanderas(ids, posiciones) {
                         }
                         // Crear y configurar la imagen
                         const img = document.createElement('img');
-                        img.alt = "Pais";
+                        img.alt = pais.nombre;
                         img.src = pais.bandera;
                         img.id='logo';
                         img.style.width = "50px";
@@ -79,7 +79,7 @@ function ponerClubes(ids, posiciones) {
                     return;
                 }
 
-                data.success.forEach((pais, index) => {
+                data.success.forEach((club, index) => {
                     const th = document.getElementById(posiciones[index]);
 
                     if (th) {
@@ -91,19 +91,22 @@ function ponerClubes(ids, posiciones) {
 
                         // Crear y configurar la imagen
                         const img = document.createElement('img');
-                        img.alt = "Club";
-                        img.src = pais.escudo;
+                        img.alt = club.nombre;
+                        img.src = club.escudo;
                         img.id='logo';
                         img.style.width = "50px";
                         img.style.height = "auto";
-                        img.classList.add('club'+pais.club);
-
-                        // Crear y configurar el texto (si se desea incluir)
-                        /*
-                        const text = document.createElement('p');
-                        text.textContent = pais.nombre;
-                        text.style.margin = "0";
-                        */
+                        img.classList.add('club'+club.club);
+                          // Aplicar degradado usando los colores de la BD
+                        const colorPrimario = club.color || 'var(--color-primario)'; // fallback
+                        const colorSecundario = club.colorSecundario || 'transparent'; // fallback
+                        th.style.background = `
+                            linear-gradient(
+                                to bottom,
+                                color-mix(in srgb, ${colorPrimario} 30%, transparent),
+                                color-mix(in srgb, ${colorSecundario} 30%, transparent)
+                            )
+                        `;
 
                         // Añadir imagen y texto al elemento th
                         th.appendChild(img);
@@ -142,25 +145,24 @@ function ponerLigas(ids, posiciones) {
                     return;
                 }
 
-                data.success.forEach((pais, index) => {
+                data.success.forEach((liga, index) => {
                     const th = document.getElementById(posiciones[index]);
 
                     if (th) {
                         const p = document.getElementById('nombre');
                         if(p){
-                            p.textContent = pais.nombre;
+                            p.textContent = liga.nombre;
                         }
                         th.innerHTML = ''; // Limpiar el contenido previo
 
                         // Crear y configurar la imagen
                         const img = document.createElement('img');
-                        img.alt = "Liga";
-                        img.src = pais.logo;
+                        img.alt = liga.nombre;
+                        img.src = liga.logo;
                         img.id='logo';
                         img.style.width = "50px";
                         img.style.height = "auto";
-                        img.classList.add('liga'+pais.liga);
-
+                        img.classList.add('liga'+liga.liga);
                         // Crear y configurar el texto (si se desea incluir)
                         /*
                         const text = document.createElement('p');
@@ -279,38 +281,6 @@ async function obtenerPosicion(id) {
     }*/ catch (error) {
         console.error('Error al obtener la posición de la jugadora:', error);
         return null; // En caso de error, devolver null
-    }
-}
-
-async function obtenerEquipos(nombre) {
-    try {
-        // Realizar la solicitud fetch
-        const response = await fetch(`../api/jugadora_trayectoria?id=${encodeURIComponent(nombre)}`);
-
-        // Verificar que la solicitud fue exitosa
-        if (!response.ok) {
-            throw new Error(`Error en la solicitud: ${response.statusText}`);
-        }
-
-        // Convertir la respuesta a JSON
-        const data = await response.json();
-        console.log("Respuesta del servidor:", data);
-
-        // Verificar si hubo un error en el JSON recibido
-        if (data.error) {
-            throw new Error(data.error);
-        }
-
-        // Comprobar si data es una lista de objetos
-        if (Array.isArray(data)) {
-            return data; // Devuelve la lista de objetos
-        } else {
-            console.warn('La respuesta no es una lista válida de objetos:', data);
-            return null;
-        }
-    } catch (error) {
-        console.error('Error al obtener los equipos:', error);
-        return null;
     }
 }
 
@@ -467,108 +437,6 @@ function debounce(func, wait) {
     };
 }
 
-async function getSesion() {
-    try {
-        const respuesta = await fetch('../api/sesion/');
-        if (!respuesta.ok) throw new Error('No se pudo obtener la sesión');
-
-        const data = await respuesta.json();
-        return data.id ?? null;
-    } catch (error) {
-        console.error("Error al obtener la sesión:", error);
-        return null;
-    }
-}
-
-async function obtenerRacha(juego) {
-    try {
-        let usuario = await getSesion();
-        if (!usuario) {
-            console.error("Error: No se pudo obtener el usuario de la sesión.");
-            return null;
-        }
-
-        const url = `../api/juego_racha?juego=${juego}&user=${usuario}`;
-        console.log("URL generada:", url);
-
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error(`Error en la solicitud: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log('Datos recibidos:', data);
-        displayRacha(data[0].Racha, data[0].Juego);
-        return data ?? null;  // Devuelve `data` si existe, si no, `null`
-    } catch (error) {
-        console.error("Error al obtener los datos:", error);
-        return null;
-    }
-}
-
-async function updateRacha(juego, condicion) {
-    let rachaActual;
-    try {
-        // Obtén el ID del usuario de la sesión
-        let usuario = await getSesion();
-
-        // Verificar la condición, si es 0, establecer la racha como 0
-        if (condicion === 0) {
-            rachaActual = 0;
-        }else if(condicion === 2){
-            rachaActual = await obtenerRacha(juego);
-            rachaActual = rachaActual[0].Racha; // Asumimos que 'obtenerRacha' devuelve un array
-        } else {
-            // Si la condición no es 0, obtenemos la racha actual
-            rachaActual = await obtenerRacha(juego);
-            rachaActual = rachaActual[0].Racha; // Asumimos que 'obtenerRacha' devuelve un array
-            rachaActual = rachaActual + 1;
-        }
-
-        // Crear una nueva instancia de FormData
-        const formData = new FormData();
-
-        // Agregar los datos al FormData
-        formData.append('racha', rachaActual);
-        formData.append('juego', juego);
-        formData.append('user', parseInt(usuario, 10));  // Convertir usuario a entero
-
-        console.log(formData); // Verificar el contenido del FormData (para debugging)
-
-        // Realizamos el POST con fetch
-        const response = await fetch('../api/juego_racha', {
-            method: 'POST',
-            body: formData // Usar FormData directamente
-        });
-
-        // Verificar si la solicitud fue exitosa
-        if (!response.ok) {
-            throw new Error(`Error al actualizar la racha: ${response.statusText}`);
-        }
-
-        // Si la respuesta es exitosa, puedes hacer algo con los datos
-        const responseData = await response.json();
-        console.log('Racha actualizada:', responseData);
-        return responseData;
-
-    } catch (error) {
-        console.error("Error al obtener los datos:", error);
-        return null;
-    }
-}
-
-
-function displayRacha(racha, juego){
-    const displayJuego = document.getElementById('racha-'+juego)
-    if(racha === 0 || !racha){
-        displayJuego.style.opacity = '0';
-    }else{
-        displayJuego.style.display = '100%';
-        displayJuego.textContent = racha;
-    }
-}
-
 let intervalos = {}; // Objeto para almacenar los intervalos
 
 function startCounter(segundos, juego, onFinish) {
@@ -588,7 +456,7 @@ function startCounter(segundos, juego, onFinish) {
         } else {
             localStorage.setItem(juego, segundos);
             segundos--;
-            console.log(segundos);
+           //console.log(segundos);
         }
     }, 1000);
 }
@@ -603,7 +471,7 @@ function stopCounter(juego) {
     }
 }
 
-function crearPopupInicialJuego(titulo, explicacion, imagen, tipo) {
+function crearPopupInicialJuego(titulo, explicacion, imagen, tipo, iniciarCallback) {
     // Crear el contenedor del popup
     const popup = document.createElement('div');
     popup.classList.add('popup-ex');
@@ -642,7 +510,7 @@ function crearPopupInicialJuego(titulo, explicacion, imagen, tipo) {
 
         const botonIniciar = document.createElement('button');
         botonIniciar.textContent = "Iniciar";
-        botonIniciar.onclick = () => iniciar();
+        botonIniciar.addEventListener('click', () => iniciarCallback());
 
         contenedorBoton.appendChild(botonIniciar);
         popup.appendChild(contenedorBoton);
@@ -659,16 +527,15 @@ function crearPopupInicialJuego(titulo, explicacion, imagen, tipo) {
     // Crear los botones de dificultad
     const botonFacil = document.createElement('button');
     botonFacil.textContent = 'Fácil';
-    botonFacil.onclick = () => iniciar('facil');  // Usamos una función de flecha para pasar el parámetro 'facil'
+    botonFacil.addEventListener('click', () => iniciarCallback('facil'));  // Usamos una función de flecha para pasar el parámetro 'facil'
 
     const botonMedio = document.createElement('button');
     botonMedio.textContent = 'Medio';
-    botonMedio.onclick = () => iniciar('medio');  // Usamos una función de flecha para pasar el parámetro 'normal'
-
+    botonMedio.addEventListener('click', () => iniciarCallback('medio'));  // Usamos una función de flecha para pasar el parámetro 'normal'
+    
     const botonDificil = document.createElement('button');
     botonDificil.textContent = 'Difícil';
-    botonDificil.onclick = () => iniciar('dificil');  // Usamos una función de flecha para pasar el parámetro 'dificil'
-
+    botonDificil.addEventListener('click', () => iniciarCallback('dificil'));  // Usamos una función de flecha para pasar el parámetro 'dificil'
 
     // Añadir los botones al contenedor de dificultad
     selectorDificultad.appendChild(textoSelectorDificultad);

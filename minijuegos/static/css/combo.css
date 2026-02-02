@@ -5,7 +5,9 @@
     align-items: center;
 }
 #sugerencias,
-#sugerenciasLiga{
+#sugerenciasLiga,
+#sugerencias-pais,
+#sugerencias-equipo{
     position: absolute;
     padding: unset;
     margin: unset;
@@ -18,7 +20,24 @@
     padding: 5px;
     border-bottom: 1px solid #ddd;
     cursor: pointer;
-    background: var(--color-primario);
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-primario) 30%, transparent),
+        color-mix(in srgb, var(--color-secundario) 30%, transparent)
+    );
+    border: 0.5px solid rgb(255, 255, 255);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+}
+
+.suggestion-item:first-child{
+    border-radius: 20px 20px 0px 0px;
+}
+
+.suggestion-item:last-child{
+    border-radius: 0px 0px 20px 20px;
 }
 
 .suggestion-item:hover {

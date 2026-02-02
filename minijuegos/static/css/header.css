@@ -1,0 +1,409 @@
+header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-style: normal;
+    padding: unset !important;
+    width: 100%;
+}
+
+header .container{
+    max-width: 100vw;
+    max-height: max-content;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 1% 3.17%;
+    justify-content: space-between;
+    background: linear-gradient(
+        90deg,
+        var(--color-primario) 5%,
+        transparent 11%
+    );
+    transition: max-height 0.5s ease-in-out; /* transición suave */
+}
+
+header .container .user-profile-link{
+    transition: all 0.4s ease-in-out;
+}
+
+header .container .user-profile-link:hover{
+    transform: scale(1.1);
+    color: var(--color-detalles);
+}
+
+header .container .avatar{
+    border-radius: 20px;
+    border: 0.25px solid rgba(227, 163, 249, 0.838);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-primario) 30%, transparent),
+        color-mix(in srgb, var(--color-secundario) 30%, transparent)
+    );
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+header #header-izquierda{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+header nav{
+    padding: 0 3.17%;
+}
+
+header img{
+    width: 75px;
+}
+
+header .navbar-brand{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+header .navbar-brand img{
+    width: 120px;
+}
+
+header ul{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: unset;
+}
+
+header ul li{
+    margin: 0 5%;
+    list-style: none;
+}
+
+header ul li a:link {
+  text-decoration: none;
+}
+
+header ul li a {
+  color:#999999;
+  -moz-transition: all 0.2s ease-in;
+  -o-transition: all 0.2s ease-in;
+  -webkit-transition: all 0.2s ease-in;
+  transition: all 0.2s ease-in;
+  font-size: large;
+}
+
+header ul li a:hover {
+  color: white;
+  text-shadow:0px 0px 30px white;
+  -moz-transition: all 0.2s ease-in;
+  -o-transition: all 0.2s ease-in;
+  -webkit-transition: all 0.2s ease-in;
+  transition: all 0.2s ease-in;
+}
+
+header ul li a.active {
+    color: white;
+    text-shadow:0px 0px 30px white;
+}
+
+header .botones{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+header .botones button{
+    background: var(--color-detalles);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: 'Oswald', sans-serif;
+    color: var(--color-primario);
+    width: max-content;
+}
+
+header .container .iniciar-sesion-button {
+    background: transparent;
+    color: white;
+    border: 2px solid;
+    border-image: linear-gradient(
+        90deg,
+        var(--color-primario),
+        var(--color-terciario)
+    ) 1;
+    border-radius: 25px;
+    transition: transform 0.3s ease-in-out;
+
+}
+
+header .container .logout-button{
+    font-size: x-large;
+    transition: all 0.3s ease-in-out;
+}
+
+header .container .logout-button:hover{
+    color: red;
+    transform: scale(1.1); /* ligera expansión */
+    text-shadow: 0 0 10px red; /* glow sobre el texto */
+}
+
+header .container .logout-button:hover::before{
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+
+header .container .iniciar-sesion-button:hover {
+    box-shadow: 0 0 10px var(--color-primario);
+    transform: scale(1.1);
+    animation: waveGradient 10s ease-in-out infinite;
+}
+
+header .container .registro-button {
+     background: linear-gradient(
+        90deg,
+        var(--color-primario),
+        var(--color-terciario),
+        var(--color-primario)
+    );
+    background-size: 300% 100%;
+    background-position: 0% 50%;
+
+    color: #fff;
+    border: 1px solid var(--color-primario);
+
+    transition: transform 0.3s ease-in-out;
+}
+@keyframes waveGradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+header .container .registro-button:hover {
+    box-shadow: 0 0 10px var(--color-primario);
+    transform: scale(1.1);
+    animation: waveGradient 10s ease-in-out infinite;
+}
+
+header .botones a{
+    color: var(--color-detalles);
+    padding-inline: 10px;
+    text-decoration: none;
+}
+
+header .botones a:hover{
+    text-decoration: none;
+    color: var(--color-texto);
+}
+
+header .icono-hamburguesa{
+    display: none;
+}
+
+/* Estilos para el menú hamburguesa */
+.hamburger-menu {
+    display: none; /* Oculto por defecto */
+    cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 50;
+}
+.hamburger-menu .bar {
+    width: 25px;
+    height: 3px;
+    background: var(--color-detalles);
+}
+/* Transformaciones para la cruz */
+.hamburger-menu.open .bar:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+.hamburger-menu.open .bar:nth-child(2) {
+    opacity: 0;
+}
+.hamburger-menu.open .bar:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+/* Menú desplegable */
+.dropdown-menu {
+    display: flex;              /* siempre existe */
+    flex-direction: column;
+    overflow: hidden;
+
+    max-height: 0;              /* cerrado */
+    opacity: 0;
+    pointer-events: none;
+    border: none;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-3px);
+    background: var(--color-secundario);
+    transition:
+        max-height 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.6s ease-in-out;
+}
+
+
+/* Cuando esté abierto */
+.dropdown-menu.open {
+    max-height: 400px; /* solo para permitir la animación */
+    opacity: 1;
+    pointer-events: auto;
+}
+
+
+.dropdown-menu div {
+    padding: 10px
+}
+
+.dropdown-menu div a{
+    text-decoration: none;
+    color: var(--color-detalles);
+}
+
+@media (max-width: 1157px){
+    header ul li{
+        margin: 0% 3%;
+    }
+    header nav ul li a{
+        font-size: large;
+    }
+
+    header #header-izquierda{
+        gap: 0px;
+    }
+
+    header .navbar-brand img{
+        width: 100px;
+    }
+}
+
+@media (max-width: 992px){
+    header .container{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    header #header-izquierda{
+        gap: 5px;
+    }
+
+    header #header-izquierda nav ul{
+        padding: 0 15%;
+    }
+
+    header #header-izquierda nav ul li{
+        margin: 0 3%;
+    }
+    
+    header #header-izquierda nav ul li a{
+        font-size: medium;
+    }
+}
+
+@media (max-width: 840px) {
+    header #header-izquierda nav ul li a{
+        font-size: small;
+    }
+    header button{
+        font-size: small;
+    }
+}
+
+@media (max-width: 768px){
+    header{
+       padding: 0% !important;
+       /*background: var(--color-secundario);*/
+       transition: background 0.5s ease-in-out;
+    }
+
+    header .container {
+        flex-direction: column; /* importante: apila nav + botones + dropdown */
+        background: none;
+        padding-left: unset;
+        padding-block: unset;
+    }
+
+    header #header-izquierda{
+        background: linear-gradient(
+            90deg,
+            var(--color-primario) 60%,
+            transparent 90%
+        );
+        padding: 1% 3.17%;
+    }
+
+    header #main-nav{
+        display: none;
+    }
+
+    header .navbar-brand img{
+        width: 80px;
+    }
+
+    header .dropdown-menu nav{
+        width: 100%;
+        padding: unset;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    header .dropdown-menu nav ul{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: unset;
+        gap: 20px;
+    }
+
+    header .dropdown-menu nav ul li{
+        margin: 0;
+    }
+
+    header .dropdown-menu nav ul li a{
+        font-size: small;
+    }
+
+    header .dropdown-menu div{
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+    }
+
+    header .dropdown-menu div button{
+        font-size: small;
+    }
+
+    header .container{
+        display: flex;
+        flex-direction: row;
+    }
+
+    header .container .botones{
+        display: none;
+    }
+
+    .hamburger-menu{
+        display: flex;
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutfemWiki</title>
+    <link rel="icon" href="{% static 'img/prueba logo.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/combo.css' %}">
+    <link rel="stylesheet" href="{% static 'css/wiki.css' %}">
+</head>
+<body>
+{% include 'partials/header.html' %}
+
+<section id="wiki-equipos">
+    <div id="cabecera-wiki-equipos">
+        <div id="selector">
+            <nav>
+                <ul>
+                    <li><button onclick="eleccion('equipo')">Equipos</button></li>
+                    <li><button id="jugadoras-btn" onclick="eleccion('jugadora')">Jugadoras</button></li>
+                </ul>
+            </nav>
+        </div>
+        <div id="cabecera-equipo">
+            <p>Seleccione un país</p>
+            <div id="input-y-boton">
+                <input id="input-pais" class="input-pais" type="text" placeholder="Buscar por país..." autocomplete="off">
+                <button id="confirmarPais">Confirmar</button>
+            </div>
+            <div id="ligas-container"></div>
+        </div>
+        <div id="cabecera-jugadora">
+            <div id="filtros">
+                <label for="equipo">Equipo:</label>
+                <input id="input-equipo" type="text" name="equipo" placeholder="Buscar por equipo..." autocomplete="off">
+                <label for="pais">Nacionalidad:</label>
+                <input id="input-pais" class="input-pais" name="pais" type="text" placeholder="Buscar por país..." autocomplete="off">
+            </div>
+            <button id="jugadoras-filtros">Confirmar</button>
+        </div>
+        <div id="sugerencias-container">
+            <ul id="sugerencias-pais"></ul>
+            <ul id="sugerencias-equipo"></ul>
+        </div>
+    </div>
+        
+    </div>
+    <div id="items-container"></div>
+</section>
+
+<script type="module" src="{% static 'js/utils/wiki.js' %}"></script>
+<script src="{% static 'js/funciones-tablas.js' %}"></script>
+<script>
+    function eleccion(tipo){
+        const equipo = document.getElementById('cabecera-equipo');
+        const jugadora = document.getElementById('cabecera-jugadora');
+        const container = document.getElementById('items-container');
+
+        if(tipo==='jugadora'){
+            container.innerHTML = '';
+            equipo.style.display = 'none';
+            jugadora.style.display = 'flex';
+        }else if(tipo==='equipo'){
+            container.innerHTML = '';
+            jugadora.style.display = 'none';
+            equipo.style.display = 'flex';
+        }
+    }
+</script>
+</body>
+</html>

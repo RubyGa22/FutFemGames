@@ -1,7 +1,9 @@
+@import url("header.css");
 :root {
     /* Colores principales */
-    --color-primario: purple;
+    --color-primario: rgb(172, 0, 172);
     --color-secundario: #480048;
+    --color-terciario: #009e79;
 
     /* Colores neutrales */
     --color-detalles: #ffffff;
@@ -25,11 +27,11 @@ body {
     /*animation: movimientoOlas 10s ease-in-out infinite;*/
     color: var(--color-detalles);
     overflow-x: hidden;
-    background-image: url("../img/fondo cesped.jpg.png");
+    /*background-image: url("../img/fondo cesped.jpg.png");
     background-size: cover;
-    background-repeat: no-repeat;
-    background-color: rgba(128, 0, 128, 0.5); /* Color negro con transparencia */
-    background-blend-mode: color-dodge; /* Modo de mezcla */
+    background-repeat: no-repeat;*/
+    background: rgb(37, 0, 37); /* Color negro con transparencia */
+    /*background-blend-mode: color-dodge; /* Modo de mezcla */
     min-height: 100vh;
 }
 /* Estilos de la barra de scroll */
@@ -56,55 +58,6 @@ body>div.cont button{
 }
 body>div.cont label{
     margin: 0 20px;
-}
-header{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1% 3.17%;
-    color: white;
-    z-index: 5;
-    font-family: 'Bauhaus 93', sans-serif;
-    font-weight: 600;
-    font-style: normal;
-    width: 100%;
-    position: relative;
-}
-header nav{
-    padding: 0 3.17%;
-}
-header .navbar-brand {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
-header img{
-    width: 75px;
-}
-header ul{
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    margin-bottom: unset;
-}
-header ul li{
-    margin: 0 5%;
-    list-style: none;
-}
-header .botones a{
-    color: var(--color-detalles);
-    padding-inline: 10px;
-    text-decoration: none;
-}
-header .botones a:hover{
-    text-decoration: none;
-    color: var(--color-texto);
-}
-header .icono-hamburguesa{
-    display: none;
 }
 h1,p{
     color: white;
@@ -224,59 +177,6 @@ input::placeholder{
     opacity: 0.8; /* Aplica un efecto visual para parecer deshabilitado */
     cursor: not-allowed; /* Cambia el cursor al de "no permitido" */
 }
-/* Estilos para el menú hamburguesa */
-.hamburger-menu {
-    display: none; /* Oculto por defecto */
-    cursor: pointer;
-    flex-direction: column;
-    gap: 5px;
-    z-index: 50;
-}
-.hamburger-menu .bar {
-    width: 25px;
-    height: 3px;
-    background: var(--color-detalles);
-}
-/* Transformaciones para la cruz */
-.hamburger-menu.open .bar:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-}
-.hamburger-menu.open .bar:nth-child(2) {
-    opacity: 0;
-}
-.hamburger-menu.open .bar:nth-child(3) {
-    transform: rotate(-45deg) translate(5px, -5px);
-}
-/* Menú desplegable */
-.dropdown-menu {
-    display: none;
-    flex-direction: column;
-    background: none;
-    /* background-image: url(../img/fondo cesped.jpg.png); */
-    /* background-size: cover; */
-    /* background-repeat: no-repeat; */
-    /* background-color: rgba(128, 0, 128, 0.5); */
-    background-blend-mode: color-dodge;
-    /* position: fixed; */
-    top: 10vh;
-    width: 100%;
-    height: 100%;
-    /*box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);*/
-    transition: right 0.3s ease-in-out;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    margin-top: unset;
-    border: none;
-}
-.dropdown-menu div {
-    padding: 10px
-}
-
-.dropdown-menu div a{
-    text-decoration: none;
-    color: var(--color-detalles);
-}
 
 /* Selecciona cualquier ID que empiece con "racha-" */
 [id^="racha-"] {
@@ -294,6 +194,32 @@ input::placeholder{
     display: flex;         /* Usamos flexbox para centrar el contenido */
     align-items: center;   /* Centra el contenido verticalmente */
     justify-content: center; /* Centra el contenido horizontalmente */
+}
+
+.glass{
+    border-radius: 20px; /* Bordes redondeados */
+    text-align: center; /* Centrar el contenido dentro del botón */
+    padding-inline: 10px; /* Espaciado interior */
+        /* Glass base */
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-primario) 30%, transparent),
+        color-mix(in srgb, var(--color-secundario) 30%, transparent)
+    );
+
+    color: white; /* Color del texto */
+    margin-bottom: 10px; /* Espaciado inferior entre botones */
+    transition: transform 0.2s; /* Suavizar el efecto de transformación */
+    border: 0.5px solid rgb(255, 255, 255);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transform: translateY(10px);
+    cursor: pointer;
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease,
+        box-shadow 0.3s ease;
 }
 
 .popup-ex {
@@ -369,19 +295,6 @@ input::placeholder{
     width: 30%;
 }
 @media (max-width: 768px){
-    header .container{
-        display: flex;
-        flex-direction: row;
-    }
-    header .container .botones{
-        display: none;
-    }
-    .hamburger-menu{
-        display: flex;
-    }
-    header{
-        position: fixed;
-    }
     .popup-ex .explicar img{
         max-width: 100px;
     }
@@ -400,6 +313,12 @@ input::placeholder{
     }
     .popup-ex>h2 {
         font-size: 1.5rem;
+    }
+
+    [id^="racha-"] {
+        width: 70px;           /* Ancho del círculo */
+        height: 80px;          /* Alto del círculo (igual que el ancho) */
+        font-size: 20px;
     }
 }
 @media (max-width: 650px) {
