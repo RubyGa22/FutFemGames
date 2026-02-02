@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-tylyd1o(l$na1k@hd!vw!6e767zw$$v5b_02p$$wbuv+f9wk7p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.236', '192.168.1.201', 'futfemgames.gti-ia.upv.es']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.236', '192.168.1.201', 'futfemgames.gti-ia.upv.es', '158.42.184.72']
 
 
 # Application definition
