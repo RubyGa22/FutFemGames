@@ -51,7 +51,7 @@ export async function handleAutocompleteEquipo(event, id) {
                 listItem.classList.add('suggestion-item');
 
                 listItem.innerHTML = `
-                        <img src="${escudo}" alt="${nombre}" class="equipo-img">
+                        <img src="/${escudo}" alt="${nombre}" class="equipo-img">
                         <div class="equipo-info">
                             <strong>${nombre}</strong>
                         </div>

@@ -24,6 +24,7 @@ urlpatterns = [
     path('', include('minijuegos.urls')),
     path('api/', include('futfem.urls')),
     path('accounts/', include('usuarios.urls')),
+    path('', include('FutFemWiki.urls')),
 ]
 
 

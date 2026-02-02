@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
     <link rel="stylesheet" href="{% static 'css/combo.css' %}">
-    <link rel="stylesheet" href="{% static 'css/wiki.css' %}">
+    <link rel="stylesheet" href="{% static 'FutFemWiki/css/wiki.css' %}">
 </head>
 <body>
 {% include 'partials/header.html' %}
@@ -53,8 +53,8 @@
     </div>
     <div id="items-container"></div>
 </section>
-
-<script type="module" src="{% static 'js/utils/wiki.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+<script type="module" src="{% static 'FutFemWiki/js/wiki.js' %}"></script>
 <script src="{% static 'js/funciones-tablas.js' %}"></script>
 <script>
     function eleccion(tipo){

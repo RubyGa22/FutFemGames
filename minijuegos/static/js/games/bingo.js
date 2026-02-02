@@ -1,11 +1,11 @@
 import { fetchJugadoraNacionalidadById, fetchJugadoraTrayectoriaById } from "../api/jugadora.js";
+import { updateRacha, obtenerUltimaRespuesta } from '../user/rachas.js';
 
 let idres;
 let paises, equipos, ligas;
 let lastPlayer;
 async function iniciar(dificultad) {
     const popup = document.getElementById('popup-ex'); // Selecciona el primer elemento con la clase 'popup-ex'
-    const answer = localStorage.getItem('Attr6');
     const btn = document.getElementsByClassName('skip-button')[0];
     lastPlayer = localStorage.getItem('last-player-bingo');
 
@@ -20,6 +20,22 @@ async function iniciar(dificultad) {
     equipos = valor.equipos;
     ligas = valor.ligas;
     idres = paises.map(String).concat(equipos.map(String), ligas.map(String)).join('');
+
+    const ultima = await obtenerUltimaRespuesta(6);
+    let ultimaArray = JSON.parse(ultima);
+    let usuarioAnswer = null;   // ← AQUÍ sí
+    if(Array.isArray(ultimaArray)){usuarioAnswer = ultimaArray[ultimaArray.length - 1].answer || null;}
+
+    if(usuarioAnswer === idres){
+        console.log('Se ha guardado la respuesta'); 
+        localStorage.setItem('Attr6', ultima);
+    }
+    
+    if(usuarioAnswer === 'loss'+idres){
+        console.log('Se ha guardado la perdida'); 
+        localStorage.setItem('Attr6', ultima);
+    }
+
     if (lastPlayer) {
         mostrarJugadora(JSON.parse(lastPlayer), paises, equipos, ligas);
     }else{
@@ -45,23 +61,29 @@ async function iniciar(dificultad) {
     ponerClubes(equipos, ["c12", "c14", "c31"]); // Asigna clubes a los países.
     ponerEdades("c11", "c24", "c22", '../img/edades/menor20.png', '../img/edades/mayor30.png', '../img/edades/igual25.png'); // Asigna imágenes basadas en las edades.
     localStorage.setItem('res6', idres);
+    let userAnswer = JSON.parse(localStorage.getItem('Attr6')) || [];
+    let userRes = null;
+    if(userAnswer.length > 0){
+        userRes = userAnswer[userAnswer.length - 1].answer || null;
+    }
+    const isAnswerTrue = (idres === userRes);
 
     setTimeout(async () => {
         await colocarAciertos();
         const celdas = comprobarFotosEnCeldas();
         console.log(celdas);
-        if (celdas) {
+        if (isAnswerTrue && celdas) {
             console.log("Deteniendo contador..."); // Verificar si llega aquí
             stopCounter("bingo");  // ⬅️ Detenemos el temporizador si el usuario gana
             Ganaste('bingo');
         }
         else{
-            if (!answer || answer.trim() === '') {
+            if (!userRes || userRes.trim() === '') {
                 startCounter(segundos, "bingo", async () => {
                     console.log("El contador llegó a 0. Ejecutando acción...");
                     await bingoPerder();
                 });
-            } else if (answer === 'loss') {
+            } else if (userRes === 'loss'+idres) {
                     await bingoPerder();
             } else {
                 startCounter(segundos, "bingo", async () => {
@@ -198,6 +220,11 @@ function handleCellClick(event, jugador) {
             }
         }
 
+    }
+    if(comprobarFotosEnCeldas){
+        stopCounter('bingo');
+        updateRacha(6, 1, localStorage.getItem('Attr6'));
+        Ganaste('bingo');
     }
     return hasMatch;
 }
@@ -417,7 +444,7 @@ async function bingoPerder() {
     //localStorage.setItem('Attr6', jugadora_id);
     // Agregar un delay de 2 segundos (2000 ms)
     if(localStorage.length>0){
-        //await updateRacha(1, 0);
+        await updateRacha(6, 0, localStorage.getItem('Attr6'));
     }
 }
 

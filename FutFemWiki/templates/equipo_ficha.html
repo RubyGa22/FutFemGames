@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
     <link rel="stylesheet" href="{% static 'css/combo.css' %}">
-    <link rel="stylesheet" href="{% static 'css/ficha-equipo.css' %}">
+    <link rel="stylesheet" href="{% static 'FutFemWiki/css/ficha-equipo.css' %}">
 </head>
 <body>
     {% include 'partials/header.html' %}
@@ -43,7 +43,7 @@
             <div id="jugadoras-container" class="container-jugadoras"></div>
         </div>
     </section>
-<script type="module" src="{% static 'js/utils/ficha-equipo.js' %}"></script>
+<script type="module" src="{% static 'FutFemWiki/js/ficha-equipo.js' %}"></script>
 <script>
     /*const body = document.body;
 
@@ -157,7 +157,7 @@
 
 </script>
 <script type="module">
-    import { crearFichaJugadorasActuales, crearFichaJugadorasDeSiempre } from '{% static "js/utils/ficha-equipo.js" %}';
+    import { crearFichaJugadorasActuales, crearFichaJugadorasDeSiempre } from '{% static "FutFemWiki/js/ficha-equipo.js" %}';
     const color = '{{equipo.color}}';
     console.log(color);
 

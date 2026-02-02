@@ -1,7 +1,8 @@
-import { handleAutocompletePais } from '/static/js/api/pais.js';
+import { handleAutocompletePais } from '../../../static/js/api/pais.js';
 import { equiposxliga, handleAutocompleteEquipo } from '/static/js/api/equipos.js';
-import { fetchAllJugadoras } from '../api/jugadora.js';
-import { fetchEquipoById } from '../api/equipos.js';
+import { fetchAllJugadoras } from '../../../static/js/api/jugadora.js';
+import { fetchEquipoById } from '../../../static/js/api/equipos.js';
+import { getDominantColors, rgbToRgba } from '../../../static/js/utils/color.thief.js';
 let jugadorasOriginal;
 
 function inicializarWiki() {
@@ -85,13 +86,13 @@ function displayJugadoras(jugadoras){
         div.classList.add('glass');
 
         const img = document.createElement('img');
-        img.src = 'static/img/predeterm.jpg';
-        if(jugadora.imagen) {img.src = jugadora.imagen;}
+        img.src = '/static/img/predeterm.jpg';
+        if(jugadora.imagen) {img.src = '/' + jugadora.imagen;}
         img.className = 'jugadora-imagen';
         img.alt = jugadora.apodo;
 
         const imgClub = document.createElement('img');
-        imgClub.src = jugadora.equipo[0].escudo;
+        imgClub.src = '/' + jugadora.equipo[0].escudo;
         imgClub.className = 'equipo-imagen';
         imgClub.alt = jugadora.equipo[0].nombre;
 
@@ -173,12 +174,30 @@ function displayLigas(data) {
         ligaElement.classList.add('glass');
         ligaElement.id = liga.liga;
         ligaElement.innerHTML = `
-            <img src="${liga.logo}" alt="${liga.nombre} Logo" class="liga-logo">
+            <img src="/${liga.logo}" alt="${liga.nombre} Logo" class="liga-logo">
             <div class="liga-info">
             <h3>${liga.nombre}</h3>
             <p>2025/2026</p>
             </div>
         `;
+
+        const img = ligaElement.querySelector('.liga-logo');
+        img.onload = async () => {
+            try {
+                const colors = await getDominantColors(img, 3);
+
+                ligaElement.style.background = `
+                    linear-gradient(
+                        to bottom,
+                        color-mix(in srgb, ${rgbToRgba(colors[0], 0.3)} 50%, transparent),
+                        color-mix(in srgb, ${rgbToRgba(colors[1], 0.3)} 100%, transparent)
+                    )
+                `;
+                ligaElement.style.borderColor = rgbToRgba(colors[2], 0.7);
+        } catch (err) {
+            console.error("Error obteniendo colores:", err);
+        }
+        };
 
         ligaElement.addEventListener('click', async () => {
             const equipos = await equiposxliga(liga.liga);
@@ -207,7 +226,7 @@ function displayEquipos(equipos) {
         const equipoElement = document.createElement('div');
         equipoElement.className = 'equipo-item';
         equipoElement.innerHTML = `
-            <img src="${equipo.escudo}" alt="${equipo.nombre} Escudo" class="equipo-escudo">
+            <img src="/${equipo.escudo}" alt="${equipo.nombre} Escudo" class="equipo-escudo">
             <div class="equipo-info">
             <h4>${equipo.nombre}</h4>  
             </div>

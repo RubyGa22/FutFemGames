@@ -26,7 +26,7 @@ export async function handleAutocompletePais(event, id) {
                     listItem.classList.add('suggestion-item');
 
                     listItem.innerHTML = `
-                        <img src="${bandera}" alt="${nombre}" class="jugadora-img">
+                        <img src="/${bandera}" alt="${nombre}" class="jugadora-img">
                         <div class="jugadora-info">
                             <strong>${nombre}</strong>
                         </div>
