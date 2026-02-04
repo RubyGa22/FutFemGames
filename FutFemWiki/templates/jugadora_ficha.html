@@ -18,40 +18,75 @@
     {% include 'partials/header.html' %}
     <h3>{{ jugadora.Nombre }}</h3>
     <div id="mostrador-tarjetas">
-    <div id="tarjeta-jugadora" class="glass tarjeta-jugadora">
-        <img id="imagen-jugadora" src="/{{ jugadora.imagen }} ">
-        <p id="nombre" class="nombre">{{ jugadora.Apodo }}</p>
-        <div id="detalles" class="detalles">
-            <img src="/{{ jugadora.Nacionalidad.bandera }}" alt="{{ jugadora.Nacionalidad.nombre }}">
-            <p id="edad">{{ jugadora.Nacimiento }}<span></span></p>
-            <p> {{ jugadora.Posicion.abreviatura }} </p>
+        <div class="tarjeta-wrapper">
+            <div class="tarjeta-inner">
+                <div id="tarjeta-jugadora" class="glass tarjeta-jugadora tarjeta-front">
+                    <img id="imagen-jugadora" src="/{{ jugadora.imagen }} ">
+                    <p id="nombre" class="nombre">{{ jugadora.Apodo }}</p>
+                    <div id="detalles" class="detalles">
+                        <img src="/{{ jugadora.Nacionalidad.bandera }}" alt="{{ jugadora.Nacionalidad.nombre }}">
+                        <p id="edad">{{ jugadora.Nacimiento }}<span></span></p>
+                        <p> {{ jugadora.Posicion.abreviatura }} </p>
+                    </div>
+                </div>
+
+                <div class="glass tarjeta-back">
+                    <h4>Palmarés</h4>
+                    <div class="trofeos" id="palmares-individual">
+                        <p>Cargando...</p>
+                    </div>
+            </div>
         </div>
     </div>
-    </div>
 <script type="module">
-    import {calcularEdad, fetchJugadoraTrayectoriaById} from '{% static "js/api/jugadora.js" %}'; 
-    import {fetchEquipoById} from '{% static "js/api/equipos.js" %}'; 
+    import {calcularEdad, fetchJugadoraTrayectoriaById, fetchJugadoraPalmaresById} from '{% static "js/api/jugadora.js" %}'; 
+    import {fetchEquipoById} from '{% static "js/api/equipos.js" %}';     
     const edad = document.getElementById('edad');
     const mostrador = document.getElementById('mostrador-tarjetas');
+    const palmaresIndiv = document.getElementById('palmares-individual');
     edad.textContent = '{{ jugadora.Nacimiento }}' + '(' + calcularEdad('{{ jugadora.Nacimiento }}') + ')'
 
     const trayectorias = await fetchJugadoraTrayectoriaById('{{ jugadora.id_jugadora }}')
-    for(const trayectoria of trayectorias){
+    const palmares = await fetchJugadoraPalmaresById('{{ jugadora.id_jugadora }}')
+    if (!palmares.individual) {palmares.individual = [];}
+    palmaresIndiv.innerHTML = `
+        ${
+            palmares.individual.length
+            ? palmares.individual.map(t => `
+                <img src="/${t.icono}" title="${t.nombre}">
+            `).join('')
+            : `<p class="sin-trofeos">Sin trofeos individuales</p>`
+        }
+    `;
+
+     for(const trayectoria of trayectorias){
+        let index = trayectorias.indexOf(trayectoria);
         const equipo = await fetchEquipoById(trayectoria.equipo);
-        console.log(equipo)
-        const tarjeta = document.createElement('div');
+        
+        const tarjetaWrapper = document.createElement('div');
+        tarjetaWrapper.classList.add('tarjeta-wrapper');
+
+        const tarjetaInner = document.createElement('div');
+        tarjetaInner.classList.add('tarjeta-inner');
+
+        const front = document.createElement('div');
+        front.classList.add('tarjeta-front', 'glass');
+
+        const back = document.createElement('div');
+        back.classList.add('tarjeta-back', 'glass');
+
 
         // Si es el equipo 83 → vintage
         if (equipo[0].club === 83) {
-            tarjeta.classList.add('vintage');
+            tarjetaInner.classList.add('vintage');
         }
-        tarjeta.classList.add('glass');
-        tarjeta.classList.add('tarjeta-jugadora')
+        front.classList.add('glass');
+        front.classList.add('tarjeta-jugadora')
         const imgSrc = trayectoria.imagen
         ? `/${trayectoria.imagen}`
         : `/{{ jugadora.imagen }}`;
 
-        tarjeta.innerHTML = `
+        front.innerHTML = `
             <img class="imagen-jugadora" src="${imgSrc}" alt="{{ jugadora.Apodo }}">
 
             <p class="nombre">{{ jugadora.Apodo }}</p>
@@ -67,8 +102,32 @@
             
         `;
 
-        const detalles = tarjeta.querySelector('.detalles');
-        const nombre = tarjeta.querySelector('.nombre');
+        const trofeosEquipo = palmares.equipo[index].success || [];
+        const trofeosAgrupados = agruparTrofeos(trofeosEquipo);
+
+        back.innerHTML = `
+            <h4>Palmarés</h4>
+            <div class="trofeos">
+                ${
+                    trofeosAgrupados.length
+                    ? trofeosAgrupados.map(t => `
+                        <div class="trofeo-item">
+                            <img src="/${t.icono}" title="${t.nombre}">
+                            <p class="veces-ganado">${t.count}</p>
+                        </div>
+                    `).join('')
+                    : `<p class="sin-trofeos">Sin trofeos</p>`
+                }
+            </div>
+        `;
+
+        const trofeosDiv = back.querySelector('.trofeos');
+        trofeosDiv.style.display = 'grid';
+        trofeosDiv.style.gridTemplateColumns = 'repeat(2, minmax(80px, 1fr))';
+
+
+        const detalles = front.querySelector('.detalles');
+        const nombre = front.querySelector('.nombre');
 
         if (detalles && nombre) {
             detalles.style.background = `
@@ -87,9 +146,30 @@
             `;
         }
 
-
-        mostrador.appendChild(tarjeta);
+        tarjetaInner.appendChild(front);
+        tarjetaInner.appendChild(back);
+        tarjetaWrapper.appendChild(tarjetaInner);
+        mostrador.appendChild(tarjetaWrapper);
     }
+
+    document.querySelectorAll('.tarjeta-wrapper').forEach(wrapper => {
+    wrapper.addEventListener('click', () => {
+        const inner = wrapper.querySelector('.tarjeta-inner');
+        inner.classList.toggle('flipped');
+    });
+});
+
+// Agrupar trofeos por ID y juntar temporadas
+function agruparTrofeos(trofeos) {
+    const agrupado = {};
+    trofeos.forEach(t => {
+        if (!agrupado[t.id]) {
+            agrupado[t.id] = { ...t, count: 0 };
+        }
+        agrupado[t.id].count += 1;
+    });
+    return Object.values(agrupado);
+}
 </script>
 </body>
 </html>

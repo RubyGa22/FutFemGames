@@ -1,4 +1,3 @@
-const colorThief = new ColorThief();
 
 /**
  * Obtiene los colores dominantes de una imagen
@@ -7,6 +6,7 @@ const colorThief = new ColorThief();
  * @returns {Promise<Array<[number,number,number]>>}
  */
 function getDominantColors(image, count = 3) {
+    const colorThief = new ColorThief();
     return new Promise((resolve, reject) => {
         let img;
 

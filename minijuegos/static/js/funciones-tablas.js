@@ -185,17 +185,64 @@ function ponerLigas(ids, posiciones) {
             console.error('Error:', error);
         });
 }//f()
+//--------------------Poner Trofeos--------------------------------------------------
+function ponerTrofeos(ids, posiciones) {
+    const url = `/api/trofeosxid?id[]=${ids.join('&id[]=')}`;
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Respuesta recibida:", data);
+            if (data.success && Array.isArray(data.success)) {
+                // Comprobar que las posiciones proporcionadas son las correctas
+                if (data.success.length !== posiciones.length) {
+                    console.error("Error: La cantidad de posiciones no coincide con la cantidad de países recibidos.");
+                    return;
+                }
+                data.success.forEach((trofeo, index) => {
+                    const th = document.getElementById(posiciones[index]);
+                    if (th) {
+                        const p = document.getElementById('nombre');
+                        if(p){
+                            p.textContent = trofeo.nombre;
+                        }
+                        th.innerHTML = ''; // Limpiar el contenido previo
+                        // Crear y configurar la imagen
+                        const img = document.createElement('img');
+                        img.alt = trofeo.nombre;
+                        img.src = trofeo.icono;
+                        img.id = trofeo.tipo;
+                        //img.id='logo';
+                        img.style.width = "50px";
+                        img.style.height = "auto";
+                        img.classList.add('trofeo'+trofeo.id);
+                        // Añadir imagen y texto al elemento th
+                        th.appendChild(img);
+                    } else {
+                        console.error(`Elemento con id ${posiciones[index]} no encontrado.`);
+                    }
+                });
+            } else {
+                console.error("Error: Respuesta no contiene un array válido:", data);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}//f()
 //--------------------Poner Edades--------------------------------------------------
-function ponerEdades(id1, id2, id3, rutaImagen1, rutaImagen2, rutaImagen3) {
+function ponerEdades(id1, id2, rutaImagen1, rutaImagen2) {
     // Obtener las celdas por sus IDs
     const cell1 = document.getElementById(id1);
     const cell2 = document.getElementById(id2);
-    const cell3 = document.getElementById(id3);
 
     // Limpiar el contenido previo en cada celda
     cell1.innerHTML = '';
     cell2.innerHTML = '';
-    cell3.innerHTML = '';
 
     // Crear imágenes y asignarles la ruta, clase y alt correspondiente
     const img1 = document.createElement('img');
@@ -210,16 +257,9 @@ function ponerEdades(id1, id2, id3, rutaImagen1, rutaImagen2, rutaImagen3) {
     img2.alt = 'Edad';  // Asignar atributo alt
     img2.style.width = '50px';
 
-    const img3 = document.createElement('img');
-    img3.src = rutaImagen3;
-    img3.classList.add('EdadIgual25');  // Clase para edad 30
-    img3.alt = 'Edad';  // Asignar atributo alt
-    img3.style.width = '50px';
-
     // Insertar las imágenes en las celdas correspondientes
     cell1.appendChild(img1);
     cell2.appendChild(img2);
-    cell3.appendChild(img3);
 }//f()
 //----------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------

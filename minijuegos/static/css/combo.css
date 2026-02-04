@@ -1,4 +1,4 @@
-#sugerencias-container{
+#sugerencias-container, .sugerencias-container{
     position: relative;
     display: flex;
     flex-direction: column;
@@ -7,7 +7,9 @@
 #sugerencias,
 #sugerenciasLiga,
 #sugerencias-pais,
-#sugerencias-equipo{
+#sugerencias-equipo,
+#sugerencias-pais1,
+#sugerencias-pais2 {
     position: absolute;
     padding: unset;
     margin: unset;

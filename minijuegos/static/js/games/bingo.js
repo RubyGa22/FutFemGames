@@ -1,8 +1,9 @@
-import { fetchJugadoraNacionalidadById, fetchJugadoraTrayectoriaById } from "../api/jugadora.js";
+import { fetchJugadoraNacionalidadById, fetchJugadoraTrayectoriaById, fetchJugadoraPalmaresById } from "../api/jugadora.js";
 import { updateRacha, obtenerUltimaRespuesta } from '../user/rachas.js';
+import { getDominantColors } from '../utils/color.thief.js';
 
 let idres;
-let paises, equipos, ligas;
+let paises, equipos, ligas, trofeos;
 let lastPlayer;
 async function iniciar(dificultad) {
     const popup = document.getElementById('popup-ex'); // Selecciona el primer elemento con la clase 'popup-ex'
@@ -10,7 +11,7 @@ async function iniciar(dificultad) {
     lastPlayer = localStorage.getItem('last-player-bingo');
 
     if (btn) {
-        btn.addEventListener('click', () => skipPlayer(paises, equipos, ligas)); // Habilitar el botón al iniciar el juego
+        btn.addEventListener('click', () => skipPlayer(paises, equipos, ligas, trofeos)); // Habilitar el botón al iniciar el juego
     }
     if (popup) {
         popup.style.display = 'none'; // Cambia el estilo para ocultarlo
@@ -19,7 +20,10 @@ async function iniciar(dificultad) {
     paises = valor.paises;
     equipos = valor.equipos;
     ligas = valor.ligas;
-    idres = paises.map(String).concat(equipos.map(String), ligas.map(String)).join('');
+    trofeos = valor.trofeos;
+    console.log('Paises:', trofeos);
+    idres = paises.map(String).concat(equipos.map(String), ligas.map(String), trofeos.map(String)).join('');
+    console.log('ID Respuesta:', idres);
 
     const ultima = await obtenerUltimaRespuesta(6);
     let ultimaArray = JSON.parse(ultima);
@@ -37,15 +41,15 @@ async function iniciar(dificultad) {
     }
 
     if (lastPlayer) {
-        mostrarJugadora(JSON.parse(lastPlayer), paises, equipos, ligas);
+        mostrarJugadora(JSON.parse(lastPlayer), paises, equipos, ligas, trofeos);
     }else{
-        skipPlayer(paises, equipos, ligas);
+        skipPlayer(paises, equipos, ligas, trofeos);
     }
     // Definir los segundos según la dificultad
     let segundos;
     switch (dificultad) {
         case "facil":
-            segundos = 180;
+            segundos = 180000000000000000000000000000000000000000000000000000000000;
             break;
         case "medio":
             segundos = 120;
@@ -59,7 +63,8 @@ async function iniciar(dificultad) {
     ponerBanderas(paises, ["c21", "c32", "c33"]); // Asigna banderas a ciertos países por su ID.
     ponerLigas(ligas, ["c13", "c34",'c23']); // Asigna ligas a los países por su ID.
     ponerClubes(equipos, ["c12", "c14", "c31"]); // Asigna clubes a los países.
-    ponerEdades("c11", "c24", "c22", '../img/edades/menor20.png', '../img/edades/mayor30.png', '../img/edades/igual25.png'); // Asigna imágenes basadas en las edades.
+    ponerTrofeos(trofeos, ["c11"]); // Asigna trofeos a los países.
+    ponerEdades("c24", "c22", '../img/edades/mayor30.png', '../img/edades/igual25.png'); // Asigna imágenes basadas en las edades.
     localStorage.setItem('res6', idres);
     let userAnswer = JSON.parse(localStorage.getItem('Attr6')) || [];
     let userRes = null;
@@ -110,10 +115,8 @@ function calcularEdad(fechaNacimiento) {
 }
 function handleCellClick(event, jugador) {
     const cell = event.currentTarget;
-    console.log(cell.id);
     const cellId = cell.id;
     const paisJugadora = jugador.pais;
-    console.log(jugador)
     // Obtener la imagen dentro de la celda clicada
     const img = event.currentTarget.querySelector('img');
     if (!img) {
@@ -137,7 +140,7 @@ function handleCellClick(event, jugador) {
             console.log("No hay coincidencia de país.");
         }
     }
-    if (img.className.toLowerCase().includes("Liga")) {
+    if (img.className.toLowerCase().includes("liga")) {
         if (Array.isArray(jugador.liga)) { // Verificar que trayectoria sea un array
             const ligaMatch = jugador.liga.some(liga => `liga${liga}` === imgClass);
 
@@ -155,7 +158,7 @@ function handleCellClick(event, jugador) {
     }
 
 
-    if (img.className.toLowerCase().includes("Club")) {
+    if (img.className.toLowerCase().includes("club")) {
         if (Array.isArray(jugador.trayectoria)) { // Verificar que trayectoria sea un array
             const clubMatch = jugador.trayectoria.some(club => `club${club}` === imgClass);
 
@@ -166,6 +169,35 @@ function handleCellClick(event, jugador) {
                 hasMatch = true;
             } else {
                 console.log("No hay coincidencia de club.");
+            }
+        } else {
+            console.log("La trayectoria no es un array o está vacía.");
+        }
+    }
+    if (img.className.toLowerCase().includes("trofeo")) {
+        if (Array.isArray(jugador.trofeos.equipo && jugador.trofeos.equipo)) { // Verificar que trayectoria sea un array
+            let trofeoMatch = false;
+            let trofeosIndividuales = [];
+            let trofeosEquipo = [];
+            for (let index = 0; index < jugador.trofeos.individual.length; index++) {
+                trofeosIndividuales.push(...jugador.trofeos.individual[index].success);
+            }
+            for (let index = 0; index < jugador.trofeos.equipo.length; index++) {
+                trofeosEquipo.push(...jugador.trofeos.equipo[index].success);
+            }
+
+            if(img.id === 'individual'){
+                trofeoMatch = trofeosIndividuales.some(trofeo => `trofeo${trofeo.id}` === imgClass);
+            } else if(img.id === 'clubes'){
+                trofeoMatch = trofeosEquipo.some(trofeo => `trofeo${trofeo.id}` === imgClass);
+            }
+            if (trofeoMatch) {
+                console.log("¡Coincidencia de trofeo encontrada!");
+                bloquearCeldaEstilo(cell, jugador.foto);
+                gestionarAciertos(cellId, jugador.foto);
+                hasMatch = true;
+            } else {
+                console.log("No hay coincidencia de trofeo.");
             }
         } else {
             console.log("La trayectoria no es un array o está vacía.");
@@ -221,7 +253,7 @@ function handleCellClick(event, jugador) {
         }
 
     }
-    if(comprobarFotosEnCeldas){
+    if(comprobarFotosEnCeldas === true){
         stopCounter('bingo');
         updateRacha(6, 1, localStorage.getItem('Attr6'));
         Ganaste('bingo');
@@ -232,10 +264,10 @@ function handleCellClick(event, jugador) {
 let jugadorasCache = [];
 let indexJugadora = 0;
 
-function skipPlayer(paises, clubes, ligas) {
+function skipPlayer(paises, clubes, ligas, trofeos) {
     // Si ya hay jugadoras en caché y no se agotaron, mostrar la siguiente
     if (jugadorasCache.length > 0 && indexJugadora < jugadorasCache.length) {
-        mostrarJugadora(jugadorasCache[indexJugadora++], paises, clubes, ligas);
+        mostrarJugadora(jugadorasCache[indexJugadora++], paises, clubes, ligas, trofeos);
         return;
     }
 
@@ -247,6 +279,7 @@ function skipPlayer(paises, clubes, ligas) {
     if (paises.length > 0) paises.forEach(pais => url.searchParams.append('nacionalidades[]', pais));
     if (clubes.length > 0) clubes.forEach(club => url.searchParams.append('equipos[]', club));
     if (ligas.length > 0) ligas.forEach(liga => url.searchParams.append('ligas[]', liga));
+    if (trofeos.length > 0) trofeos.forEach(trofeo => url.searchParams.append('trofeos[]', trofeo));
 
     fetch(url)
         .then(response => {
@@ -261,7 +294,7 @@ function skipPlayer(paises, clubes, ligas) {
 
             jugadorasCache = data;
             indexJugadora = 0;
-            mostrarJugadora(jugadorasCache[indexJugadora++], paises, clubes, ligas);
+            mostrarJugadora(jugadorasCache[indexJugadora++], paises, clubes, ligas, trofeos);
         })
         .catch(error => {
             console.error('Hubo un problema con la solicitud fetch:', error);
@@ -269,7 +302,7 @@ function skipPlayer(paises, clubes, ligas) {
 }
 
 
-async function mostrarJugadora(jugadora, paises, clubes, ligas) {
+async function mostrarJugadora(jugadora, paises, clubes, ligas, trofeos) {
     document.getElementById("player-name").textContent = jugadora.nombre;
     const img = document.getElementById("player-image");
     localStorage.setItem('last-player-bingo', JSON.stringify(jugadora));
@@ -281,7 +314,8 @@ async function mostrarJugadora(jugadora, paises, clubes, ligas) {
     const edad = calcularEdad(jugadora.Nacimiento);
     const pais = await fetchJugadoraNacionalidadById(jugadora.id);
     const equipos = await fetchJugadoraTrayectoriaById(jugadora.id);
-    console.log(pais)
+    const palmares = await fetchJugadoraPalmaresById(jugadora.id);
+    console.log(palmares);
 
     if (equipos && equipos.length > 0) {
         const nombresEquipos = equipos.map(e => e.equipo);
@@ -291,7 +325,8 @@ async function mostrarJugadora(jugadora, paises, clubes, ligas) {
             'edad': edad,
             'trayectoria': nombresEquipos,
             'foto': jugadora.imagen,
-            'liga': ligasEquipos
+            'liga': ligasEquipos,
+            'trofeos': palmares
         };
 
         const cells = document.querySelectorAll('td');
@@ -303,7 +338,7 @@ async function mostrarJugadora(jugadora, paises, clubes, ligas) {
                 let click = handleCellClick(event, data);
                 if (click) {
                     newCell.removeEventListener('click', handleCellClick);
-                    skipPlayer(paises, clubes, ligas); // Avanza a la siguiente jugadora
+                    skipPlayer(paises, clubes, ligas, trofeos); // Avanza a la siguiente jugadora
                 } else {
                     newCell.classList.add('tremble');
                     setTimeout(() => newCell.classList.remove('tremble'), 500);
@@ -421,7 +456,8 @@ async function play() {
     let paises = [jugadora.paises[0], jugadora.paises[1], jugadora.paises[2]];
     let clubes = [jugadora.equipos[0], jugadora.equipos[1], jugadora.equipos[2]];
     let ligas = [jugadora.ligas[0], jugadora.ligas[1], jugadora.ligas[2]];
-    idres = paises.map(String).concat(clubes.map(String), ligas.map(String)).join('');
+    let trofeos = [jugadora.trofeos[0]];
+    idres = paises.map(String).concat(clubes.map(String), ligas.map(String), trofeos.map(String)).join('');
     const res = localStorage.getItem('res6');
     if(res !== idres || !res){
         localStorage.removeItem('Attr6');

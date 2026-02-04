@@ -38,8 +38,13 @@
         <div id="cabecera-equipo" class="panel active">
             <p>Seleccione un país</p>
             <div id="input-y-boton">
+                <div id="filtros-pais">
                 <input id="input-pais" class="input-pais" type="text" placeholder="Buscar por país..." autocomplete="off">
                 <button id="confirmarPais">Confirmar</button>
+                </div>
+                <div class="sugerencias-container">
+                    <ul id="sugerencias-pais1"></ul>
+                </div>
             </div>
             <div id="ligas-container"></div>
         </div>
@@ -47,14 +52,16 @@
             <div id="filtros">
                 <label for="equipo">Equipo:</label>
                 <input id="input-equipo" type="text" name="equipo" placeholder="Buscar por equipo..." autocomplete="off">
+                <div class="sugerencias-container">
+                    <ul id="sugerencias-equipo"></ul>
+                </div>
                 <label for="pais">Nacionalidad:</label>
                 <input id="input-pais" class="input-pais" name="pais" type="text" placeholder="Buscar por país..." autocomplete="off">
+                <div class="sugerencias-container">
+                    <ul id="sugerencias-pais2"></ul>
+                </div>
             </div>
             <button id="jugadoras-filtros">Confirmar</button>
-        </div>
-        <div id="sugerencias-container">
-            <ul id="sugerencias-pais"></ul>
-            <ul id="sugerencias-equipo"></ul>
         </div>
     </div>
         

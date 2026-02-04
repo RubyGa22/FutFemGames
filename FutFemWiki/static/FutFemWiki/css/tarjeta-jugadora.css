@@ -9,8 +9,9 @@
 
     align-items: center;
 }
-.tarjeta-jugadora .imagen-jugadora{
+.imagen-jugadora{
     filter: contrast(1);
+    width: 100%;
 }
 /* Efecto vintage B/N */
 .tarjeta-jugadora.vintage .imagen-jugadora {
@@ -131,6 +132,76 @@
 
 .tarjeta-jugadora p{
     margin-bottom: 0;
+}
+
+
+/* Contenedor de la tarjeta para el efecto 3D */
+
+
+.tarjeta-wrapper {
+    flex: 0 0 auto;
+    width: 250px;
+    height: 400px;
+    perspective: 1200px;
+}
+
+/* Interior de la tarjeta que gira */
+
+.tarjeta-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s ease;
+    transform-style: preserve-3d;
+}
+
+.tarjeta-inner.flipped {
+    transform: rotateY(180deg);
+}
+
+.tarjeta-front {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    padding-inline: unset;
+    display: flex;
+    flex-direction: column;
+}
+
+.tarjeta-back {
+    position: absolute;
+    inset: 0;
+    transform: rotateY(180deg);
+    backface-visibility: hidden;
+
+    /* mismo look */
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow:
+        0 20px 40px rgba(0,0,0,0.35),
+        inset 0 0 0 1px rgba(255,255,255,0.15);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+.tarjeta-back .trofeos{
+    align-items: center;
+    justify-items: center;
+}
+
+.tarjeta-back img{
+    object-fit: contain;
+    height: 100%;
+    width: 100%;
+}
+
+.trofeo-item{
+    max-width: 50%;
 }
 
 @media (max-width: 768px){

@@ -74,3 +74,17 @@ export async function handleAutocompleteEquipo(event, id) {
         input.setAttribute('data-id', null); // Guardar el ID del equipo
     }
 }
+
+export async function fetchEquipoPalmaresByTemporadas(id_equipo, temporadas) {
+    try {
+        const url = `/api/equipo_palmares?equipo=${encodeURIComponent(id_equipo)}&temporadas=${encodeURIComponent(temporadas)}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Error fetching equipo palmares: ${response.statusText}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching equipo palmares:', error);
+        throw error;
+    }
+}

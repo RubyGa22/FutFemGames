@@ -11,7 +11,7 @@
     color: white; /* Color del texto */
     margin-bottom: 20px; /* Espaciado inferior entre botones */
     transition: transform 0.2s; /* Suavizar el efecto de transformación */
-    border: 0.5px solid rgb(255, 255, 255);
+    border: 0.5px solid rgb(128, 0, 128);
     box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);
 
     backdrop-filter: blur(10px);

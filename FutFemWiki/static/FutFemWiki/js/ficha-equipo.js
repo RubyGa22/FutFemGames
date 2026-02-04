@@ -1,5 +1,5 @@
 import { jugadorasxTemporadaYEquipo } from "../../../static/js/api/equipos.js";
-import { displayEquipos } from "./wiki.js"; 
+//import { displayEquipos } from "./wiki.js"; 
 
 export async function crearFichaJugadorasActuales(equipo, color) {
     const jugadoras = await jugadorasxTemporadaYEquipo(equipo, 2026);

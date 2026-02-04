@@ -1,4 +1,4 @@
-import {calcularEdad, fetchJugadoraTrayectoriaById} from '../../../minijuegos/static/js/api/jugadora.js'; 
+import {calcularEdad, fetchJugadoraTrayectoriaById, fetchJugadoraPalmaresById} from '../../../minijuegos/static/js/api/jugadora.js'; 
 import {fetchEquipoById} from '../../../minijuegos/static/js/api/equipos.js'; 
 
     const mostrador = document.getElementById('mostrador-tarjetas');
@@ -11,7 +11,6 @@ import {fetchEquipoById} from '../../../minijuegos/static/js/api/equipos.js';
     const trayectorias = await fetchJugadoraTrayectoriaById(jugadora.id)
     for(const trayectoria of trayectorias){
         const equipo = await fetchEquipoById(trayectoria.equipo);
-        console.log(equipo)
         const tarjeta = document.createElement('div');
 
         // Si es el equipo 83 → vintage

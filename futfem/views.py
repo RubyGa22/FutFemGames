@@ -1,14 +1,31 @@
+from webbrowser import get
 from django.http import JsonResponse
 from django.db import connection, IntegrityError
 from django.db.models import Q
 from datetime import date, datetime
-from .models import Jugadora, Trayectoria, Equipo, Pais, Liga
+from .models import Jugadora, Trayectoria, Equipo, Pais, Liga, Trofeo
 from random import shuffle
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import make_password, check_password
 
 # Create your views here.
+def parse_temporada(temporada_str):
+    año_actual = datetime.now().year
+
+    if "-" in temporada_str:
+        inicio, fin = temporada_str.split("-")
+        inicio = int(inicio)
+
+        if fin.lower() == "act":
+            fin = año_actual
+        else:
+            # soporta 21-22 y 2021-2022
+            fin = int("20" + fin) if len(fin) == 2 else int(fin)
+    else:
+        inicio = fin = int(temporada_str)
+
+    return inicio, fin
 #################################################################################################
 ######################################JUGADORAS##################################################
 #################################################################################################
@@ -768,3 +785,114 @@ def posicion_por_jugadora(request):
     resultado = [{"Posicion": fila[0]} for fila in filas]
 
     return JsonResponse({"success": resultado})
+
+#################################################################################################
+#########################################TROFEOS#################################################
+#################################################################################################
+
+def trofeos_individuales(request):
+    jugadora = request.GET.get("jugadora")
+
+    if not jugadora:
+        return JsonResponse({"error": "ID de jugadora no proporcionado"}, status=400)
+    try:
+        jugadora = int(jugadora)
+    except ValueError:
+        return JsonResponse({"error": "ID inválido"}, status=400)
+    query = """
+        SELECT t.id, t.nombre, t.tipo, t.icono
+        FROM trofeos t
+        INNER JOIN `jugadora-trofeo` ti ON t.id = ti.trofeo WHERE ti.jugadora = %s;
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(query, [jugadora])
+        filas = cursor.fetchall()
+    if not filas:
+        return JsonResponse({"error": "No se encontraron trofeos para esa jugadora"}, safe=False)
+    resultado = []
+    for fila in filas:
+        resultado.append({
+            "id": fila[0],
+            "nombre": fila[1],
+            "tipo": fila[2],
+            "icono": fila[3],
+        })
+    return JsonResponse({"success": resultado})
+
+def equipo_palmares(request):
+    equipo = request.GET.get("equipo")
+    print("Equipo recibido:", equipo)
+    temporadas = request.GET.get("temporadas", "1950-act")
+
+    if not equipo:
+        return JsonResponse({"error": "ID de equipo no proporcionado"}, status=400)
+
+    try:
+        equipo = int(equipo)
+        filtro_inicio, filtro_fin = parse_temporada(temporadas)
+    except ValueError:
+        return JsonResponse({"error": "Datos inválidos"}, status=400)
+
+    query = """
+        SELECT t.id, t.nombre, t.tipo, t.icono, ti.temporada
+        FROM trofeos t
+        INNER JOIN `equipo-trofeo` ti
+            ON t.id = ti.trofeo
+        WHERE ti.equipo = %s;
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(query, [equipo])
+        filas = cursor.fetchall()
+
+    if not filas:
+        return JsonResponse({"success": []})
+
+    resultado = []
+
+    for fila in filas:
+        temporada_trofeo = fila[4]
+
+        try:
+            trofeo_inicio, trofeo_fin = parse_temporada(temporada_trofeo)
+        except ValueError:
+            continue  # temporada mal formada → ignorar
+
+        # REGla ÚNICA de solapamiento
+        if trofeo_inicio < filtro_fin and trofeo_fin > filtro_inicio:
+            resultado.append({
+                "id": fila[0],
+                "nombre": fila[1],
+                "tipo": fila[2],
+                "icono": fila[3],
+                "temporada": temporada_trofeo
+            })
+
+    return JsonResponse({"success": resultado})
+
+def trofeosxid (request):
+    ids = request.GET.getlist('id[]')  # Recupera id[]=1&id[]=2&id[]=3
+
+    if not ids:
+        return JsonResponse({"error": "Faltan parámetros o no se encontraron resultados."}, status=400)
+
+    # Convertir a enteros
+    try:
+        ids = [int(i) for i in ids]
+    except ValueError:
+        return JsonResponse({"error": "IDs inválidos."}, status=400)
+
+    # Consulta
+    trofeos = Trofeo.objects.filter(id__in=ids)
+
+    salida = []
+    for t in trofeos:
+
+        salida.append({
+            "id": t.id,
+            "nombre": t.nombre,
+            "tipo": t.tipo,
+            "icono": t.icono
+        })
+
+    return JsonResponse({"success": salida})

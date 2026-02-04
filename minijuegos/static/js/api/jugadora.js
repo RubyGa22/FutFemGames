@@ -1,5 +1,5 @@
 // static/js/api/jugadoras.js
-
+import { fetchEquipoPalmaresByTemporadas } from "./equipos.js";
 /**
  * Obtener nacionalidad de una jugadora por ID
  * @param {number|string} id
@@ -145,4 +145,38 @@ export function calcularEdad(fechaNacimiento) {
     }
 
     return edad;
+}
+
+/** * Obtener trofeos individuales de una jugadora por ID
+ * @param {*} id 
+ * @return {Promise<Array>}
+ */
+function fetchJugadoraTrofeosIndividualesById(id) {
+    return fetch(`/api/jugadora_trofeos_individuales?jugadora=${id}`)
+        .then(response => response.json())
+        .then(data => data.success)
+        .catch(error => {
+            console.error('Error fetching jugadora trofeos individuales:', error);
+            throw error;
+        });
+}
+
+/**
+ * Obtener palmarés de una jugadora por ID
+ * @param {*} id 
+ * @return {Promise<{equipo: Array, individual: Array}>}
+ */
+export async function fetchJugadoraPalmaresById(id) {
+    console.log('Fetching palmares for jugadora ID:', id);
+    const trayectoria = await fetchJugadoraTrayectoriaById(id);
+    const palmaresIndividual = await fetchJugadoraTrofeosIndividualesById(id);
+    let palmaresEquipo = [];
+    for(const etapa of trayectoria){
+        const palmares = await fetchEquipoPalmaresByTemporadas(etapa.equipo, etapa.años);
+        palmaresEquipo.push(palmares);
+    }
+    return { 
+        equipo: palmaresEquipo,
+        individual: palmaresIndividual
+    };
 }

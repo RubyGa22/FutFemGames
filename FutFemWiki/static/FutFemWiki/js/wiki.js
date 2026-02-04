@@ -36,11 +36,14 @@ function inicializarWiki() {
         handleAutocompleteEquipo(event, 'sugerencias-equipo');
     });
 
-    for(const input of inputPaises){
-        input.addEventListener('input', async (event) => {
-            handleAutocompletePais(event, 'sugerencias-pais');
+    
+        inputPaises[0].addEventListener('input', async (event) => {
+            handleAutocompletePais(event, 'sugerencias-pais1');
         });
-    }
+        inputPaises[1].addEventListener('input', async (event) => {
+            handleAutocompletePais(event, 'sugerencias-pais2');
+        });
+    
 
 
     botonConfirmar.addEventListener('click', async () => {
@@ -268,29 +271,13 @@ function displayLigas(data) {
                 ligaElement.style.background = `
                     linear-gradient(
                         to bottom,
-                        color-mix(in srgb, ${rgbToRgba(colors[0], 0.3)} 50%, transparent),
-                        color-mix(in srgb, ${rgbToRgba(colors[1], 0.3)} 100%, transparent)
+                        color-mix(in srgb, ${rgbToRgba(colors[0], 0.5)} 50%, transparent),
+                        color-mix(in srgb, ${rgbToRgba(colors[1], 0.5)} 100%, transparent)
                     )
                 `;
                 ligaElement.style.borderColor = rgbToRgba(colors[2], 0.7);
-                var css = `.liga-item:hover {
-                    box-shadow:
-                        0 12px 40px rgba(0, 0, 0, 0.35),
-                        0 0 20px ${rgbToRgba(colors[2], 0.5)};
-
-                    border-color: ${rgbToRgba(colors[2], 0.9)};
-                    
-                }
-                        
-                .liga-item.selected {
-                    box-shadow:
-                        0 12px 40px rgba(0, 0, 0, 0.35),
-                        0 0 20px ${rgbToRgba(colors[2], 0.75)};
-                    border-color: ${rgbToRgba(colors[2], 0.9)}
-                }`;
-                var style = document.createElement('style');
-                style.textContent = css;
-                document.head.appendChild(style);
+                // Guardamos color[2] en variable CSS del elemento
+                ligaElement.style.setProperty('--liga-shadow-color', rgbToRgba(colors[2], 1));
         } catch (err) {
             console.error("Error obteniendo colores:", err);
         }
@@ -350,6 +337,8 @@ export function displayEquipos(equipos, container) {
                 color-mix(in srgb, ${colorSecundario} 30%, transparent)
             )
         `;
+        equipoElement.style.setProperty('--equipo-shadow-color', colorPrimario);
+
         container.appendChild(equipoElement);
 
         equipoElement.addEventListener('click', () => {

@@ -55,22 +55,49 @@
 
 <script type="module">
     import { obtenerRacha } from '{% static "js/user/rachas.js" %}';
+
     const rachas = await obtenerRacha();
     const rachasDiv = document.getElementById('rachas');
     rachasDiv.innerHTML = '';
-    console.log(rachas);
-    const ul = document.createElement('ul');
+
+    const table = document.createElement('table');
+    table.classList.add('racha-table');
+
+    const thead = document.createElement('thead');
+    thead.innerHTML = `
+        <tr>
+            <th>Juego</th>
+            <th>Actual</th>
+            <th>Mejor</th>
+        </tr>
+    `;
+
+    const tbody = document.createElement('tbody');
+
     rachas.forEach(racha => {
-        const li = document.createElement('li');
-        const pJuego = document.createElement('p');
-        pJuego.textContent = racha.juego.nombre;
-        const pRacha = document.createElement('p');
-        pRacha.textContent = racha.racha_actual;
-        li.appendChild(pJuego)
-        li.appendChild(pRacha)
-        ul.appendChild(li)
+        const tr = document.createElement('tr');
+
+        const tdJuego = document.createElement('td');
+        tdJuego.textContent = racha.juego.nombre;
+
+        const tdRacha = document.createElement('td');
+        tdRacha.textContent = racha.racha_actual;
+        tdRacha.classList.add('racha-num');
+
+        const tdMejor = document.createElement('td');
+        tdMejor.textContent = racha.mejor_racha;
+        tdMejor.classList.add('racha-num');
+
+        tr.appendChild(tdJuego);
+        tr.appendChild(tdRacha);
+        tr.appendChild(tdMejor);
+        tbody.appendChild(tr);
     });
-    rachasDiv.appendChild(ul)
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    rachasDiv.appendChild(table);
+
 </script>
 </body>
 </html>

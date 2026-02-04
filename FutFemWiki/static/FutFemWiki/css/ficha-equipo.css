@@ -1,3 +1,12 @@
+body{
+    background-image: url("../../img/fondo cesped.jpg.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: rgb(37, 0, 37); /* Color negro con transparencia */
+    background-blend-mode: color-dodge; /* Modo de mezcla */
+    min-height: 60vh;
+    width: 100%;
+}
 img{
     width: 10%;
 }

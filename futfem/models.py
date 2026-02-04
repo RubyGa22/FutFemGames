@@ -82,6 +82,19 @@ class Jugadora(models.Model):
 
     def __str__(self):
         return self.Jugadora
+    
+class Trofeo(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombre = models.TextField()
+    tipo = models.TextField(null=True, blank=True)
+    icono = models.TextField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'trofeos'
+        managed = False  # Si la tabla ya existe y no quieres que Django la reescriba
+
+    def __str__(self):
+        return self.Trofeo
 
 
 class Trayectoria(models.Model):

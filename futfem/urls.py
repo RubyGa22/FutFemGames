@@ -24,4 +24,7 @@ urlpatterns = [
     path('jugadoras', views.jugadoras_All, name='jugadoras'),
     path('posicionesall', views.posicionesall, name='posicionesall'),
     path('posicionxjugadora', views.posicion_por_jugadora, name='posicionxjugadora'),
+    path('jugadora_trofeos_individuales', views.trofeos_individuales, name='jugadora_trofeos_individuales'),
+    path('equipo_palmares', views.equipo_palmares, name='equipo_palmares'),
+    path('trofeosxid', views.trofeosxid, name='trofeosxid'),
 ]
