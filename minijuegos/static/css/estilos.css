@@ -15,6 +15,10 @@
     --color-danger: #e74c3c; /* Rojo */
     --color-warning: #f39c12; /* Naranja */
     --color-success: #2ecc71; /* Verde */
+    --gradient: conic-gradient( from 90deg at 50% 50%, rgb(251, 55, 60), 
+    rgba(252, 114, 28, 1), rgba(255, 220, 0, 1), 
+    rgba(27, 206, 255, 1), rgba(42, 107, 255, 1), 
+    rgba(217, 41, 255, 1), rgba(255, 10, 92, 1) );
 }
 body {
     font-family: "Montserrat", sans-serif;
@@ -27,11 +31,11 @@ body {
     /*animation: movimientoOlas 10s ease-in-out infinite;*/
     color: var(--color-detalles);
     overflow-x: hidden;
-    /*background-image: url("../img/fondo cesped.jpg.png");
+    background-image: url("../img/fondo cesped.jpg.png");
     background-size: cover;
-    background-repeat: no-repeat;*/
-    background: rgb(37, 0, 37); /* Color negro con transparencia */
-    /*background-blend-mode: color-dodge; /* Modo de mezcla */
+    background-repeat: no-repeat;
+    background-color: rgba(37, 0, 37, 0.75); /* Color negro con transparencia */
+    background-blend-mode: color-dodge; /* Modo de mezcla */
     min-height: 100vh;
 }
 /* Estilos de la barra de scroll */

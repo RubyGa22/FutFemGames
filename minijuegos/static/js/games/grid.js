@@ -1,6 +1,5 @@
 import { fetchJugadoraTrayectoriaById } from "/static/futfem/js/jugadora.js";
 import { updateRacha, obtenerUltimaRespuesta } from "/static/usuarios/js/rachas.js";
-
 let idres;
 let jugadorasProhibidas = [];
 async function iniciar(dificultad) {
@@ -38,7 +37,7 @@ async function iniciar(dificultad) {
     let segundos;
     switch (dificultad) {
         case "facil":
-            segundos = 180;
+            segundos = 18000000000000000000000000000000000000000;
             break;
         case "medio":
             segundos = 120;
@@ -324,7 +323,14 @@ async function colocarImagenEnTabla(equipo, columna, player) {
         img.style.width = '100%'; // Ajustar tamaño según sea necesario
         img.style.height = '100%';
         img.style.background = 'white';
+        img.classList.add('jugadora-img')
         td.appendChild(img);
+        gsap.from(img, {
+        opacity: 0,
+        scale: 0.5,
+        duration: 0.6,
+        ease: "back.out(1.7)"
+        });
 
         console.log(`Imagen colocada en la celda con id ${idCelda}`);
     } else {

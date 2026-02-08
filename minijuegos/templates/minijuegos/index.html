@@ -15,12 +15,13 @@
     <link rel="stylesheet" href="{% static 'css/glow-border.css' %}">
 </head>
 <body class="loading">
+    <div id="bg-dynamic"></div>
 {% include 'partials/header.html' %}
 <section class="juegos">
 <div class="container mt-5 sibling-fade">
     <div class="row sibling-fade d-flex justify-content-center">
-        {% include 'partials/game_card.html' with racha_id="racha-1" destino_js="career" imagen="img/trayectoria.jpg" titulo="Futfem Career" %}
-        {% include 'partials/game_card.html' with racha_id="racha-4" destino_js="grid" imagen="img/grid.png" titulo="Futfem Grid" %}
+        {% include 'partials/game_card.html' with racha_id="racha-1" destino_js="career" imagen="img/trayectoria.png" titulo="Futfem Career" %}
+        {% include 'partials/game_card.html' with racha_id="racha-4" destino_js="grid" imagen="img/grid1.png" titulo="Futfem Grid" %}
         {% include 'partials/game_card.html' with racha_id="racha-6" destino_js="bingo" imagen="img/Bingo.png" titulo="Futfem Bingo" %}
         <div class="col-md-4" style="display: none;">
             <div class="game-button glow" onclick="redireccionarA('XI_Clubs')">
@@ -33,16 +34,19 @@
     <div class="row sibling-fade d-flex justify-content-center">
         {% include 'partials/game_card.html' with racha_id="racha-2" destino_js="wordle" imagen="img/wordle.png" titulo="Futfem Wordle" %}
         {% include 'partials/game_card.html' with racha_id="racha-3" destino_js="guess" imagen="img/ComingSoon.png" titulo="Futfem Guess" %}
-        {% include 'partials/game_card.html' with racha_id="racha-5" destino_js="mates" imagen="img/ComingSoon.png" titulo="Futfem Partners" %}        
+        {% include 'partials/game_card.html' with racha_id="racha-5" destino_js="mates" imagen="img/ComingSoon.png" titulo="Futfem Mates" %}        
     </div>
 </div>
 </section>
 <link rel="" href="app/widgets/language.html">
 <script src="{% static 'js/redireccion.js' %}"></script>
+<script src="{% static 'js/sounds.js' %}"></script>
 <script src="{% static 'js/funciones-tablas.js' %}"></script>
 <script type="module" src="{% static 'usuarios/js/rachas.js' %}"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
+<script src="{% static 'js/animations/index.js' %}"></script>
 <script type="module" id="control-acceso" src="{% static 'usuarios/js/control-acceso.js' %}" data-allowed-roles="1,2"></script>
 <script type="module">
     import { obtenerRacha, displayRacha } from '{% static "usuarios/js/rachas.js" %}';

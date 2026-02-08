@@ -37,6 +37,11 @@ th, td {
     height: 100px;
     position: relative;
 }
+th[id*="Equipo"] {
+  background-size: 200% 200%; /* permite movimiento suave */
+  background-repeat: no-repeat;
+}
+
 
 img {
     width: 100%;

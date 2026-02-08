@@ -2,8 +2,9 @@
 <div class="col-md-4">
     <div id="{{ racha_id }}" class="fire"></div>
 
-    <div class="game-button glow" onclick="redireccionarA('{{ destino_js }}')">
-        <img src="{% static imagen %}" alt="{{ titulo }}">
-        <h4>{{ titulo }}</h4>
+    <div class="game-button glow-on-hover" onclick="redireccionarA('{{ destino_js }}')" data-bg="/static/img/bg-{{ destino_js }}.png">
+        <div class="glow"></div>
+        <img src="{% static imagen %}" alt="{{ titulo }}" class="game-img">
+        <h4 class="game-title">{{ titulo }}</h4>
     </div>
 </div>

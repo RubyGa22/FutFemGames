@@ -10,7 +10,7 @@
         <ul>
           <li><a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
           <li><a href="{% url 'wiki' %}" class="{% if request.resolver_match.url_name == 'wiki' %}active{% endif %}">Wiki</a></li>
-          <li><a href="#nosotros">Nosotros</a></li>
+          <li><a href="{% url 'nosotros' %}" class="{% if request.resolver_match.url_name == 'nosotros' %}active{% endif %}">Nosotros</a></li>
           <li><a href="#contacto">Contacto</a></li>
         </ul>
       </nav>
@@ -63,6 +63,7 @@
     </div>
   </div>
 </header>
+<script src="{% static 'js/animations/header.js' %}"></script>
 <script>
   function toggleMenu() {
     const menu = document.querySelector('.dropdown-menu');

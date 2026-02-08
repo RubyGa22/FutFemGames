@@ -1,0 +1,1 @@
+const hoverSound = new Audio('/static/sounds/hover.wav');

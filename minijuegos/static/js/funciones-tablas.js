@@ -42,7 +42,7 @@ function ponerBanderas(ids, posiciones) {
                         span.classList.add(`fi-${pais.iso}`);
                         span.style.fontSize = 'xx-large';
                         img.alt = pais.nombre;
-                        img.src = pais.bandera;
+                        img.src = '#';
                         img.id='logo';
                         img.style.width = "50px";
                         img.style.height = "auto";
@@ -131,7 +131,7 @@ function ponerClubes(ids, posiciones) {
         });
 }//f()
 //--------------------Poner Ligas---------------------------------------------------
-function ponerLigas(ids, posiciones) {
+async function ponerLigas(ids, posiciones) {
     const url = `../api/ligasxid?id[]=${ids.join('&id[]=')}`;
     //console.log(`URL generada: ${url}`);
 

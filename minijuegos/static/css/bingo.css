@@ -3,7 +3,28 @@ body {
     font-family: Arial, sans-serif;
     color: white;
     text-align: center;
+    background: none;
 }
+header{
+    z-index: 100;
+}
+
+#bg-dynamic {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+
+  background-size: cover;
+  background-position: center;
+  filter: blur(0px) brightness(0.6);
+  transform: scale(1.1);
+
+  transition: none;
+  height: 100vh;
+  width: 100vw;
+}
+
+
 
 img {
     max-width: 150px;
@@ -11,7 +32,7 @@ img {
     object-fit: cover;
     display: block;
     margin: 0 auto;
-    pointer-events: none; /* Evita que las imágenes capturen el clic */
+    /*pointer-events: none; /* Evita que las imágenes capturen el clic */
 }
 
 .contenedor {
@@ -20,6 +41,7 @@ img {
     align-items: center;
     justify-content: center;
     /*margin-top: 50px;*/
+    z-index: 2;
 }
 
 #cabecera-bingo{
@@ -30,6 +52,7 @@ img {
     padding: 0.5rem;
     position: relative;
     width: 100%;
+    z-index: 2;
 }
 
 #cabecera-bingo button {
@@ -98,11 +121,15 @@ th, td {
     transition: background-color 0.3s ease;
     margin: 10px;
     border-radius: 5px;
+    z-index: 3;
 }
 
 td {
     position: relative;
     background-color: rgba(128,0,128,0.5);
+}
+td * {
+    pointer-events: none;
 }
 
 /* Estilo temporal al hacer clic */
@@ -123,6 +150,11 @@ td.selected {
     position: relative;
     overflow: hidden;
 }
+
+.blocked:hover {
+    pointer-events: auto; /* permite hover */
+}
+
 /* Imagen del jugador - parte inferior derecha, por delante */
 .blocked .player-imagen {
     position: absolute;

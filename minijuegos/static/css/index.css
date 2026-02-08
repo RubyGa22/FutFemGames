@@ -1,25 +1,143 @@
 .col-md-4{
     max-width: 20%;
 }
+body{
+    height: 100vh;
+}
+#bg-dynamic {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  background-size: cover;
+  background-position: center;
+  filter: blur(0px) brightness(0.6);
+  transform: scale(1.1);
+
+  transition: none;
+  max-height: 100vh;
+}
+
+section{
+    width: 100%;
+    height: 100%;
+}
+section .container {
+    height: 100%;
+    position: relative;
+}
 
 /* Estilos principales para .game-button */
 .game-button {
-    border-radius: 20px; /* Bordes redondeados */
+    --start: 0;
+    border-radius: 10px; /* Bordes redondeados */
     text-align: center; /* Centrar el contenido dentro del botón */
-    padding: 10px; /* Espaciado interior */
-    background-color: rgba(128,0,128,0.45); /* Color de fondo primario */
+    /*padding: 10px; /* Espaciado interior */
+    background-color: var(--color-secundario); /* Color de fondo primario */
     color: white; /* Color del texto */
     margin-bottom: 20px; /* Espaciado inferior entre botones */
     transition: transform 0.2s; /* Suavizar el efecto de transformación */
-    border: 0.5px solid rgb(128, 0, 128);
+    /*border: 0.5px solid var(--color-primario);*/
     box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);
-
-    backdrop-filter: blur(10px);
+    position: relative;
+    transition: border-color 0.5s ease-in-out;
+    backdrop-filter: blur(20px);
+    pointer-events: auto;
+    overflow: hidden;
 }
+.game-button {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    z-index: 20; /* por si acaso */
+}
+
+.game-button::before{
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 100%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    border: 3px solid transparent;
+    background: var(--gradient);
+    background-attachment: fixed;
+    mask: linear-gradient(#0000, #0000),
+        conic-gradient(
+        from calc((var(--start) - (20 * 1.1)) * 1deg),
+        #ffffff1f 0deg,
+        white,
+        #ffffff00 100deg
+        );
+    mask-composite: intersect;
+    mask-clip: padding-box, border-box;
+    opacity: 0;
+    transition: 0.5s ease;
+}
+.row { 
+    position: relative;
+    width: 100%; 
+    left: 0; 
+    backface-visibility: hidden; 
+    margin: 0 !important;
+    padding: 0 !important;
+    transform-style: preserve-3d; 
+    backface-visibility: hidden;
+    pointer-events: none
+}
+.glow {
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  filter: blur(14px);
+  position: absolute;
+  inset: -30px; /* sale del botón */
+}
+
+.glow::before {
+  position: absolute;
+  content: "";
+  width: 98%;
+  height: 98%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 10px;
+  border: 35px solid transparent;
+  background: var(--gradient);
+  background-attachment: fixed;
+   mask: linear-gradient(#0000, #0000),
+    conic-gradient(
+      from calc((var(--start) - (20 * 1.1)) * 1deg),
+      #ffffff1f 0deg,
+      white,
+      #ffffff00 100deg
+    );
+  mask-composite: intersect;
+  mask-clip: padding-box, border-box;
+  opacity: 0;
+  transition: 1s ease;
+}
+
+.game-button:hover > .glow::before {
+  opacity: 1;
+}
+
+.game-button:hover::before {
+  opacity: 0.6;
+}
+
 .game-button img {
     max-width: 100%; /* La imagen ocupa el ancho total disponible */
     height: auto; /* Mantener la proporción de la imagen */
-    border-radius: 10px; /* Bordes redondeados en las imágenes */
+    border-radius: 10px 10px 0 0; /* Bordes redondeados en las imágenes */
+    object-fit: cover;
+    transition: transform 0.4s ease, opacity 0.4s ease; transform-origin: center center;
 }
 
 .game-button button {
@@ -39,6 +157,7 @@
     color: var(--color-texto); /* Cambiar el color del texto en hover */
     background: var(--color-detalles);
 }
+
 
 @media (max-width: 1200px) {
     .game-button h4{
@@ -74,9 +193,6 @@
     }
     .row{
         margin-inline: 0px;
-    }
-    .game-button img{
-        max-width: 80%; /* La imagen ocupa el 80% del ancho disponible */
     }
     .game-button button {
         display: none; /* Ocultar los botones en pantallas pequeñas */;

@@ -1,6 +1,6 @@
 import { fetchJugadoraNacionalidadById, fetchJugadoraTrayectoriaById, fetchJugadoraPalmaresById } from "/static/futfem/js/jugadora.js";
 import { updateRacha, obtenerUltimaRespuesta } from '/static/usuarios/js/rachas.js';
-import { getDominantColors } from '../utils/color.thief.js';
+import { getDominantColors, rgbToRgba } from '../utils/color.thief.js';
 
 let idres;
 let paises, equipos, ligas, trofeos;
@@ -61,11 +61,14 @@ async function iniciar(dificultad) {
             segundos = localStorage.getItem('bingo'); // Valor por defecto si la dificultad no es válida
     }
     ponerBanderas(paises, ["c21", "c32", "c33"]); // Asigna banderas a ciertos países por su ID.
-    ponerLigas(ligas, ["c13", "c34",'c23']); // Asigna ligas a los países por su ID.
+    await ponerLigas(ligas, ["c13", "c34",'c23']); // Asigna ligas a los países por su ID.
     ponerClubes(equipos, ["c12", "c14", "c31"]); // Asigna clubes a los países.
     ponerTrofeos(trofeos, ["c11"]); // Asigna trofeos a los países.
     ponerEdades("c24", "c22", '../img/edades/mayor30.png', '../img/edades/igual25.png'); // Asigna imágenes basadas en las edades.
     localStorage.setItem('res6', idres);
+    
+
+            
     let userAnswer = JSON.parse(localStorage.getItem('Attr6')) || [];
     let userRes = null;
     if(userAnswer.length > 0){
@@ -74,7 +77,10 @@ async function iniciar(dificultad) {
     const isAnswerTrue = (idres === userRes);
 
     setTimeout(async () => {
+        await pintarCeldas();
         await colocarAciertos();
+        await iniciarHoverFondos();
+        //Asegurar que los <td> ya existen y están pintados 
         const celdas = comprobarFotosEnCeldas();
         console.log(celdas);
         if (isAnswerTrue && celdas) {
@@ -272,6 +278,7 @@ let jugadorasCache = [];
 let indexJugadora = 0;
 
 function skipPlayer(paises, clubes, ligas, trofeos) {
+    requestAnimationFrame(() => { iniciarHoverFondos(); });
     // Si ya hay jugadoras en caché y no se agotaron, mostrar la siguiente
     if (jugadorasCache.length > 0 && indexJugadora < jugadorasCache.length) {
         mostrarJugadora(jugadorasCache[indexJugadora++], paises, clubes, ligas, trofeos);
@@ -464,6 +471,79 @@ async function colocarAciertos() {
         }
     }
 }
+
+async function pintarCeldas() {
+    const cells = document.querySelectorAll('td'); 
+    let cellsToPaint = [];
+
+    // 1. Filtrar correctamente IMG visibles o SPAN (flag-icons)
+    cells.forEach(celda => {
+    const img = celda.querySelector('img');
+    const span = celda.querySelector('span');
+
+    if (img && img.offsetParent !== null) {
+        const cls = img.className.toLowerCase();
+        if (cls.includes("liga") || cls.includes("pais") || cls.includes("trofeo")) {
+            cellsToPaint.push(celda);
+        }
+        return;
+    }
+
+    if (span) {
+        cellsToPaint.push(celda);
+    }
+});
+
+
+    // 2. Pintar celdas
+    for (const celda of cellsToPaint) {
+    const img = celda.querySelector('img');
+    const span = celda.querySelector('span');
+    let colors = null;
+
+    // IMG visible tiene prioridad absoluta
+    if (img && img.offsetParent !== null) {
+        await img.decode();
+        colors = await getDominantColors(img, 3);
+    }
+
+    // SPAN (flag-icons)
+    else if (span) {
+        let bg = getComputedStyle(span).backgroundImage;
+
+        // fallback ::before
+        if (!bg || bg === 'none') {
+            bg = getComputedStyle(span, '::before').backgroundImage;
+        }
+
+        if (bg && bg !== 'none') {
+            const match = bg.match(/url\(["']?(.*?)["']?\)/);
+            if (match) {
+                const tempImg = new Image();
+                tempImg.crossOrigin = "anonymous";
+                tempImg.src = match[1];
+                await tempImg.decode();
+                colors = await getDominantColors(tempImg, 3);
+            }
+        }
+    }
+
+    if (!colors) continue;
+
+    celda.style.background = `
+        linear-gradient(
+            to bottom,
+            color-mix(in srgb, ${rgbToRgba(colors[0], 0.75)} 50%, transparent),
+            color-mix(in srgb, ${rgbToRgba(colors[1], 0.75)} 100%, transparent)
+        )
+    `;
+    celda.style.borderColor = rgbToRgba(colors[2], 0.7);
+    celda.style.setProperty('--liga-shadow-color', rgbToRgba(colors[2], 1));
+    }
+
+}
+
+
 
 play().then(r => r)
 async function play() {
