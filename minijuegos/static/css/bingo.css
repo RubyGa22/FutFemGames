@@ -132,6 +132,13 @@ td * {
     pointer-events: none;
 }
 
+td:hover{
+    background:linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--gradient-primary) 50%, transparent),
+    color-mix(in srgb, var(--gradient-secondary) 100%, transparent));
+}
+
 /* Estilo temporal al hacer clic */
 td:active {
     background-color: rgba(26, 149, 247, 0);
@@ -159,7 +166,7 @@ td.selected {
 .blocked .player-imagen {
     position: absolute;
     right: 0; /* Ajusta la distancia desde el borde derecho */
-    transform: scale(1.2); /* Agrandar la imagen del jugador en la celda bloqueada */
+    transform: scale(1.2) !important; /* Agrandar la imagen del jugador en la celda bloqueada */
     z-index: 3; /* Asegurar que la imagen del jugador esté por delante */
     opacity: 1; /* Imagen del jugador completamente visible */
     width: 70%;

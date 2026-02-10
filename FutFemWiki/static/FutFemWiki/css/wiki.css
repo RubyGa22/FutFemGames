@@ -1,3 +1,6 @@
+body{
+    height: 100vh;
+}
 .selector {
     display: flex;
     align-items: center;
@@ -98,8 +101,9 @@
     background-repeat: no-repeat;
     background-color: rgb(37, 0, 37); /* Color negro con transparencia */
     background-blend-mode: color-dodge; /* Modo de mezcla */
-    min-height: 60vh;
+    height: 100%;
     width: 100%;
+    overflow-y: auto;
 }
 
 #items-container.jugadoras{
@@ -160,6 +164,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 100%;
 }
 
 #cabecera-wiki-equipos{
@@ -170,9 +175,73 @@
     border-bottom: 2px solid var(--color-primario);
     transition: all 0.3s ease;
     width: 100%;
-    height: 225px;
+    height: 300px;
     position: relative;
 }
+
+.marker-punto {
+    width: 12px;
+    height: 12px;
+    background: #ff33ff;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.marker-escudo {
+    width: 50px;
+    height: 50px;
+    animation: pop 0.4s ease-out;
+    cursor: pointer;
+}
+
+@keyframes pop {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+
+.marker-escudo:hover {
+    filter: drop-shadow(0 0 10px #ac00ac);
+}
+
+#mapa-equipos{
+    height: 100% !important;
+}
+
+#mapa-equipos .leaflet-tile-pane {
+    filter: hue-rotate(260deg) saturate(1.4) brightness(0.9);
+}
+
+.marker-wrapper {
+    position: relative;
+    width: 50px;
+    height: 70px;
+}
+
+.marker-pin {
+    width: 10px;
+    height: 10px;
+    background: #ff0066;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 8px rgba(255, 0, 102, 0.6);
+}
+
+.marker-escudo-img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    border-radius: 6px;
+    /*background: var(--color-primario);*/
+    padding: 3px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
 
 #cabecera-wiki-equipos #filtros-pais{
 display: flex;
@@ -191,6 +260,7 @@ display: flex;
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 225px;
 }
 
 #input-y-boton{
@@ -218,7 +288,7 @@ display: flex;
     padding-inline: 10px; /* Espaciado interior */
     background-color: rgba(128,0,128,0.45); /* Color de fondo primario */
     color: white; /* Color del texto */
-    margin-bottom: 20px; /* Espaciado inferior entre botones */
+    margin-bottom: unset; /* Espaciado inferior entre botones */
     transition: transform 0.2s; /* Suavizar el efecto de transformación */
     border: 0.5px solid rgb(255, 255, 255);
     box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);

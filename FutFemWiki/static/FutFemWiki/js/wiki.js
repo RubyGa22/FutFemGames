@@ -2,6 +2,7 @@ import { handleAutocompletePais } from '/static/futfem/js/pais.js';
 import { equiposxliga, handleAutocompleteEquipo, fetchEquipoById } from '/static/futfem/js/equipos.js';
 import { fetchAllJugadoras } from '/static/futfem/js/jugadora.js';
 import { getDominantColors, rgbToRgba } from '/static/js/utils/color.thief.js';
+import { inicializarMapaEquipos, añadirEquipoMapa, centrarMapaEnEquipos } from './mapa.js';
 let jugadorasOriginal;
 
 function inicializarWiki() {
@@ -284,8 +285,8 @@ function displayLigas(data) {
 
         ligaElement.addEventListener('click', async () => {
             seleccionarLiga(ligaElement);
-            const equipos = await equiposxliga(liga.liga);
-            displayEquipos(equipos.success);
+        const equipos = await equiposxliga(liga.liga);
+        displayEquipos(equipos.success);
         });
         container.appendChild(ligaElement);
 
@@ -306,6 +307,7 @@ function seleccionarLiga(ligaElement) {
 }
 
 export function displayEquipos(equipos, container) {
+    inicializarMapaEquipos();
     if (!container) {
         container = document.getElementById('items-container');
     }
@@ -317,6 +319,9 @@ export function displayEquipos(equipos, container) {
         return;
     }
     equipos.forEach((equipo, index) => {
+        if(equipo.lat && equipo.lon){
+            añadirEquipoMapa(equipo.id, equipo.nombre, equipo.lat, equipo.lon, '/'+equipo.escudo, equipo.color)
+        }
         const equipoElement = document.createElement('div');
         equipoElement.className = 'equipo-item';
         equipoElement.innerHTML = `
@@ -349,6 +354,7 @@ export function displayEquipos(equipos, container) {
             equipoElement.classList.add('visible');
         }, index * 150); // cada liga 150ms después de la anterior
     });
+    centrarMapaEnEquipos();
 }
 
 function filtroJugadoras(equipo, nacionalidad, posicion){

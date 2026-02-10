@@ -11,7 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
     <link rel="stylesheet" href="{% static 'css/combo.css' %}">
     <link rel="stylesheet" href="{% static 'FutFemWiki/css/wiki.css' %}">
@@ -47,6 +49,7 @@
                     </div>
                 </div>
                 <button id="confirmarPais">Confirmar</button>
+                <button id="ver-mapa">Ver Mapa</button>
                 </div>
             </div>
             <div id="ligas-container"></div>
@@ -72,6 +75,7 @@
         </div>
     </div>
         
+    <div id="mapa-equipos" style="width: 100%; height: 500px; display: none;"></div>
     <div id="items-container"></div>
     <div id="pagination" class="pagination">
     </div>
@@ -79,6 +83,7 @@
 </section>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
 <script src="{% static 'js/funciones-tablas.js' %}"></script>
 <script type="module">
     import { manejarJugadoras } from '../static/FutFemWiki/js/wiki.js';
@@ -173,6 +178,10 @@ eleccion('equipo');
 
 
 </script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
 <script type="module" src="{% static 'FutFemWiki/js/wiki.js' %}"></script>
+<script type="module" src="{% static 'FutFemWiki/js/mapa.js' %}"></script>
+<script src="{% static 'FutFemWiki/js/animations/index.js' %}"></script>
 </body>
 </html>

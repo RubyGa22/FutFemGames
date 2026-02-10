@@ -169,7 +169,13 @@ def jugadora_companeras(request):
         ]
 
     # Convertir la imagen a base64 si existe
-
+    for r in results: 
+        if not r["imagen"]: # NULL, vacío o None 
+            with connection.cursor() as cursor: 
+                cursor.execute( "SELECT imagen FROM jugadoras WHERE id_jugadora = %s LIMIT 1", [r["jugadora"]] ) 
+                row = cursor.fetchone() 
+                if row and row[0]: 
+                    r["imagen"] = row[0] # asignar imagen alternativa
     return JsonResponse(results, safe=False)
 
 def jugadora_datos(request):
@@ -543,7 +549,7 @@ def equiposxliga(request):
 
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT e.id_equipo, e.nombre, e.escudo, e.color
+            SELECT e.id_equipo, e.nombre, e.escudo, e.color, e.latitud, e.longitud
             FROM equipos e
             JOIN ligas l ON e.liga = l.id_liga
             WHERE l.id_liga = %s
@@ -552,12 +558,14 @@ def equiposxliga(request):
         filas = cursor.fetchall()
 
     equipos = []
-    for id_equipo, nombre, escudo, color in filas:
+    for id_equipo, nombre, escudo, color, latitud, longitud in filas:
         equipos.append({
             "nombre": nombre,
             "id": id_equipo,
             "escudo": escudo,
-            "color": color
+            "color": color,
+            "lat": latitud,
+            "lon": longitud
         })
 
     return JsonResponse({"success": equipos})

@@ -89,8 +89,9 @@ async function loadJugadoraApodo(id, ganaste) {
 
 function createBoard() {
     const board = document.getElementById("board");
+    board.style.gridTemplateColumns = `repeat(${answer.length}, 60px)`;
     for (let i = 0; i < maxRows; i++) {
-        for (let j = 0; j < 5; j++) {
+        for (let j = 0; j < answer.length; j++) {
             const input = document.createElement("input");
             input.type = "text";
             input.maxLength = 1; // Limitar a un solo carácter
@@ -109,10 +110,10 @@ function handleInputChange(event) {
     const currentTileId = input.getAttribute("id");
     const [_, row, __, tile] = currentTileId.split("-");
 
-    if (input.value.length === 1 && parseInt(tile) < 4) {
+    if (input.value.length === 1 && parseInt(tile) < answer.length-1) {
         const nextTile = document.getElementById(`row-${row}-tile-${parseInt(tile) + 1}`);
         nextTile.focus();
-    } else if (input.value.length === 1 && parseInt(tile) === 4) {
+    } else if (input.value.length === 1 && parseInt(tile) === answer.length-1) {
         // Automatically check the word if on the last tile
         checkWord();
     }
@@ -137,7 +138,7 @@ function quitarAcentos(str) {
 
 async function checkWord() {
     const guess = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < answer.length; i++) {
         const input = document.getElementById(`row-${currentRow}-tile-${i}`);
         guess.push(input.value.toLowerCase());
     }
@@ -173,7 +174,7 @@ async function checkWord() {
 
 
 function fillRowWithAnswer() {
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < answer.length; i++) {
         const tile = document.getElementById(`row-${currentRow}-tile-${i}`);
         tile.value = answer[i]; // Rellenar la respuesta en la fila
     }
@@ -181,7 +182,7 @@ function fillRowWithAnswer() {
 
 function disableRowInputs(row) {
     for (let i = 0; i < maxRows; i++) {
-        for (let j = 0; j < 5; j++) {
+        for (let j = 0; j < answer.length; j++) {
             const tile = document.getElementById(`row-${i}-tile-${j}`);
             tile.disabled = i < row; // Desactivar todas las filas anteriores
         }
@@ -191,7 +192,7 @@ function disableRowInputs(row) {
 function updateActiveRow() {
     // Habilitar la fila actual y deshabilitar las demás
     for (let i = 0; i < maxRows; i++) {
-        for (let j = 0; j < 5; j++) {
+        for (let j = 0; j < answer.length; j++) {
             const tile = document.getElementById(`row-${i}-tile-${j}`);
             tile.disabled = i !== currentRow; // Solo habilitar la fila actual
         }
@@ -212,7 +213,7 @@ function colorTiles(guess) {
     }
 
     // Primero, marcar las letras correctas
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < answer.length; i++) {
         const tile = document.getElementById(`row-${currentRow}-tile-${i}`);
         const letter = guess[i];
 
@@ -224,7 +225,7 @@ function colorTiles(guess) {
     }
 
     // Luego, marcar las letras presentes
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < answer.length; i++) {
         const tile = document.getElementById(`row-${currentRow}-tile-${i}`);
         const letter = guess[i];
 
@@ -248,7 +249,7 @@ function displayMessage(message) {
 function lockAllRows() {
     // Bloquear todas las filas
     for (let i = 0; i < maxRows; i++) {
-        for (let j = 0; j < 5; j++) {
+        for (let j = 0; j < answer.length; j++) {
             const tile = document.getElementById(`row-${i}-tile-${j}`);
             tile.disabled = true;
         }
@@ -291,7 +292,7 @@ function saveWordleRow(guess, resultStates) {
 function colocarRespuestas(palabra, results, row) {
     disableRowInputs(row);
     // Rellenar cada letra
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < answer.length; i++) {
         const tile = document.getElementById(`row-${row}-tile-${i}`);
       
         tile.value = palabra[i];

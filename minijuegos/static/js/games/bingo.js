@@ -59,7 +59,7 @@ async function iniciar(dificultad) {
     await ponerLigas(ligas, ["c13", "c34",'c23']); // Asigna ligas a los países por su ID.
     ponerClubes(equipos, ["c12", "c14", "c31"]); // Asigna clubes a los países.
     ponerTrofeos(trofeos, ["c11"]); // Asigna trofeos a los países.
-    ponerEdades("c24", "c22", '../img/edades/mayor30.png', '../img/edades/igual25.png'); // Asigna imágenes basadas en las edades.
+    ponerEdades("c24", "c22", '/static/img/edades/mayor30.png', '/static/img/edades/igual25.png'); // Asigna imágenes basadas en las edades.
     localStorage.setItem('res6', idres);
     
 
@@ -77,8 +77,8 @@ async function iniciar(dificultad) {
         await iniciarHoverFondos();
         //Asegurar que los <td> ya existen y están pintados 
         const celdas = comprobarFotosEnCeldas();
-        console.log(celdas);
-        if (isAnswerTrue && celdas) {
+        console.log(celdas, userRes);
+        if (/*isAnswerTrue &&*/ celdas) {
             console.log("Deteniendo contador..."); // Verificar si llega aquí
             stopCounter("bingo");  // ⬅️ Detenemos el temporizador si el usuario gana
             Ganaste('bingo');
@@ -118,6 +118,7 @@ function handleCellClick(event, jugador) {
     const cell = event.currentTarget;
     const cellId = cell.id;
     const paisJugadora = jugador.pais;
+    let celdasLlenas = false;
     // Obtener la imagen dentro de la celda clicada
     const img = event.currentTarget.querySelector('img');
     if (!img) {
@@ -137,6 +138,7 @@ function handleCellClick(event, jugador) {
             bloquearCeldaEstilo(cell, jugador.foto); // Usar la imagen correcta
             gestionarAciertos(cellId, jugador.foto);
             hasMatch = true;
+            celdasLlenas = comprobarFotosEnCeldas();
         } else {
             console.log("No hay coincidencia de país.");
         }
@@ -150,6 +152,7 @@ function handleCellClick(event, jugador) {
                 bloquearCeldaEstilo(cell, jugador.foto); // Usar la imagen correcta
                 gestionarAciertos(cellId, jugador.foto);
                 hasMatch = true;
+                celdasLlenas = comprobarFotosEnCeldas();
             } else {
                 console.log("No hay coincidencia de liga.");
             }
@@ -168,6 +171,7 @@ function handleCellClick(event, jugador) {
                 bloquearCeldaEstilo(cell, jugador.foto); // Usar la imagen correcta
                 gestionarAciertos(cellId, jugador.foto);
                 hasMatch = true;
+                celdasLlenas = comprobarFotosEnCeldas();
             } else {
                 console.log("No hay coincidencia de club.");
             }
@@ -204,6 +208,7 @@ function handleCellClick(event, jugador) {
                 bloquearCeldaEstilo(cell, jugador.foto);
                 gestionarAciertos(cellId, jugador.foto);
                 hasMatch = true;
+                celdasLlenas = comprobarFotosEnCeldas();
             } else {
                 console.log("No hay coincidencia de trofeo.");
             }
@@ -211,7 +216,7 @@ function handleCellClick(event, jugador) {
             console.log("La trayectoria no es un array o está vacía.");
         }
     }
-    if (img.className.toLowerCase().includes("Edad")) {
+    if (img.className.toLowerCase().includes("edad")) {
         // Verificar si la clase contiene 'EdadMenor'
         const claseEdadMenor = Array.from(img.classList).find(cls => cls.startsWith('EdadMenor'));
         const claseEdadMayor = Array.from(img.classList).find(cls => cls.startsWith('EdadMayor'));
@@ -225,9 +230,11 @@ function handleCellClick(event, jugador) {
                 bloquearCeldaEstilo(cell, jugador.foto); // Usar la imagen correcta
                 gestionarAciertos(cellId, jugador.foto);
                 hasMatch = true;
+                celdasLlenas = comprobarFotosEnCeldas();
             } else {
                 console.log(`No hay coincidencia de edad menor de ${edadLimite}.`);
                 hasMatch = false;
+                celdasLlenas = comprobarFotosEnCeldas();
             }
         }
         if (claseEdadMayor) {
@@ -239,6 +246,7 @@ function handleCellClick(event, jugador) {
                 bloquearCeldaEstilo(cell, jugador.foto); // Usar la imagen correcta
                 gestionarAciertos(cellId, jugador.foto)
                 hasMatch = true;
+                celdasLlenas = comprobarFotosEnCeldas();
             } else {
                 console.log(`No hay coincidencia de edad mayor de ${edadLimite}.`);
                 hasMatch = false;
@@ -254,6 +262,7 @@ function handleCellClick(event, jugador) {
                 bloquearCeldaEstilo(cell, jugador.foto); // Usar la imagen correcta
                 gestionarAciertos(cellId, jugador.foto);
                 hasMatch = true;
+                celdasLlenas = comprobarFotosEnCeldas();
             } else {
                 console.log(`No hay coincidencia de edad igual a ${edadLimite}.`);
                 hasMatch = false;
@@ -261,7 +270,7 @@ function handleCellClick(event, jugador) {
         }
 
     }
-    if(comprobarFotosEnCeldas === true){
+    if(celdasLlenas){
         stopCounter('bingo');
         updateRacha(6, 1, localStorage.getItem('Attr6'));
         Ganaste('bingo');
@@ -403,6 +412,13 @@ function bloquearCeldaEstilo(celda, jugadoraImagen) {
     playerImg.style.opacity = 1;
 
     celda.appendChild(playerImg);
+
+    gsap.to(playerImg, { 
+        opacity: 1, 
+        scale: 1, 
+        duration: 0.4, 
+        ease: "back.out(1.7)" 
+    });
 }
 // Función para verificar si todas las celdas están bloqueadas
 
@@ -434,6 +450,10 @@ function gestionarAciertos(celda, foto) {
     let retrievedGrid = grid ? JSON.parse(grid) : [];
 
     let item = { celda, foto };
+    if( retrievedGrid.length == 11){
+        item.answer = idres
+    }
+    
     retrievedGrid.push(item); // Agregar el nuevo objeto
 
     // Guardar de nuevo en localStorage
@@ -533,7 +553,10 @@ async function pintarCeldas() {
         )
     `;
     celda.style.borderColor = rgbToRgba(colors[2], 0.7);
-    celda.style.setProperty('--liga-shadow-color', rgbToRgba(colors[2], 1));
+    //celda.style.setProperty('--liga-shadow-color', rgbToRgba(colors[2], 1));
+    celda.style.setProperty('--gradient-primary', rgbToRgba(colors[0], 1));
+    celda.style.setProperty('--gradient-secondary', rgbToRgba(colors[1], 1));
+
     }
 
 }
@@ -566,9 +589,11 @@ async function bingoPerder() {
     celdas.disabled = true;
     boton.disabled = true;
     resultDiv.textContent = 'Has perdido';
-    //const jugadora_id = 'loss';
-    //localStorage.setItem('Attr6', jugadora_id);
-    // Agregar un delay de 2 segundos (2000 ms)
+    let grid = localStorage.getItem('Attr6');
+    let retrievedGrid = grid ? JSON.parse(grid) : [];
+    retrievedGrid[retrievedGrid.length - 1].answer = 'loss'+idres;
+    // Guardar de nuevo 
+    localStorage.setItem('Attr6', JSON.stringify(retrievedGrid));
     if(localStorage.length>0){
         await updateRacha(6, 0, localStorage.getItem('Attr6'));
     }
