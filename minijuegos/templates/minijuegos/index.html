@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FutFemGames</title>
-    <link rel="icon" href="{% static 'img/prueba logo.png' %}">
+    <link rel="icon" href="{% static 'img/logo.png' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -35,6 +35,15 @@
         {% include 'partials/game_card.html' with racha_id="racha-2" destino_js="wordle" imagen="img/wordle.png" titulo="Futfem Wordle" %}
         {% include 'partials/game_card.html' with racha_id="racha-3" destino_js="guess" imagen="img/ComingSoon.png" titulo="Futfem Guess" %}
         {% include 'partials/game_card.html' with racha_id="racha-5" destino_js="mates" imagen="img/ComingSoon.png" titulo="Futfem Mates" %}        
+    </div>
+
+    <div id="regular-games">
+        <h2>Regular Games</h2>
+
+        <div class="row sibling-fade d-flex justify-content-center">
+            {% include 'partials/game_card.html' with racha_id="racha-20" destino_js="higher_lower" imagen="img/higher_lower.png" titulo="Higher or Lower" %}
+        </div>
+
     </div>
 </div>
 </section>

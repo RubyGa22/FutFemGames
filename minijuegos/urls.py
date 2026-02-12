@@ -11,6 +11,7 @@ urlpatterns = [
     path('wordle', views.futfemWordle),
     path('mates', views.futfemMates),
     path('guess', views.futfemGuess),
+    path('higher_lower', views.futfemHigherLower, name='higher_lower'),
     path('api/juegoxid', views.juegoxid, name='juegoxid'),
     path('XI_Clubs', views.futfemXIClubs, name='futfemXIClubs'),
 ]

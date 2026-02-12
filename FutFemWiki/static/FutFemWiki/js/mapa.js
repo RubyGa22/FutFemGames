@@ -1,9 +1,12 @@
+import {CapaControl} from '../mapstyles/capaControl.js';
 const btnMapa = document.getElementById("ver-mapa");
 const mapa = document.getElementById("mapa-equipos");
 const item = document.getElementById("items-container");
 
 btnMapa.addEventListener("click", () => {
-    const visible = mapa.style.display === "block";
+    const visible = mapa.style.display === 'block';
+
+    
 
     if (visible) {
         // Ocultar mapa
@@ -18,7 +21,7 @@ btnMapa.addEventListener("click", () => {
 
         setTimeout(() => { 
             if (map) {
-                //map.invalidateSize();
+                map.resize();
                 centrarMapaEnEquipos(); 
             }
         }, 50);
@@ -45,55 +48,7 @@ export let map = null;
 //let markersGroup = L.featureGroup();
 let markersGroup = [];
 
-/*export function inicializarMapaEquipos() {
-    if (map) {markersGroup.clearLayers(); return;} // evitar reinicializar
-
-    map = L.map('mapa-equipos', {
-        minZoom: 5, // ← NO permite alejar más que esto 
-        zoomControl: true
-    }).setView([40.4, -3.7], 5);
-
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        'attribution': 'Map data &copy; OpenStreetMap contributors',
-        maxZoom: 18,
-    }).addTo(map);
-
-    //obtenerEstiloMapa();
-    map.on("zoomend", () => {
-        const zoom = map.getZoom();
-
-        markersGroup.eachLayer(marker => {
-            if (zoom < 7) {
-                marker.setIcon(iconoPunto);
-            } else {
-                marker.setIcon(iconoEscudoBonito(marker.options.escudoUrl));
-            }
-        });
-    });
-
-
-    markersGroup = L.featureGroup().addTo(map);
-
-    // limpiar marcadores cada vez que se llama 
-    markersGroup.clearLayers();
-}*/
-
-/*export function añadirEquipoMapa(id, nombre, lat, lng, escudoUrl) {
-    const marker = L.marker([lat, lng], { 
-        icon: iconoEscudoBonito(escudoUrl),
-        escudoUrl: escudoUrl // guardamos el escudo
-    });
-
-    marker.bindPopup(`<b>${nombre}</b>`);
-    marker.addEventListener('click', () => {
-        window.location.href = `/wiki/equipo/${id}/`;
-    });
-    markersGroup.addLayer(marker);
-
-    /*marker.on("click", () => {
-        seleccionarEquipoDesdeMapa(nombre);
-    });*/
-//}
+let bloqueado = false;
 
 export function inicializarMapaEquipos() {
     if (map) {
@@ -106,35 +61,125 @@ export function inicializarMapaEquipos() {
         container: 'mapa-equipos',
         style: '/static/FutFemWiki/mapstyles/style-morado.json', // luego lo cambiamos por tu estilo
         center: [-3.7, 40.4],
-        zoom: 5,
-        minZoom: 5
+        zoom: 6,
+        minZoom: 6,
+        bearing: -20,
+        pitch: 45,
+        antialias: true
     });
 
     map.addControl(new maplibregl.NavigationControl());
 
+    map.on("movestart", () => {
+        bloqueado = true;
+    });
+
+    map.on("moveend", () => {
+        bloqueado = false;
+    });
+
     map.on("zoom", () => {
-    const zoom = map.getZoom();
+        const zoom = map.getZoom();
 
-    generarHeatmap();
+        generarHeatmap();
 
-    markersGroup.forEach(m => {
-        const el = m.el;
+        markersGroup.forEach(m => {
+            const el = m.el;
 
-        // 🔥 2. Tamaño según zoom
-        const scale = Math.min(1.3, Math.max(0.5, zoom / 7));
-        el.style.transform = `scale(${scale})`;
+            // 2. Tamaño según zoom
+            const scale = Math.min(1.3, Math.max(0.5, zoom / 7));
+            el.style.transform = `scale(${scale})`;
 
-        // 🔥 3. Punto vs escudo
-        if (zoom < 6) {
-            el.classList.add("marker-punto");
-            el.classList.remove("marker-escudo");
-        } else {
-            el.classList.add("marker-escudo");
-            el.classList.remove("marker-punto");
-        }
+            // 3. Punto vs escudo
+            if (zoom < 6) {
+                el.classList.add("marker-punto");
+                el.classList.remove("marker-escudo");
+            } else {
+                el.classList.add("marker-escudo");
+                el.classList.remove("marker-punto");
+            }
+        });
     });
-    });
 
+    map.on("load", () => {
+        // buscar capa de labels para poner los edificios debajo
+        const layers = map.getStyle().layers;
+        const labelLayerId = layers.find(
+            l => l.type === "symbol" && l.layout?.["text-field"]
+        )?.id;
+
+        /*map.addSource("terrain-dem", {
+            type: "raster-dem",
+            url: "https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=LYmhz1BKy6QniXWrxK2S",
+            tileSize: 256
+        });*/
+
+        /*map.setTerrain({
+            source: "terrain-dem",
+            exaggeration: 1.2   // puedes subirlo a 2 o 3 si quieres más relieve
+        });*/
+
+
+
+        map.addSource("satellite", {
+            type: "raster",
+            tiles: [
+                "https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=LYmhz1BKy6QniXWrxK2S"
+            ],
+            tileSize: 256,
+            attribution: "© MapTiler © OpenStreetMap contributors"
+        });
+
+        map.addLayer({
+            id: "satellite-layer",
+            type: "raster",
+            source: "satellite",
+            layout: {
+                visibility: "none"   // empieza oculta
+            }
+        });
+
+        map.moveLayer("satellite-layer");
+
+        map.addLayer({
+            id: "3d-buildings",
+            source: "openmaptiles",
+            "source-layer": "building",
+            type: "fill-extrusion",
+            minzoom: 13,
+            paint: {
+                "fill-extrusion-color": "#c000ff",
+                "fill-extrusion-height": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    13, ["get", "render_height"],
+                    16, ["*", ["get", "render_height"], 0.6]
+                ],
+                "fill-extrusion-base": ["get", "render_min_height"],
+                "fill-extrusion-opacity": 0.85
+            }
+        }, labelLayerId);
+
+        map.addLayer({
+            id: "sky",
+            type: "sky",
+            paint: {
+                "sky-type": "atmosphere",
+                "sky-atmosphere-sun": [0.0, 0.0],
+                "sky-atmosphere-sun-intensity": 15
+            }
+        });
+
+        map.setLight({
+            anchor: "viewport",
+            color: "#ffffff",
+            intensity: 0.6,
+            position: [1.5, 180, 80] // azimut, polar
+        });
+
+    });
+    map.addControl(new CapaControl(), "top-right");
 }
 
 
@@ -161,7 +206,20 @@ export function añadirEquipoMapa(id, nombre, lat, lng, escudoUrl, color) {
         
 
     el.addEventListener('click', () => {
-        window.location.href = `/wiki/equipo/${id}/`;
+        const target = [lng, lat];
+
+        map.easeTo({
+            center: target,
+            zoom: 15,
+            pitch: 70,
+            bearing: map.getBearing() + 120,
+            duration: 1500,
+            easing: t => t * t
+        });
+        orbitando = true;
+        mostrarTooltipEquipo(id, nombre, target);
+        requestAnimationFrame(rotarSuave);
+        
     });
 
     // Crear marcador MapLibre
@@ -180,6 +238,64 @@ export function añadirEquipoMapa(id, nombre, lat, lng, escudoUrl, color) {
     //setTimeout(() => evitarColision(el, marker), 50);
 }
 
+let orbitando = false;
+let lastTime = null;
+
+function rotarSuave(time) {
+    if (!orbitando) {
+        lastTime = null;
+        return;
+    }
+
+    if (!lastTime) lastTime = time;
+    const delta = time - lastTime;
+    lastTime = time;
+
+    const velocidad = 0.005; // cuanto menor, más suave
+    map.rotateTo(
+        map.getBearing() + delta * velocidad,
+        { duration: 0 }
+    );
+
+    requestAnimationFrame(rotarSuave);
+}
+
+
+function mostrarTooltipEquipo(id, nombre, lngLat) {
+    const popup = new maplibregl.Popup({
+        closeButton: true,
+        offset: 25
+    })
+    .setLngLat(lngLat)
+    .setHTML(`
+        <div class="map-tooltip">
+            <h4>${nombre}</h4>
+            <button id="ver-equipo">Ver equipo</button>
+        </div>
+    `)
+    .addTo(map);
+
+    popup.on('open', () => {
+        // cuando abres tooltip
+        rotando = true;
+        orbitar();
+        document
+          .getElementById('ver-equipo')
+          .addEventListener('click', () => {
+              window.location.href = `/wiki/equipo/${id}/`;
+          });
+    });
+
+    popup.on('close', () => {
+        orbitando = false;
+    });
+
+    popup.on('close', () => {
+        // cuando lo cierras
+        rotando = false;
+    })
+}
+
 
 function iconoEscudoBonito(url) {
     return L.divIcon({
@@ -196,41 +312,22 @@ function iconoEscudoBonito(url) {
     });
 }
 
-
-
-export async function obtenerCoordenadasClub(nombreClub) {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(nombreClub)}`;
-
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if (data.length === 0) return null;
-
-    return {
-        lat: parseFloat(data[0].lat),
-        lon: parseFloat(data[0].lon),
-        display: data[0].display_name
-    };
-}
-
-/*export function centrarMapaEnEquipos() {
-    if (!map) return;
-    if (markersGroup.getLayers().length === 0) return;
-
-    map.fitBounds(markersGroup.getBounds(), {
-        padding: [50, 50]
-    });
-}*/
-
 export function centrarMapaEnEquipos() {
-    if (!map) return;
-    if (markersGroup.length === 0) return;
+    if (!map || markersGroup.length === 0) return;
 
     const bounds = new maplibregl.LngLatBounds();
-
     markersGroup.forEach(m => bounds.extend([m.lng, m.lat]));
 
-    map.fitBounds(bounds, { padding: 50 });
+    const center = bounds.getCenter();
+
+    map.easeTo({
+        center,
+        zoom: Math.min(8, map.getZoom()), // ajusta si quieres
+        pitch: 45,
+        bearing: 20,
+        duration: 1200,
+        easing: t => t * (2 - t) // easeOut
+    });
 }
 
 

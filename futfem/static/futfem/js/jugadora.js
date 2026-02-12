@@ -1,5 +1,7 @@
 // static/js/api/jugadoras.js
 import { fetchEquipoPalmaresByTemporadas } from "./equipos.js";
+let min = 1;
+let max = 476;
 /**
  * Obtener nacionalidad de una jugadora por ID
  * @param {number|string} id
@@ -77,7 +79,7 @@ export async function fetchJugadoraCompanyerasById(id) {
  * @param {number|string} id
  * @returns {Promise<Array>}
  */
-async function fetchJugadoraById(id) {
+export async function fetchJugadoraById(id) {
     try {
         const urlj = `../api/jugadoraxid?id=${encodeURIComponent(id)}`;
 
@@ -100,6 +102,11 @@ async function fetchJugadoraById(id) {
     } catch (error) {
         console.error("Error al obtener los datos:", error);
     }
+}
+
+export async function fetchRandomPlayer() {
+    const response = await fetch("/api/random-player/")
+    return await response.json()
 }
 
 /** 
@@ -180,3 +187,62 @@ export async function fetchJugadoraPalmaresById(id) {
         individual: palmaresIndividual
     };
 }
+
+
+
+export async function obtenerValorMercado(urlJugador) {
+    console.log(urlJugador)
+    try {
+        const response = await fetch("/api/jugadora-valor-mercado/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                url: urlJugador
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            console.error("Error:", data.error);
+        } else {
+            console.log("Nombre:", data);
+            console.log("Valor de mercado:", data.market_value);
+
+            // Ejemplo: mostrarlo en el HTML
+            /*document.getElementById("nombre").innerText = data.name;
+            document.getElementById("valor").innerText = data.market_value;*/
+        }
+
+        return data;
+
+    } catch (error) {
+        console.error("Error en fetch:", error);
+    }
+}
+
+
+export async function fetchClubPlayers(clubUrl) {
+    try {
+        const response = await fetch(`/api/club_players/?club_url=${encodeURIComponent(clubUrl)}`);
+        const data = await response.json();
+
+        if (data.error) {
+            console.error("Error:", data.error);
+            return [];
+        }
+
+        return data.player_urls;
+    } catch (err) {
+        console.error("Fetch fallido:", err);
+        return [];
+    }
+}
+
+// Ejemplo de uso:
+const clubUrl = "https://www.soccerdonna.de/de/fc-bayern-muenchen/profil/verein_1241.html";
+const urls = await fetchClubPlayers(clubUrl);
+console.log("URLs de jugadoras:", urls);
+

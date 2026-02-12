@@ -56,6 +56,9 @@ def futfemMates(request):
 def futfemGuess(request):
         return render(request, 'minijuegos/adivina.html')
 
+@never_cache
+def futfemHigherLower(request):
+        return render(request, 'minijuegos/higher-lower.html')
 
 @never_cache
 def futfemXIClubs(request):

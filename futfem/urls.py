@@ -19,6 +19,13 @@ urlpatterns = [
     path('jugadora_apodo', views.jugadora_apodo, name='jugadora_apodo'),
     path('jugadora_companyeras', views.jugadora_companeras, name='jugadora_companyeras'),
     path('jugadoraxid', views.jugadoraxid, name='jugadoraxid'),
+
+    path("jugadora-valor-mercado/", views.obtener_valor_mercado, name="valor_mercado"),
+    path("club_players/", views.api_club_players, name="club_players"),
+    path("update_mkvalue/", views.actualizar_valores_jugadoras, name="update_mkvalue"),
+    path("actualizar_soccerdonna_url/", views.actualizar_soccerdonna_url, name="actualizar_soccerdonna_url"),
+    path("random-player/", views.api_random_player, name="random_player"),
+
     path('jugadora_datos', views.jugadora_datos, name='jugadora_datos'),
     path('jugadorasxequipo_temporada', views.jugadoras_por_equipo_y_temporada, name='jugadorasxequipo_temporada'),
     path('jugadoras', views.jugadoras_All, name='jugadoras'),

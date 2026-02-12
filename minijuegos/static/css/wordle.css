@@ -21,7 +21,7 @@
 }
 #board {
     display: grid;
-    grid-template-columns: repeat(5, 60px);
+    /*grid-template-columns: repeat(5, 60px);
     grid-gap: 0 10px;
     /*margin-bottom: 20px;*/
     justify-items: center;

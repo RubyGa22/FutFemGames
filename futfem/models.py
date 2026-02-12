@@ -73,7 +73,9 @@ class Jugadora(models.Model):
     Nacimiento = models.DateField(max_length=255)     
     Nacionalidad = models.ForeignKey(Pais, on_delete=models.CASCADE, db_column='Nacionalidad')     
     Posicion = models.ForeignKey(Posicion, on_delete=models.CASCADE, db_column='Posicion')     
-    imagen = models.TextField(null=True)     
+    imagen = models.TextField(null=True) 
+    soccerdonna_url = models.URLField(unique=True)
+    market_value = models.IntegerField(null=True, blank=True)    
     retiro = models.IntegerField()     
 
     class Meta:

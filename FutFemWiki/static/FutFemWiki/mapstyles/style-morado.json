@@ -164,6 +164,17 @@
       }
     },
 
+    {
+      "id": "remove-ferry-routes",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["==", "class", "ferry"],
+      "paint": {
+        "line-color": "rgba(0,0,0,0)",
+        "line-width": 0
+      }
+    },
 
     {
       "id": "place-labels",

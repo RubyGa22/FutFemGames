@@ -1,4 +1,6 @@
 from webbrowser import get
+import json, random
+from django.utils import timezone
 from django.http import JsonResponse
 from django.db import connection, IntegrityError
 from django.db.models import Q
@@ -7,8 +9,14 @@ from .models import Jugadora, Trayectoria, Equipo, Pais, Liga, Trofeo
 from random import shuffle
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
+from bs4 import BeautifulSoup
+import requests
 from django.contrib.auth.hashers import make_password, check_password
-
+BASE_URL = "https://www.soccerdonna.de"
+HEADERS = {
+    "User-Agent": "Mozilla/5.0"
+}
 # Create your views here.
 def parse_temporada(temporada_str):
     año_actual = datetime.now().year
@@ -113,6 +121,7 @@ def jugadoraxid(request):
         "Nacionalidad": j.Nacionalidad.id_pais if j.Nacionalidad else None,
         "Posicion": j.Posicion.idPosicion if j.Posicion else None,
         "Retiro": j.retiro,
+        "Valor": j.market_value
     }
 
     return JsonResponse(data)
@@ -464,6 +473,165 @@ def jugadoras_por_equipo_y_temporada(request):
             jugadoras.append(fila_dict)
 
     return JsonResponse({"success": jugadoras})
+
+######
+#####
+#####
+@csrf_exempt
+def obtener_valor_mercado(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        url = data.get("url")
+
+        if not url:
+            return JsonResponse({"error": "URL no proporcionada"}, status=400)
+
+        headers = {"User-Agent": "Mozilla/5.0"}
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        # Nombre de la jugadora
+        name_tag = soup.find("h1")
+        name = name_tag.get_text(strip=True) if name_tag else None
+
+        # Buscar Marktwert en la tabla
+        label = soup.find(
+            "td",
+            string=lambda t: t and ("Marktwert" in t or "Market value" in t)
+        )
+
+
+        if label:
+            raw_value = label.find_next("td").get_text(strip=True)
+            # Manejo de casos donde no hay valor
+            if raw_value in ["–", ""]:
+                market_value = None
+            else:
+                # Limpiar caracteres y convertir a entero
+                market_value = int(''.join(filter(str.isdigit, raw_value)))
+        else:
+            market_value = None
+
+        return JsonResponse({
+            "name": name,
+            "market_value": market_value
+        })
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+def actualizar_market_value():
+    jugadoras = Jugadora.objects.all()
+    for j in jugadoras:
+        if not j.soccerdonna_url:
+            continue
+        try:
+            resp = requests.get(j.soccerdonna_url, headers=HEADERS)
+            soup = BeautifulSoup(resp.text, "html.parser")
+
+            # Buscar Marktwert o Market value
+            label = soup.find(
+                "td",
+                string=lambda t: t and ("Marktwert" in t or "Market value" in t)
+            )
+            if label:
+                raw_value = label.find_next("td").get_text(strip=True)
+                if raw_value in ["–", ""]:
+                    mv = None
+                else:
+                    mv = int(''.join(filter(str.isdigit, raw_value)))
+                j.market_value = mv
+            else:
+                j.market_value = None
+
+            j.soccerdonna_last_updated = timezone.now()
+            j.save()
+
+        except Exception as e:
+            print(f"Error actualizando {j.nombre}: {e}")
+
+@csrf_exempt
+def actualizar_valores_jugadoras(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
+    try:
+        actualizar_market_value()
+        return JsonResponse({"status": "ok", "message": "Market values actualizados"})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+@csrf_exempt
+def actualizar_soccerdonna_url(request):
+    """
+    Actualiza el campo soccerdonna_url buscando la jugadora en la base
+    usando nombre + apellidos, ignorando números iniciales y segundos nombres.
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        name = data.get("name")  # ej: "1 Andrea Tarazona"
+        url = data.get("url")
+
+        if not name or not url:
+            return JsonResponse({"error": "Faltan name o url"}, status=400)
+
+        # Eliminar números y caracteres no alfabéticos del inicio
+        import re
+        cleaned_name = re.sub(r"^\d+\s*", "", name).strip()  # "Andrea Tarazona"
+
+        # Separar en palabras
+        name_parts = cleaned_name.split()  # ["Andrea", "Tarazona"]
+
+        # Buscar coincidencia parcial de todas las palabras en nombre o apellidos
+        # Generamos un queryset que filtre cualquier jugadora que contenga todas las palabras
+        queryset = Jugadora.objects.all()
+        for part in name_parts:
+            queryset = queryset.filter(
+                Nombre__icontains=part
+            ) | queryset.filter(
+                Apellidos__icontains=part
+            )
+
+        jugadora = queryset.first()
+        if not jugadora:
+            return JsonResponse({"error": f"No se encontró jugadora con nombre {cleaned_name}"}, status=404)
+
+        # Actualizar campo
+        jugadora.soccerdonna_url = url
+        jugadora.save()
+
+        return JsonResponse({
+            "status": "ok",
+            "jugadora": f"{jugadora.Nombre} {jugadora.Apellidos}",
+            "url": url
+        })
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+def api_random_player(request):
+    # Solo jugadoras con market_value existente
+    jugadoras = Jugadora.objects.filter(market_value__isnull=False)
+
+    if not jugadoras.exists():
+        return JsonResponse({"error": "No hay jugadoras con market value"}, status=404)
+
+    jugadora = random.choice(jugadoras)
+
+    return JsonResponse({
+        "id": jugadora.id_jugadora,
+        "nombre": f"{jugadora.Nombre} {jugadora.Apellidos}",
+        "market_value": jugadora.market_value,
+        "imagen": jugadora.imagen if jugadora.imagen else None
+    })
 #################################################################################################
 ########################################EQUIPOS##################################################
 #################################################################################################
@@ -893,3 +1061,26 @@ def trofeosxid (request):
         })
 
     return JsonResponse({"success": salida})
+
+
+def get_player_urls(club_url):
+    player_urls = []
+    resp = requests.get(club_url, headers=HEADERS)
+    soup = BeautifulSoup(resp.content, 'html.parser')
+    for a in soup.select("table#spieler a.fb"):
+        href = a.get("href", "")
+        if "/profil/spieler_" in href:
+            full_url = BASE_URL + href
+            player_urls.append(full_url)
+    return player_urls
+
+def api_club_players(request):
+    club_url = request.GET.get("club_url")
+    if not club_url:
+        return JsonResponse({"error": "No se proporcionó club_url"}, status=400)
+    
+    try:
+        urls = get_player_urls(club_url)
+        return JsonResponse({"player_urls": urls})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

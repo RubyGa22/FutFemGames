@@ -27,6 +27,12 @@ section .container {
     position: relative;
 }
 
+#regular-games{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 /* Estilos principales para .game-button */
 .game-button {
     --start: 0;
