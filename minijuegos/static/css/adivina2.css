@@ -23,6 +23,10 @@ body{
 .incorrecto{
     background-color: #262a25;
 }
+
+.fi{
+    font-size: xx-large;
+}
 #game{
     display: flex;
     flex-direction: column;

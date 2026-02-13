@@ -96,10 +96,14 @@ async function verificar(){
 
     const jugadoraAnswer = await obtenerJugadora(nombreJugadora)
     const edad = compararEdad(jugadora.edad, jugadoraAnswer.edad)
+    const altura = compararAltura(jugadora.altura, jugadoraAnswer.altura);
     const equipo = compararEquipos(jugadora.equipo, jugadoraAnswer.equipo)
     const pais = compararPaises(jugadora.pais, jugadoraAnswer.pais)
+    const pie = compararPies(jugadora.pie, jugadoraAnswer.pie)
     const posicion = compararPosiciones(jugadora.posicionObj, jugadoraAnswer.posicionObj)
+    jugadoraAnswer.pie = pie
     jugadoraAnswer.edad = edad
+    jugadoraAnswer.altura = altura
     jugadoraAnswer.equipo = equipo
     jugadoraAnswer.pais = pais
     jugadoraAnswer.posicion = posicion
@@ -155,11 +159,12 @@ async function verificar(){
         clone.querySelector(".nombre").textContent = jugadora.nombre;
         clone.querySelector(".edad").classList.add(jugadora.edad.res);
         clone.querySelector(".edad-texto").textContent = jugadora.edad.edad;
-        //clone.querySelector(".equipo-nombre").textContent = jugadora.equipo.equipo?.nombre || "Sin equipo";
+        clone.querySelector(".pie").classList.add(jugadora.pie.res);
+        clone.querySelector(".pie-texto").textContent = jugadora.pie.pie;
+        clone.querySelector(".altura").classList.add(jugadora.altura.res);
+        clone.querySelector(".altura-texto").textContent = jugadora.altura.altura+" m";
         clone.querySelector(".fi").classList.add(`fi-${jugadora.pais_iso}`);
-        clone.querySelector(".fi").classList.add(`fis`);
         clone.querySelector(".pais").classList.add(jugadora.pais.res);
-        clone.querySelector(".nacionalidad").textContent = jugadora.nacionalidad || "";
 
         if (jugadora.nacionalidad?.iso) {
             clone.querySelector(".flag").classList.add(`fi-${jugadora.nacionalidad.iso.toLowerCase()}`);
@@ -176,6 +181,19 @@ async function verificar(){
         if(edad1>edad2){
             res.res = "mayor"
         }else if(edad1<edad2){
+            res.res = "menor"
+        }else{
+            res.res = "igual"
+        }
+        return res;
+    }
+
+    function compararAltura(altura1, altura2){
+        let res = { "altura": altura2, "res": null }
+
+        if(altura1>altura2){
+            res.res = "mayor"
+        }else if(altura1<altura2){
             res.res = "menor"
         }else{
             res.res = "igual"
@@ -225,3 +243,13 @@ async function verificar(){
         return res;
     }
 
+    function compararPies(pie1, pie2){
+        let res = { "pie": pie2, "res": null }
+
+        if(pie1===pie2){
+            res.res = "igual"
+        }else{
+            res.res = "incorrecto"
+        }
+        return res;
+    }

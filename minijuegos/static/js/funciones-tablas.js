@@ -254,13 +254,13 @@ function ponerEdades(id1, id2, rutaImagen1, rutaImagen2) {
     // Crear imágenes y asignarles la ruta, clase y alt correspondiente
     const img1 = document.createElement('img');
     img1.src = rutaImagen1;
-    img1.classList.add('EdadMenor20');  // Clase para edad menor de 20
+    img1.classList.add('EdadMayor30');  // Clase para edad menor de 20
     img1.alt = 'Edad';  // Asignar atributo alt
     img1.style.width = '50px';
 
     const img2 = document.createElement('img');
     img2.src = rutaImagen2;
-    img2.classList.add('EdadMayor30');  // Clase para edad 25
+    img2.classList.add('EdadIgual25');  // Clase para edad 25
     img2.alt = 'Edad';  // Asignar atributo alt
     img2.style.width = '50px';
 

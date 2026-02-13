@@ -15,37 +15,39 @@
 </head>
 <body>
     {% include 'partials/header.html' %}
-<h1>Compañeras</h1>
-<div id="reloj"></div>
-<div class="flip-container" id="foto-jug" style="height: 150px">
-    <div class="flipper">
-        <div class="front">
-            <img src="{% static 'img/mystery.jpg' %}" class="mystery" alt="mystery player">
-        </div>
-        <div class="back">
-            <img src="#" class="mystery" alt="mystery player" id="jugadora">
-        </div>
-    </div>
-</div>
-<p id="result"></p>
-
-<div class="juego">
-    <div class="compañeras" id="compañeras">
-        <div id="jugadora-1"></div>
-        <div id="jugadora-2"></div>
-        <div id="jugadora-3"></div>
-        <div id="jugadora-4"></div>
-        <div id="jugadora-5"></div>
-    </div>
-
-    <div id="respuesta" class="cont">
-        <label for="jugadoraInput">
-            <input type="text" id="jugadoraInput" placeholder="Escribe el nombre de la jugadora">
-            <div id="sugerencias-container">
-                <ul id="sugerencias"></ul>
+    <div class="mates-container">
+    <h1>Compañeras</h1>
+    <div class="flip-container" id="foto-jug" style="height: 150px">
+        <div class="flipper">
+            <div class="front">
+                <img src="{% static 'img/mystery.jpg' %}" class="mystery" alt="mystery player">
             </div>
-        </label>
-        <button id="botonVerificar">Verificar</button>
+            <div class="back">
+                <img src="#" class="mystery" alt="mystery player" id="jugadora">
+            </div>
+        </div>
+    </div>
+    <div id="reloj"></div>
+    <p id="result"></p>
+
+    <div class="juego">
+        <div class="compañeras" id="compañeras">
+            <div id="jugadora-1"></div>
+            <div id="jugadora-2"></div>
+            <div id="jugadora-3"></div>
+            <div id="jugadora-4"></div>
+            <div id="jugadora-5"></div>
+        </div>
+
+        <div id="respuesta" class="cont">
+            <label for="jugadoraInput">
+                <input type="text" id="jugadoraInput" placeholder="Escribe el nombre de la jugadora">
+                <div id="sugerencias-container">
+                    <ul id="sugerencias"></ul>
+                </div>
+            </label>
+            <button id="botonVerificar">Verificar</button>
+        </div>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

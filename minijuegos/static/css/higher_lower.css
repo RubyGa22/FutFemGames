@@ -35,8 +35,16 @@ body{
     background: rgb(255, 91, 12);
 }
 
-#game div:hover{
+#game div:nth-child(2):hover{
+    background: rgb(253, 111, 40);
+}
+
+#game div:nth-child(3):hover{
     background: var(--color-primario);
+}
+
+
+#game div:hover{
     cursor: pointer;
     background-repeat: no-repeat;
     background-size: cover;

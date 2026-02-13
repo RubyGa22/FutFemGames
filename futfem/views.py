@@ -41,7 +41,7 @@ def jugadoras_All(request):
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT 
-                j.*,
+                j.id_jugadora, j.Nombre, j.Apellidos, j.Apodo, j.Nacimiento, j.Nacionalidad, j.Posicion, j.imagen, j.retiro,
                 t.equipo AS equipo_actual_id
             FROM jugadoras j
             JOIN trayectoria t 
@@ -230,6 +230,8 @@ def jugadora_datos(request):
         "pais_id": j.Nacionalidad.id_pais if j.Nacionalidad else None,
         "pais_iso": j.Nacionalidad.iso if j.Nacionalidad else None,
         "pais": j.Nacionalidad.id_pais if j.Nacionalidad else None,
+        "altura": j.altura,
+        "pie": j.pie_habil,
         "imagen": j.imagen,
         "posicion": j.Posicion.idPosicion if j.Posicion else j.Posicion.idPosicion,
         "posicionObj": posicion_to_dict(j.Posicion),
