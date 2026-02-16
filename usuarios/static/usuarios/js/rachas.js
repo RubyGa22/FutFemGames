@@ -109,18 +109,26 @@ async function updateRachaUser(juego, condicion, ultima_respuesta) {
     try {
         let rachaActual;
 
+        let game;
+
         // Obtener racha actual según condición
         if (condicion === 0) {
             rachaActual = 0;
         } else {
             const data = await obtenerRacha(juego); // tu función obtenerRacha devuelve array
+            game = data;
             rachaActual = (data?.[0]?.racha_actual || 0) + (condicion === 1 ? 1 : 0);
         }
+
+        console.log(game)
 
         // Crear FormData
         const formData = new FormData();
         formData.append('racha', rachaActual);
         formData.append('juego', juego);
+        if(rachaActual > game[0].mejor_racha){
+            formData.append('mejor_racha', rachaActual);
+        }
         formData.append('user', parseInt(usuario, 10));
         formData.append('last_answer', ultima_respuesta);
 

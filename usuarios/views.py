@@ -181,17 +181,20 @@ def juego_racha(request):
         if racha_obj:
             # Actualizar racha existente
             racha_obj.racha_actual = racha_actual
-            racha_obj.ultima_respuesta = ultima_respuesta
             if mejor_racha:
-                racha_obj.mejor_racha = mejor_racha
-            racha_obj.save(update_fields=['racha_actual', 'ultima_respuesta'] if ultima_respuesta else ['racha_actual'])
+                if ultima_respuesta and mejor_racha:
+                    racha_obj.ultima_respuesta = ultima_respuesta
+                    racha_obj.mejor_racha = mejor_racha
+                    racha_obj.save(update_fields=['racha_actual', 'ultima_respuesta', 'mejor_racha'])
+                else:
+                    racha_obj.save(update_fields=['racha_actual'])
         else:
-            # Crear nueva racha sin campo id
             Racha.objects.create(usuario=usuario, juego=juego, racha_actual=racha_actual, ultima_respuesta=ultima_respuesta if ultima_respuesta else None)
 
         return JsonResponse({
             'success': True,
             'usuario': usuario.id,
+            'mejor_racha': mejor_racha,
             'juego': juego.id,
             'racha_actual': racha_actual,
             'ultima_respuesta': ultima_respuesta
