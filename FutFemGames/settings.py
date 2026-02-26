@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-tylyd1o(l$na1k@hd!vw!6e767zw$$v5b_02p$$wbuv+f9wk7p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.236', '192.168.1.201', '158.42.184.72', '10.10.1.78']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -77,11 +77,15 @@ TEMPLATES = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://futfemgames.gti-ia.upv.es'
+    'https://futfemgames.gti-ia.upv.es',
+    'https://*.trycloudflare.com',
+    'http://*.trycloudflare.com',
 ]
 
 WSGI_APPLICATION = 'FutFemGames.wsgi.application'
 
+# settings.py
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -90,7 +94,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('DB_NAME', 'futfemgames'),
-        'USER': os.getenv('DB_USER', 'ruben'),
+        'USER': os.getenv('DB_USER', 'root'),
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'HOST': os.getenv('DB_HOST', '127.0.0.1'),
         'PORT': os.getenv('DB_PORT', '3306'),                    # puerto por defecto de MySQL
