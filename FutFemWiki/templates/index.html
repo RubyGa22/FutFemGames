@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FutfemWiki</title>
-    <link rel="icon" href="{% static 'img/prueba logo.png' %}">
+    <link rel="icon" href="{% static 'img/logo.png' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -146,26 +146,26 @@
     });
 
     function eleccion(tipo){
-    const equipo = document.getElementById('cabecera-equipo');
-    const jugadora = document.getElementById('cabecera-jugadora');
-    const container = document.getElementById('items-container');
-    const pagination = document.getElementById('pagination');
+        const equipo = document.getElementById('cabecera-equipo');
+        const jugadora = document.getElementById('cabecera-jugadora');
+        const container = document.getElementById('items-container');
+        const pagination = document.getElementById('pagination');
 
-    container.innerHTML = '';
+        container.innerHTML = '';
 
-    if(tipo === 'jugadora'){
-        if(jugadoras.length === 0){
-            jugadoras = manejarJugadoras();
+        if(tipo === 'jugadora'){
+            if(jugadoras.length === 0){
+                jugadoras = manejarJugadoras();
+            }
+            equipo.classList.remove('active');
+            jugadora.classList.add('active');
+            pagination.style.display = 'flex';
+        } else {
+            jugadora.classList.remove('active');
+            equipo.classList.add('active');
+            pagination.style.display = 'none';
         }
-        equipo.classList.remove('active');
-        jugadora.classList.add('active');
-        pagination.style.display = 'flex';
-    } else {
-        jugadora.classList.remove('active');
-        equipo.classList.add('active');
-        pagination.style.display = 'none';
     }
-}
 
 
 document.querySelectorAll('.tab').forEach(tab => {

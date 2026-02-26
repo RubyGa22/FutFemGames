@@ -185,7 +185,9 @@ async function Verificar() {
         colocarConSeleccion(libres, nombreJugadora);
 
         if(comprobarFotosEnCeldas()){
+            stopCounter('grid');
             updateRacha(4,1,localStorage.getItem('Attr4'))
+            Ganaste('grid')
         }
 
     } catch (error) {
