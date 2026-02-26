@@ -74,13 +74,13 @@ class Jugadora(models.Model):
     Apodo = models.TextField()     
     Nacimiento = models.DateField(max_length=255)     
     Posicion = models.ForeignKey(Posicion, on_delete=models.CASCADE, db_column='Posicion')     
-    imagen = models.TextField(null=True) 
+    imagen = models.TextField(null=True, blank=True) 
     altura = models.FloatField(null=True)
     pie_habil = models.TextField(null=True, max_length=12)
-    soccerdonna_url = models.URLField(unique=True)
+    soccerdonna_url = models.URLField(unique=True, null=True, blank=True)
     market_value = models.IntegerField(null=True, blank=True)    
-    retiro = models.IntegerField()     
-    soccerdonna_last_updated = models.DateTimeField()
+    retiro = models.IntegerField(null=True, blank=True)     
+    soccerdonna_last_updated = models.DateTimeField(null=True, blank=True)
 
     class Meta:
             db_table = 'jugadoras'

@@ -87,3 +87,9 @@ p{
     display: flex;
     flex-direction: column;
 }
+
+@media (max-width:680px){
+    .jugadora-info strong{
+        font-size: x-small;
+    }
+}

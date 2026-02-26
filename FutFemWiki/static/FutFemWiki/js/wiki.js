@@ -106,13 +106,13 @@ export async function manejarJugadoras() {
     jugadorasOriginal = await fetchAllJugadoras();
 
     // Usamos for...of para poder await dentro del loop
-    for (const jugadora of jugadorasOriginal) {
+    /*for (const jugadora of jugadorasOriginal) {
         if (jugadora.equipo) {
             jugadora.equipo = await fetchEquipoById(jugadora.equipo);
         } else {
             jugadora.equipo = null; // si no tiene equipo actual
         }
-    }
+    }*/
 
     return jugadorasOriginal.length;
 }

@@ -1,5 +1,6 @@
 import { updateRacha, obtenerUltimaRespuesta } from "/static/usuarios/js/rachas.js";
 import { Ganaste, crearPopupInicialJuego } from "./funciones-comunes.js";
+import { victory } from "../sounds.js";
 
 let answer = "";
 let currentRow = 0;
@@ -153,6 +154,7 @@ async function checkWord() {
         displayMessage("¡Correcto! Has ganado.");
         if(localStorage.length>0){
             setTimeout(async () => {
+                victory.play()
                 await updateRacha(2, 1, localStorage.getItem('Attr2'));
             }, 0);
             //localStorage.setItem('Attr2', jugadora.idJugadora);

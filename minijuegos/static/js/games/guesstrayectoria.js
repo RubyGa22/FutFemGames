@@ -2,7 +2,7 @@ import { fetchJugadoraTrayectoriaById, handleAutocompletePlayer } from "/static/
 import { updateRacha, obtenerUltimaRespuesta } from "/static/usuarios/js/rachas.js";
 import { inicializarCounter, startCounter, stopCounter } from '../utils/counter.js'; 
 import { Ganaste, crearPopupInicialJuego } from "./funciones-comunes.js";
-import { victory } from "../sounds.js";
+import { victory, wrong } from "../sounds.js";
 
 // Variables de Juego
 let jugadoraId;
@@ -238,6 +238,7 @@ async function checkAnswer() {
         stopCounter('trayectoria');
         Ganaste('trayectoria');
     }else{
+        wrong.play()
         resultText.textContent = 'Sigue intentando!'
     }
 }

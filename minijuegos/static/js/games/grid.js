@@ -2,6 +2,7 @@ import { fetchJugadoraTrayectoriaById, handleAutocompletePlayer } from "/static/
 import { updateRacha, obtenerUltimaRespuesta } from "/static/usuarios/js/rachas.js";
 import { inicializarCounter, startCounter, stopCounter } from '../utils/counter.js'; 
 import { ponerClubes, Ganaste, crearPopupInicialJuego } from "./funciones-comunes.js";
+import { victory, wrong, correct } from "../sounds.js";
 
 // ----------------------------------------------------- 
 // Declaracion de variables
@@ -15,10 +16,7 @@ const resultDiv = document.getElementById('resultado');
 // Añadir el evento de input al campo de texto
 input.addEventListener('input', debounce(handleAutocompletePlayer, 300)); // Debounce de 300ms
 
-const texto = '¡Demuestra tu conocimiento sobre fútbol femenino! En "Futfem Grid", los jugadores se enfrentan a una cuadrícula llena de escudos de equipos de fútbol. El objetivo del juego es rellenar correctamente las casillas de la tabla con los nombres de las jugadoras que coinciden con los equipos de las filas y columnas. ' +
-    'El tablero es una rejilla (Grid) con filas y columnas. Cada celda contiene el escudo de un equipo de fútbol.\n' +
-    'Tu misión es rellenar cada celda con el nombre de una jugadora que haya jugado en ese equipo, tanto en la fila como en la columna correspondiente.\n' +
-    'Los jugadores deben completar el tablero lo más rápido posible, identificando correctamente las jugadoras que han jugado en esos equipos.\n';
+const texto = '¡Pon a prueba tu conocimiento! Rellena la cuadrícula con nombres de jugadoras que hayan militado en los dos equipos que coinciden en cada celda (fila y columna). ¡Completa el tablero y demuestra que eres quien más sabe de fútbol femenino!';
 const imagen = 'static/img/grid.png';
 
 
@@ -186,6 +184,10 @@ async function Verificar() {
         // 6. Caso múltiple → resaltar y esperar clic
         colocarConSeleccion(libres, nombreJugadora);
 
+        if(comprobarFotosEnCeldas()){
+            updateRacha(4,1,localStorage.getItem('Attr4'))
+        }
+
     } catch (error) {
         console.error('Error en Verificar():', error);
     }
@@ -264,12 +266,15 @@ async function Verificar() {
                 //th.classList.add("resaltado");
             }
         });
+        if(columnasEncontradas.length===0){
+            wrong.play()
+        }
 
         // Mostrar resultado
         //const resultado = document.getElementById("resultado");
         resultado.textContent = columnasEncontradas.length > 0
             ? `Equipos encontrados en columnas: ${columnasEncontradas.join(", ")}.`
-            : `Nacionalidad no encontrada en las columnas.`;
+            : `No encontrada en las columnas.`;
         console.log(`Equipos encontrados en columnas: ${columnasEncontradas.join(", ")}.`)
 
         return columnasEncontradas;
@@ -322,6 +327,7 @@ async function Verificar() {
             return resultadosEncontrados;
         } else {
             resultado.textContent = `No se han encontrado coincidencias.`;
+            wrong.play()
             return [];
         }
     }
@@ -367,6 +373,7 @@ const columnaContadores = {
     // ============ BLOQUE: COLOCACIÓN DE FOTOS ========== 
     // =====================================================
     async function colocarDirecto({ fila, columna, foto }, nombreJugadora) {
+        correct.play()
         const idCelda = `c${fila}${columna}`;
 
         await colocarImagenEnTabla(fila, columna, foto);
@@ -396,6 +403,7 @@ const columnaContadores = {
                     await colocarImagenEnTabla(fila, columna, foto);
                     gestionarAciertos(idCelda, foto);
                     jugadorasProhibidas.push(nombreJugadora);
+                    correct.play()
 
                     comprobarVictoriaGrid();
 

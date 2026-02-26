@@ -2,6 +2,7 @@ import { fetchRandomPlayer } from '/static/futfem/js/jugadora.js'
 import { animarContador, animarEntrada, animarSalida } from '/static/js/animations/higher_lower.js'
 import { getDominantColors , rgbToRgba } from '/static/js/utils/color.thief.js'
 import { updateRachaJuegoLineal } from '/static/usuarios/js/rachas.js'
+import { victory, correct } from "../sounds.js";
 const player1 = document.getElementById('option1');
 const player2 = document.getElementById('option2');
 const p2 = player2.querySelector('p');
@@ -71,6 +72,7 @@ async function verificar(event){
 
     if (acierto) {
         console.log("Correcto");
+        correct.play()
         rachaActual++;
         console.log(rachaActual)
         siguienteRonda(pulsado.id);
@@ -129,9 +131,29 @@ async function siguienteRonda(ganadoraId){
 }
 
 
-async function finDelJuego(){
-    await updateRachaJuegoLineal(7, rachaActual)
-    alert("Game Over");
+async function finDelJuego() {
+    // 1. Guardar la racha en la base de datos
+    await updateRachaJuegoLineal(7, rachaActual);
+    victory.play()
+    // 2. Referenciar elementos del popup
+    const popup = document.getElementById('popup-gameover');
+    const rachaSpan = document.getElementById('rfinal');
+    const btnReintentar = document.getElementById('btn-reintentar');
+    const btnSalir = document.getElementById('btn-salir');
+
+    // 3. Mostrar la racha y el popup
+    rachaSpan.textContent = rachaActual;
+    popup.style.display = 'flex';
+
+    // 4. Lógica de los botones
+    btnReintentar.onclick = () => {
+        popup.style.display = 'none';
+        location.reload(); // Reinicia el juego
+    };
+
+    btnSalir.onclick = () => {
+        window.location.href = '/'; // O la URL de salida que prefieras
+    };
 }
 
 

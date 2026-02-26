@@ -281,7 +281,7 @@ export function crearPopupInicialJuego(titulo, explicacion, imagen, tipo, inicia
 
     // Crear los botones de dificultad
     const botonSinTiempo = document.createElement('button');
-    botonSinTiempo.textContent = 'Sin Tiempo';
+    botonSinTiempo.innerHTML = '<i class="bi bi-infinity"></i>';
     botonSinTiempo.addEventListener('click', () => iniciarCallback('infinito'));  // Usamos una función de flecha para pasar el parámetro 'facil'
     
     const botonFacil = document.createElement('button');

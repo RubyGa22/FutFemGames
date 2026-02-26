@@ -39,28 +39,37 @@ def jugadoras_All(request):
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT 
-                j.id_jugadora, j.Nombre, j.Apellidos, j.Apodo, j.Nacimiento, 
-                j.Posicion, j.imagen, j.retiro, t.equipo AS equipo_actual_id,
-                -- Columna 9: IDs (7,52)
+                j.id_jugadora, 
+                j.Nombre, 
+                j.Apellidos, 
+                j.Apodo, 
+                j.Nacimiento, 
+                j.Posicion, 
+                j.imagen, 
+                j.retiro,
+                -- Datos del equipo para crear el objeto (Columnas 8, 9, 10)
+                e.id_equipo, 
+                e.nombre AS nombre_equipo, 
+                e.escudo,
+                e.color,
+                -- Nacionalidades (Columnas 11, 12)
                 GROUP_CONCAT(jp.pais ORDER BY jp.es_primaria DESC) AS ids_paises,
-                -- Columna 10: ISOs (NL,SR)
                 GROUP_CONCAT(p.iso ORDER BY jp.es_primaria DESC) AS isos_paises
             FROM jugadoras j
             INNER JOIN trayectoria t ON t.jugadora = j.id_jugadora AND t.equipo_actual = TRUE
+            INNER JOIN equipos e ON t.equipo = e.id_equipo
             LEFT JOIN `jugadora-pais` jp ON jp.jugadora = j.id_jugadora
             LEFT JOIN `paises` p ON jp.pais = p.id_pais
-            GROUP BY j.id_jugadora, t.equipo
+            GROUP BY j.id_jugadora, e.id_equipo
             ORDER BY j.id_jugadora;
         """)
         filas = cursor.fetchall()
 
     jugadoras = []
     for fila in filas:
-        # Procesar IDs: de "7,52" a [7, 52]
-        lista_ids = [int(x) for x in fila[9].split(',')] if fila[9] else []
-        
-        # Procesar ISOs: de "NL,SR" a ["nl", "sr"]
-        lista_isos = [x.lower() for x in fila[10].split(',')] if fila[10] else []
+        # Procesar nacionalidades (IDs e ISOs)
+        lista_ids = [int(x) for x in fila[12].split(',')] if fila[11] else []
+        lista_isos = [x.lower() for x in fila[13].split(',')] if fila[12] else []
         
         jugadoras.append({
             "id_jugadora": fila[0],
@@ -71,9 +80,15 @@ def jugadoras_All(request):
             "posicion": fila[5],
             "imagen": fila[6],
             "retiro": fila[7],
-            "equipo": fila[8],
-            "nacionalidades_ids": lista_ids,    # Para lógica de filtros o bingo
-            "nacionalidades_isos": lista_isos   # Para pintar las banderas
+            # AQUÍ ESTÁ EL OBJETO EQUIPO
+            "equipo": {
+                "id": fila[8],
+                "nombre": fila[9],
+                "escudo": fila[10],
+                "color": fila[11]
+            },
+            "nacionalidades_ids": lista_ids,
+            "nacionalidades_isos": lista_isos
         })
     
     return JsonResponse({"success": jugadoras})

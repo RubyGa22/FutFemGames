@@ -1,3 +1,6 @@
+body{
+    max-height: 100vh;
+}
 #game {
     display: flex;
     flex-direction: column;
@@ -25,7 +28,7 @@
     /*backdrop-filter: blur(10px);*/
 }
 #sugerencias{
-    max-height: 125px;
+    max-height: 222px;
     overflow-y: scroll;
 }
 #sugerencias::-webkit-scrollbar{
@@ -177,7 +180,7 @@ p {
         max-width: 100%;
     }
     #trayectoria {
-        width: 95%;
+        width: 100%;
         padding: 1rem;
         flex: 1 1 0;
         height: auto;
@@ -199,7 +202,7 @@ p {
         width: 150px;
     }
     input {
-        width: 90%;
+        width: 90% !important;
         font-size: 14px;
     }
 
@@ -220,19 +223,27 @@ p {
     #game{
         width: 97%;
     }
+    #foto-jug{
+        height: 100px !important;
+    }
+    #sugerencias{
+    max-height: 130px;
+    overflow-y: scroll;
+    }
     #trayectoria {
         max-width: 97%;
-        padding: 1rem 0.2rem;
+        padding: 0.5rem 0.2rem;
         flex: 1 1 0;
         height: auto;
         /*display: grid;
         grid-template-columns: repeat(4, 25%);*/ /* Esto crea 3 columnas de igual tamaño */
-        gap: 1.5rem 0; /* Espacio entre los elementos, ajusta según tu preferencia */
+        gap: 0 0; /* Espacio entre los elementos, ajusta según tu preferencia */
         justify-items: center;
     }
     .trayectoria-row{
         width: 100%;
         justify-content: space-around;
+        height: fit-content;
     }
     .flip-container{
         max-width: 70px;
@@ -250,7 +261,7 @@ p {
         margin: 0;
     }
     .mystery{
-        width: 150px;
+        width: 90px;
     }
     input {
         width: 90%;

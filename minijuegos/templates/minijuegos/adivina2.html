@@ -21,6 +21,15 @@
     <div id="game">
         <div id="resultado"></div>
         <p id="vidas"></p>
+        <div id="game-header">
+            <div>
+                <input type="text" name="jugadora" id="jugadoraInput">
+                <div id="sugerencias-container">
+                    <ul id="sugerencias"></ul>
+                </div>
+            </div>
+            <button id="botonVerificar">Confirmar</button>
+        </div>
         <div id="game-results">
             <template id="jugadora-template">
             <div class="jugadora-item">
@@ -52,15 +61,6 @@
                 </div>
             </div>
             </template>
-        </div>
-        <div id="game-header">
-            <div>
-                <input type="text" name="jugadora" id="jugadoraInput">
-                <div id="sugerencias-container">
-                    <ul id="sugerencias"></ul>
-                </div>
-            </div>
-            <button id="botonVerificar">Confirmar</button>
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

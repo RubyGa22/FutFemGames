@@ -44,7 +44,7 @@ input{
     border: 1px solid #333;
     border-radius: 8px;
     background-color: rgba(255,255,255,0.8); /* Color de fondo primario */
-    color: var(--color-texto); /* Color del texto */
+    color: var(--color-detalles); /* Color del texto */
     transition: transform 0.2s; /* Suavizar el efecto de transformación */
     box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(10px);
