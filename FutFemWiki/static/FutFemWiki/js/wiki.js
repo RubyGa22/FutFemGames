@@ -142,7 +142,7 @@ function renderJugadorasPage(page = 1) {
     const end = start + itemsPerPage;
     const jugadoras = jugadorasGlobal.slice(start, end);
     jugadoras.forEach((jugadora, index) => { 
-        const nombreCompleto = jugadora.nombre + jugadora.apellido;
+        const nombreCompleto = jugadora.nombre_completo || 'Desconocida';
         const div = document.createElement('div');
         div.classList.add('jugadora-item');
         div.classList.add('glass');
@@ -164,7 +164,7 @@ function renderJugadorasPage(page = 1) {
         imgClub.alt = jugadora.equipo.nombre;
 
         const pNombre = document.createElement('p');
-        pNombre.textContent = jugadora.apodo; 
+        pNombre.textContent = nombreCompleto; 
         div1_2.appendChild(pNombre);
 
         // Contenedor para las banderas

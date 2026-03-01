@@ -35,8 +35,8 @@ class Equipo(models.Model):
     nombre = models.TextField()
     escudo = models.TextField(null=True, blank=True)
     color = models.CharField(max_length=7, null=True, blank=True)  # Color en formato hexadecimal
-    latitud = models.FloatField(null=True)
-    longitud = models.FloatField(null=True)
+    latitud = models.FloatField(null=True, blank=True)
+    longitud = models.FloatField(null=True, blank=True)
 
     class Meta:
         db_table = 'equipos'

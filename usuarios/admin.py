@@ -27,3 +27,8 @@ class UsuarioAdmin(UserAdmin):
     list_filter = ('rol', 'is_staff', 'is_active') 
     filter_horizontal = ()
     ordering = ('username',)
+
+    class Media:
+            css = {
+                'all': ('https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css','/static/futfem/css/custom_admin.css')
+            }

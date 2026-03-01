@@ -183,6 +183,7 @@ summary, details{
 
 .jugadora-item p{
     width: 100%;
+    font-size: x-small;
 }
 
 #wiki-equipos{
@@ -469,6 +470,10 @@ display: flex;
 
     #items-container.equipos {
         grid-template-columns: repeat(2, 1fr); /* 1 columna en pantallas pequeñas */
+    }
+
+    .jugadora-item{
+        width: 100%;
     }
 
 }

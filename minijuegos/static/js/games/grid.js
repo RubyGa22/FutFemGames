@@ -140,7 +140,7 @@ async function iniciar(dificultad) {
 play().then(r => r);
 async function play() {
     let jugadora = await fetchData(4);
-    let paises = [jugadora.pais1, jugadora.pais2, jugadora.pais3];
+    let paises = [jugadora.club4, jugadora.club5, jugadora.club6];
     let clubes = [jugadora.club1, jugadora.club2, jugadora.club3];
     idres = paises.map(String).concat(clubes.map(String)).join('');
     const res = localStorage.getItem('res4');
@@ -184,11 +184,6 @@ async function Verificar() {
         // 6. Caso múltiple → resaltar y esperar clic
         colocarConSeleccion(libres, nombreJugadora);
 
-        if(comprobarFotosEnCeldas()){
-            stopCounter('grid');
-            updateRacha(4,1,localStorage.getItem('Attr4'))
-            Ganaste('grid')
-        }
 
     } catch (error) {
         console.error('Error en Verificar():', error);
@@ -382,7 +377,7 @@ const columnaContadores = {
         gestionarAciertos(idCelda, foto);
         jugadorasProhibidas.push(nombreJugadora);
 
-        comprobarVictoriaGrid();
+        await comprobarVictoriaGrid();
     }
 
     // --------------------------------------------------------- 
@@ -401,18 +396,19 @@ const columnaContadores = {
                 celdasDisponibles.push(td);
 
                 td.addEventListener("click", async function handler() {
+                    if(!td.classList.contains('resaltado')) return null;
 
                     await colocarImagenEnTabla(fila, columna, foto);
                     gestionarAciertos(idCelda, foto);
                     jugadorasProhibidas.push(nombreJugadora);
                     correct.play()
 
-                    comprobarVictoriaGrid();
+                    await comprobarVictoriaGrid();
 
                     // limpiar resaltados
                     celdasDisponibles.forEach(celda => {
                         celda.classList.remove("resaltado");
-                        celda.replaceWith(celda.cloneNode(true));
+                        celda.onclick = null;
                     });
 
                 }, { once: true });
@@ -491,8 +487,10 @@ const columnaContadores = {
     // COMPROBAR VICTORIA GRID
     // Al validar una jugadora, comprueba si con ella se ha llenado la tabla(se gana)
     // ---------------------------------------------------------
-    function comprobarVictoriaGrid() {
+    async function comprobarVictoriaGrid() {
         if (comprobarFotosEnCeldas()) {
+            victory.play()
+            await updateRacha(4,1,localStorage.getItem('Attr4'))
             stopCounter("grid");
             Ganaste('grid');
         }

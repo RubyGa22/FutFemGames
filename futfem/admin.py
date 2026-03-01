@@ -1,13 +1,29 @@
 from django.contrib import admin
 from django.contrib import admin
 from django.utils.html import format_html
+from django.contrib.admin.models import LogEntry
 from .models import Pais ,Jugadora, Trayectoria, Equipo, Liga, JugadoraPais
 # Register your models here.
+@admin.register(LogEntry)
+class LogEntryAdmin(admin.ModelAdmin):
+    # Configuramos qué columnas queremos ver
+    list_display = ('action_time', 'user', 'content_type', 'object_repr', 'action_flag')
+    
+    # Filtros laterales para buscar por usuario, fecha o tipo de acción
+    list_filter = ('user', 'content_type', 'action_flag')
+    
+    # Buscador para encontrar objetos específicos por su nombre
+    search_fields = ('object_repr', 'change_message')
+    
+    # Para que nadie pueda borrar o editar los logs desde aquí (solo lectura)
+    def has_add_permission(self, request): return False
+    def has_change_permission(self, request, obj=None): return False
+    def has_delete_permission(self, request, obj=None): return False
 # 1. Definimos el Inline para la Trayectoria
 class TrayectoriaInline(admin.TabularInline):
     model = Trayectoria
     extra = 1  # Número de filas vacías para añadir nuevos equipos
-    fields = ('equipo', 'años', 'equipo_actual', 'ver_escudo')
+    fields = ('equipo', 'años', 'equipo_actual', 'ver_escudo', 'imagen')
     readonly_fields = ('ver_escudo',)
     
     def ver_escudo(self, obj):
@@ -49,7 +65,7 @@ class PaisAdmin(admin.ModelAdmin):
     class Media:
         # Cargamos el CSS de banderas para verlo también aquí
         css = {
-            'all': ('https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css',)
+            'all': ('https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css','/static/futfem/css/custom_admin.css')
         }
 
 # 2. Registramos la Jugadora con su configuración
@@ -159,6 +175,10 @@ class EquipoAdmin(admin.ModelAdmin):
             )
         return "Sin color"
     ver_color.short_description = 'Color Principal'
+    class Media:
+        css = {
+            'all': ('https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css','/static/futfem/css/custom_admin.css')
+        }
 
 @admin.register(Liga)
 class LigaAdmin(admin.ModelAdmin):
@@ -188,5 +208,5 @@ class LigaAdmin(admin.ModelAdmin):
     # Cargamos los iconos de banderas también aquí
     class Media:
         css = {
-            'all': ('https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css',)
+            'all': ('https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css','/static/futfem/css/custom_admin.css')
         }

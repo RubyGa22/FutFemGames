@@ -32,6 +32,27 @@ def parse_temporada(temporada_str):
         inicio = fin = int(temporada_str)
 
     return inicio, fin
+
+def formatear_nombre_corto(nombre_str, apellidos_str):
+    # 1. Procesar Nombre (siempre la primera palabra)
+    nombre = nombre_str.split()[0] if nombre_str else ""
+    
+    # 2. Procesar Apellidos con lógica de partículas (van, de, la, etc.)
+    if not apellidos_str:
+        return nombre.strip()
+        
+    palabras = apellidos_str.split()
+    resultado_apellido = []
+    
+    for i, palabra in enumerate(palabras):
+        resultado_apellido.append(palabra)
+        # Si la palabra actual empieza con Mayúscula, paramos ahí.
+        # Esto capturará "van der" (minúsculas) y se detendrá en "Gragt" (mayúscula).
+        if palabra[0].isupper():
+            break
+            
+    apellido_final = " ".join(resultado_apellido)
+    return f"{nombre} {apellido_final}".strip()
 #################################################################################################
 ######################################JUGADORAS##################################################
 #################################################################################################
@@ -61,7 +82,7 @@ def jugadoras_All(request):
             LEFT JOIN `jugadora-pais` jp ON jp.jugadora = j.id_jugadora
             LEFT JOIN `paises` p ON jp.pais = p.id_pais
             GROUP BY j.id_jugadora, e.id_equipo
-            ORDER BY j.id_jugadora;
+            ORDER BY j.Apellidos;
         """)
         filas = cursor.fetchall()
 
@@ -88,7 +109,8 @@ def jugadoras_All(request):
                 "color": fila[11]
             },
             "nacionalidades_ids": lista_ids,
-            "nacionalidades_isos": lista_isos
+            "nacionalidades_isos": lista_isos,
+            "nombre_completo": formatear_nombre_corto(fila[1], fila[2])
         })
     
     return JsonResponse({"success": jugadoras})
@@ -310,7 +332,7 @@ def jugadoraxnombre(request):
 
     data = [{
         'id_jugadora': j.id_jugadora,
-        'Nombre_Completo': f"{j.Nombre} {j.Apellidos}",
+        'Nombre_Completo': formatear_nombre_corto(j.Nombre, j.Apellidos),
         'imagen': j.imagen or '/static/img/predeterm.jpg',
         'Nacimiento': j.Nacimiento.strftime("%Y-%m-%d") if j.Nacimiento else "",
         'Apodo': j.Apodo,
@@ -426,7 +448,7 @@ def jugadora_aleatoria(request):
 
                     jugadoras_finales[j.id_jugadora] = {
                         "id": j.id_jugadora,
-                        "nombre": f"{j.Nombre} {j.Apellidos}",
+                        "nombre": formatear_nombre_corto(j.Nombre, j.Apellidos),
                         "imagen": j.imagen if j.imagen else None,
                         "pais": id_pais,
                         "Nacimiento": j.Nacimiento.strftime("%Y-%m-%d") if j.Nacimiento else None,
@@ -459,7 +481,7 @@ def jugadora_aleatoria(request):
                 pais_rel = j.jugadorapais_set.filter(es_primaria=True).first()
                 jugadoras_finales[j.id_jugadora] = {
                     "id": j.id_jugadora,
-                    "nombre": f"{j.Nombre} {j.Apellidos}",
+                    "nombre": formatear_nombre_corto(j.Nombre, j.Apellidos),
                     "imagen": j.imagen,
                     "pais": pais_rel.pais_id if pais_rel else None,
                     "Nacimiento": j.Nacimiento.strftime("%Y-%m-%d") if j.Nacimiento else None,
