@@ -9,7 +9,28 @@
       <nav id="main-nav">
         <ul>
           <li><a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
-          <li><a href="{% url 'wiki' %}" class="{% if request.resolver_match.url_name == 'wiki' %}active{% endif %}">Wiki</a></li>
+          <li class="dropdown">
+            <a href="#" class="{% if request.resolver_match.url_name in 'wiki,equipos,jugadoras,mapa' %}active{% endif %}">
+                Wiki
+            </a>
+            <ul class="submenu">
+                <li>
+                    <a href="{% url 'equipos' %}" class="{% if request.resolver_match.url_name == 'equipos' %}active{% endif %}">
+                        Equipos
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'players' %}" class="{% if request.resolver_match.url_name == 'players' %}active{% endif %}" data-active-section="{{ seccion }}">
+                        Jugadoras
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'mapa' %}" class="{% if request.resolver_match.url_name == 'mapa' %}active{% endif %}">
+                        Mapa
+                    </a>
+                </li>
+            </ul>
+        </li>
           <li><a href="{% url 'nosotros' %}" class="{% if request.resolver_match.url_name == 'nosotros' %}active{% endif %}">Nosotros</a></li>
         </ul>
       </nav>

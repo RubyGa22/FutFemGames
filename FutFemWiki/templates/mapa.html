@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutFem Map</title>
+    <link rel="icon" href="{% static 'img/logo.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/combo.css' %}">
+    <link rel="stylesheet" href="{% static 'FutFemWiki/css/wiki.css' %}">
+    <link rel="stylesheet" href="{% static 'FutFemWiki/css/mapa.css' %}">
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    <div id="mapa-container" style="width: 100vw; height: 100vh;">
+        <div id="inputs">
+            <input id="input-equipo" type="text" name="equipo" placeholder="Buscar por equipo..." autocomplete="off">
+            <div class="sugerencias-container">
+                <ul id="sugerencias-equipo"></ul>
+            </div>
+        </div>
+        <div id="mapa-equipos"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/maplibre-gl@5.18.0/dist/maplibre-gl.js"></script>
+    <script type="module" src="{% static 'FutFemWiki/mapstyles/capaControl.js' %}"></script>
+    <script type="module" src="{% static 'FutFemWiki/js/mapa.js' %}"></script>
+<script type="module">
+import { inicializarMapaEquipos, añadirEquipoMapa, centrarMapaEnEquipos, map } from '{% static "FutFemWiki/js/mapa.js" %}';
+import { fetchAllEquipos, handleAutocompleteEquipo } from '{% static "futfem/js/equipos.js" %}';
+
+const inputEquipo = document.getElementById('input-equipo');
+
+inputEquipo.addEventListener('input', async (event) => {
+        handleAutocompleteEquipo(event, 'sugerencias-equipo');
+    });
+inicializarMapaEquipos();
+
+map.on("load", async () => {
+
+    let equipos = await fetchAllEquipos();
+    equipos = equipos.success;
+
+    equipos.forEach(equipo => {
+
+        if (equipo.lat != null && equipo.long != null) {
+
+            añadirEquipoMapa(
+                equipo.id,
+                equipo.nombre,
+                parseFloat(equipo.lat),
+                parseFloat(equipo.long),
+                '/' + equipo.escudo,
+                equipo.color
+            );
+        }
+
+    });
+
+    //centrarMapaEnEquipos();
+
+});
+</script>
+</body>
+</html>

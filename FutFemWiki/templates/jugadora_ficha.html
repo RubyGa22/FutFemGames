@@ -176,6 +176,7 @@ async function cargarTrayectorias() {
 
         // Lógica de colores y contenido...
         const imgSrc = trayectoria.imagen ? `/${trayectoria.imagen}` : `/{{ jugadora.imagen }}`;
+        const iso = jugadora.pais_iso && jugadora.pais_iso.length > 0 ? jugadora.pais_iso[0] : 'xx';
         
         front.innerHTML = `
             <img class="imagen-jugadora" src="${imgSrc}">
@@ -184,11 +185,14 @@ async function cargarTrayectorias() {
                 <div class="equipo-pais">
                     <p>{{ jugadora.Posicion.abreviatura }}</p>
                     <img src="/${equipo.escudo}">
-                    <span class="fi fi-{{ jugadora.Nacionalidad.iso }}" style="font-size: xx-large;"></span>
+                    <span class="fi fi-${iso}" style="font-size: xx-large;"></span>
                 </div>
-                <p>${trayectoria.años}</p>
-            </div>
+                <p>${trayectoria.fecha_inicio ? (trayectoria.fecha_inicio.substring(0, 4) + (trayectoria.fecha_fin ? ' - ' + trayectoria.fecha_fin.substring(0, 4) : ' - Act.')) : null}</p>            </div>
         `;
+        if(equipo.club === 83){
+            info.querySelector('img').classList.add('vintage');
+            front.querySelector('.imagen-jugadora').classList.add('vintage');
+        }
 
         // Palmarés en el Back...
         const trofeosEquipo = palmares.equipo[index].success || [];

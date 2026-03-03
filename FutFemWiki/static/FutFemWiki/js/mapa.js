@@ -115,7 +115,7 @@ export function inicializarMapaEquipos() {
             }
         }, labelLayerId);
 
-        map.addLayer({
+        /*map.addLayer({
             id: "sky",
             type: "sky",
             paint: {
@@ -123,7 +123,7 @@ export function inicializarMapaEquipos() {
                 "sky-atmosphere-sun": [0.0, 0.0],
                 "sky-atmosphere-sun-intensity": 15
             }
-        });
+        });*/
 
         map.setLight({
             anchor: "viewport",
@@ -139,10 +139,18 @@ export function inicializarMapaEquipos() {
 
 export function añadirEquipoMapa(id, nombre, lat, lng, escudoUrl, color) {
 
+    lat = parseFloat(lat);
+    lng = parseFloat(lng);
+
+    if (lat == null || lng == null) {
+        console.log(`Equipo sin coordenadas: ${nombre}`);
+        return;
+    }
+
     const el = document.createElement('div');
     el.className = 'marker-escudo';
     el.innerHTML = `
-        <div class="marker-wrapper">
+        <div class="marker-wrapper" id="marker-${id}">
             <!--<div class="marker-pin"></div>-->
             <img src="${escudoUrl}" class="marker-escudo-img" />
         </div>

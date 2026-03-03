@@ -170,6 +170,41 @@ header .botones{
     gap: 10px;
 }
 
+/* Estructura básica del menú */
+li.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Ocultar el submenú por defecto */
+.submenu {
+    display: none;
+    position: absolute;
+    background-color: var(--color-secundario);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    list-style: none;
+    padding: 0;
+}
+
+/* Mostrar al hacer hover */
+.dropdown:hover .submenu {
+    display: block;
+}
+
+/* Estilo de los links del submenú */
+.submenu li a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.submenu li a:hover, .submenu li a.active {
+    color: #007bff; /* Color de tu tema */
+}
+
 header .botones button{
     background: var(--color-detalles);
     border: none;

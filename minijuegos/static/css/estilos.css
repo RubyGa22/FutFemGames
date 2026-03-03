@@ -51,6 +51,9 @@ h1{
 img{
     pointer-events: none;
 }
+img.vintage{
+    filter: grayscale(0.5) contrast(1.2) sepia(0.75);
+}
 body.loading{
     display: none;
 }

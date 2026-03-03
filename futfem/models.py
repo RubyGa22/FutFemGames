@@ -37,6 +37,7 @@ class Equipo(models.Model):
     color = models.CharField(max_length=7, null=True, blank=True)  # Color en formato hexadecimal
     latitud = models.FloatField(null=True, blank=True)
     longitud = models.FloatField(null=True, blank=True)
+    equipo_sucesor = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, db_column='equipo_sucesor', related_name='versiones_antiguas',verbose_name="Convertido en / Sucesor de")
 
     class Meta:
         db_table = 'equipos'
@@ -44,6 +45,31 @@ class Equipo(models.Model):
 
     def __str__(self):
         return self.nombre
+
+# models.py
+
+class EquipoTrofeo(models.Model):
+    # Django creará el campo 'id' automático (AUTO_INCREMENT)
+    equipo = models.ForeignKey(
+        'Equipo', 
+        on_delete=models.CASCADE, 
+        db_column='equipo' # Nombre real en tu MySQL
+    )
+    trofeo = models.ForeignKey(
+        'Trofeo', 
+        on_delete=models.CASCADE, 
+        db_column='trofeo' # Nombre real en tu MySQL
+    )
+    temporada = models.CharField(max_length=10, db_column='temporada')
+
+    class Meta:
+        managed = False          # Importante: Django no intentará crear la tabla, usará la que ya tienes
+        db_table = 'equipo-trofeo' # El nombre exacto de tu tabla con guion
+        verbose_name = "Logro de Equipo"
+        verbose_name_plural = "Palmarés"
+
+    def __str__(self):
+        return f"{self.equipo.nombre} - {self.trofeo.nombre} ({self.temporada})"
 
 
 class Posicion(models.Model):
@@ -116,7 +142,7 @@ class Trofeo(models.Model):
         managed = False  # Si la tabla ya existe y no quieres que Django la reescriba
 
     def __str__(self):
-        return self.Trofeo
+        return self.nombre
 
 
 class Trayectoria(models.Model):
@@ -124,6 +150,8 @@ class Trayectoria(models.Model):
     jugadora = models.ForeignKey(Jugadora, on_delete=models.CASCADE, db_column='jugadora')
     equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE, db_column='equipo')
     años = models.TextField()
+    fecha_inicio = models.DateField(null=True, blank=True)
+    fecha_fin = models.DateField(null=True, blank=True)
     imagen = models.TextField(null=True, blank=True)
     equipo_actual = models.BooleanField()
 

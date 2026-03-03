@@ -23,7 +23,7 @@
 
 <section id="wiki-equipos">
     <div id="cabecera-wiki-equipos">
-        <div id="selector" class="selector">
+        <div id="selector" class="selector" style="display: none;">
             <i class="bi bi-chevron-left arrow" id="arrow-left"></i>
 
             <div class="selector-center">
@@ -38,7 +38,7 @@
         </div>
 
 
-        <div id="cabecera-equipo" class="panel active">
+        <div id="cabecera-equipo" class="panel">
             <p>Seleccione un país</p>
             <div id="input-y-boton">
                 <div id="filtros-pais">
@@ -80,102 +80,19 @@
     <div id="pagination" class="pagination">
     </div>
 
+    <div id="config-wiki" data-seccion="{{ seccion }}"></div>
+
 </section>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
 <script type="module">
-    import { manejarJugadoras } from '../static/FutFemWiki/js/wiki.js';
-    let modoActual = 'equipo';
-    let jugadoras = [];
-
-    function actualizarSelector() {
-    const texto = document.getElementById('selector-text');
-    const dotEquipo = document.getElementById('dot-equipo');
-    const dotJugadora = document.getElementById('dot-jugadora');
-    const arrowLeft = document.getElementById('arrow-left');
-    const arrowRight = document.getElementById('arrow-right');
-
-    // Animación suave del texto
-    texto.style.opacity = 0;
-    texto.style.transform = 'translateY(4px)';
-
-    setTimeout(() => {
-        texto.textContent = modoActual === 'equipo' ? 'Equipos' : 'Jugadoras';
-        texto.style.opacity = 1;
-        texto.style.transform = 'translateY(0)';
-    }, 150);
-
-    // Puntitos
-    dotEquipo.classList.toggle('active', modoActual === 'equipo');
-    dotJugadora.classList.toggle('active', modoActual === 'jugadora');
-
-    // Flechas activas / desactivadas
-    arrowLeft.classList.toggle('disabled', modoActual === 'equipo');
-    arrowRight.classList.toggle('disabled', modoActual === 'jugadora');
-
-    // Mostrar contenido
-    eleccion(modoActual);
+    import { manejarJugadoras, inicializarWiki } from '/static/FutFemWiki/js/wiki.js';
+    // No pases el elemento, pasa el valor
+    const elemento = document.getElementById('config-wiki');
+    if (elemento) {
+        inicializarWiki(elemento.dataset.seccion);
     }
-
-
-    // Dots
-    document.getElementById('dot-equipo').addEventListener('click', () => {
-        if (modoActual !== 'equipo') eleccion('equipo');
-    });
-
-    document.getElementById('dot-jugadora').addEventListener('click', () => {
-        if (modoActual !== 'jugadora') eleccion('jugadora');
-    });
-
-
-
-    // Flechas
-    document.getElementById('arrow-left').addEventListener('click', () => {
-        if (modoActual !== 'equipo') {
-            modoActual = 'equipo';
-            actualizarSelector();
-        }
-    });
-
-    document.getElementById('arrow-right').addEventListener('click', () => {
-        if (modoActual !== 'jugadora') {
-            modoActual = 'jugadora';
-            actualizarSelector();
-        }
-    });
-
-    function eleccion(tipo){
-        const equipo = document.getElementById('cabecera-equipo');
-        const jugadora = document.getElementById('cabecera-jugadora');
-        const container = document.getElementById('items-container');
-        const pagination = document.getElementById('pagination');
-
-        container.innerHTML = '';
-
-        if(tipo === 'jugadora'){
-            if(jugadoras.length === 0){
-                jugadoras = manejarJugadoras();
-            }
-            equipo.classList.remove('active');
-            jugadora.classList.add('active');
-            pagination.style.display = 'flex';
-        } else {
-            jugadora.classList.remove('active');
-            equipo.classList.add('active');
-            pagination.style.display = 'none';
-        }
-    }
-
-
-document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-        eleccion(tab.dataset.tipo);
-    });
-});
-eleccion('equipo');
-
-
 </script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://unpkg.com/maplibre-gl@5.18.0/dist/maplibre-gl.js"></script>

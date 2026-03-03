@@ -202,7 +202,7 @@ export async function fetchRandomPlayer() {
  */
 export async function fetchAllJugadoras() {
     try{
-        const url = `../api/jugadoras`;
+        const url = `/api/jugadoras`;
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -265,7 +265,10 @@ export async function fetchJugadoraPalmaresById(id) {
     const palmaresIndividual = await fetchJugadoraTrofeosIndividualesById(id);
     let palmaresEquipo = [];
     for(const etapa of trayectoria){
-        const palmares = await fetchEquipoPalmaresByTemporadas(etapa.equipo, etapa.años);
+        // Extraemos solo el año (primeros 4 caracteres YYYY)
+        const anioInicio = etapa.fecha_inicio.substring(0, 4);
+        const anioFin = etapa.fecha_fin ? etapa.fecha_fin.substring(0, 4) : 'act';
+        const palmares = await fetchEquipoPalmaresByTemporadas(etapa.equipo, `${anioInicio}-${anioFin}`);
         palmaresEquipo.push(palmares);
     }
     return { 

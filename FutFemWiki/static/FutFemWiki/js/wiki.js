@@ -8,7 +8,7 @@ const btnMapa = document.getElementById("ver-mapa");
 const mapa = document.getElementById("mapa-equipos");
 const item = document.getElementById("items-container");
 
-btnMapa.addEventListener("click", () => {
+/*btnMapa.addEventListener("click", () => {
     const visible = mapa.style.display === 'block';
 
     
@@ -31,13 +31,16 @@ btnMapa.addEventListener("click", () => {
             }
         }, 50);
     }
-});
+});*/
 
-function inicializarWiki() {
+
+export function inicializarWiki(arg) {
 
     const inputPaises = document.getElementsByClassName('input-pais');
 
     const cabeceraLigas = document.getElementById('cabecera-equipo');
+
+    const cabeceraJugadoras = document.getElementById('cabecera-jugadora');
 
     const ligasContainer = document.getElementById('ligas-container');
 
@@ -48,6 +51,24 @@ function inicializarWiki() {
     //const botonJugadoras = document.getElementById('jugadoras-btn');
 
     const botonFiltro = document.getElementById('jugadoras-filtros');
+
+    if(arg === 'jugadoras'){
+        cabeceraJugadoras.classList.add('active');
+        cabeceraLigas.classList.remove('active');
+        manejarJugadoras().then(cantidad => {
+            console.log(`Total jugadoras cargadas: ${cantidad}`);
+            displayJugadoras(jugadorasOriginal);
+        });
+    }else if(arg === 'equipos'){
+        cabeceraJugadoras.classList.remove('active');
+        cabeceraLigas.classList.add('active');
+        ligasxpais(1).then(ligas => {
+            displayLigas(ligas.success);
+        });
+         equiposxliga(1).then(equipos => {
+        displayEquipos(equipos.success);
+        });
+    }
 
     botonFiltro.addEventListener('click', () => {
         const paisInput = inputPaises[1];
@@ -84,19 +105,16 @@ function inicializarWiki() {
     });
 
     // default equipo display
-    ligasxpais(1).then(ligas => {
+    /*ligasxpais(1).then(ligas => {
         ligasContainer.firstElementChild.classList.add('selected');
         cabeceraLigas.style.display = 'flex';
     });
     equiposxliga(1).then(equipos => {
         displayEquipos(equipos.success);
-    });
+    });*/
 
     
 }
-
-
-inicializarWiki();
 
 
 export async function manejarJugadoras() {
@@ -441,7 +459,7 @@ function filtroJugadoras(equipo, nacionalidad, posicion) {
     let nuevasJugadoras = jugadorasOriginal.filter(jugadora => {
         // 1. Filtro de Equipo
         // Comparamos el ID del equipo (o club) según cómo venga en tu JSON
-        if (equipo && jugadora.equipo.club !== parseInt(equipo)) return false;
+        if (equipo && jugadora.equipo.id !== parseInt(equipo)) return false;
 
         // 2. Filtro de Nacionalidad
         // Si hay una nacionalidad seleccionada, comprobamos si está en su lista de IDs

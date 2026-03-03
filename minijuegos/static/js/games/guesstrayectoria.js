@@ -162,7 +162,7 @@ function displayTrayectoria(data, acertaste) {
             front.appendChild(escudoImg);
 
             const anyos = document.createElement('p');
-            anyos.textContent = item.años;
+            anyos.textContent = item.fecha_inicio ? (item.fecha_inicio.substring(0, 4) + (item.fecha_fin ? ' - ' + item.fecha_fin.substring(0, 4) : ' - Act.')) : null;
             anyos.style.textAlign = 'center';
             front.appendChild(anyos);
         }else{
@@ -189,7 +189,7 @@ function displayTrayectoria(data, acertaste) {
                 back.appendChild(jugadoraImg);
 
                 const anyos = document.createElement('p');
-                anyos.textContent = item.años;
+                anyos.textContent = item.fecha_inicio ? (item.fecha_inicio.substring(0, 4) + (item.fecha_fin ? ' - ' + item.fecha_fin.substring(0, 4) : ' - Act.')) : null;
                 anyos.style.textAlign = 'center';
                 back.appendChild(anyos);
 
@@ -202,7 +202,7 @@ function displayTrayectoria(data, acertaste) {
                 back.appendChild(jugadoraImg);
 
                 const anyos = document.createElement('p');
-                anyos.textContent = item.años;
+                anyos.textContent = item.fecha_inicio ? (item.fecha_inicio.substring(0, 4) + (item.fecha_fin ? ' - ' + item.fecha_fin.substring(0, 4) : ' - Act.')) : null;
                 anyos.style.textAlign = 'center';
                 back.appendChild(anyos);
 

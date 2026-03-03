@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib import admin
 from django.utils.html import format_html
 from django.contrib.admin.models import LogEntry
-from .models import Pais ,Jugadora, Trayectoria, Equipo, Liga, JugadoraPais
+from .models import Pais ,Jugadora, Trayectoria, Equipo, Liga, JugadoraPais, EquipoTrofeo, Trofeo
 # Register your models here.
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
@@ -23,7 +23,7 @@ class LogEntryAdmin(admin.ModelAdmin):
 class TrayectoriaInline(admin.TabularInline):
     model = Trayectoria
     extra = 1  # Número de filas vacías para añadir nuevos equipos
-    fields = ('equipo', 'años', 'equipo_actual', 'ver_escudo', 'imagen')
+    fields = ('equipo', 'fecha_inicio', 'fecha_fin', 'equipo_actual', 'ver_escudo', 'imagen')
     readonly_fields = ('ver_escudo',)
     
     def ver_escudo(self, obj):
@@ -44,6 +44,24 @@ class NacionalidadInline(admin.TabularInline):
         if obj.pais:
             return format_html('<span class="fi fi-{}"></span>', obj.pais.iso.lower())
         return ""
+
+@admin.register(Trofeo)
+class TrofeoAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'tipo')
+    search_fields = ('nombre',) # <-- ESTO es lo que necesita el Inline para funcionar
+
+class EquipoTrofeoInline(admin.TabularInline):
+    model = EquipoTrofeo
+    extra = 1
+    fields = ('trofeo', 'temporada')
+    autocomplete_fields = ['trofeo']
+
+    # FILTRO: Solo permite seleccionar trofeos donde tipo === 'clubes'
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "trofeo":
+            # Ajusta 'clubes' según cómo esté escrito exactamente en tu BD
+            kwargs["queryset"] = Trofeo.objects.filter(tipo='clubes')
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 @admin.register(Pais)
 class PaisAdmin(admin.ModelAdmin):
@@ -134,11 +152,13 @@ class EquipoAdmin(admin.ModelAdmin):
     list_display = ('ver_escudo', 'nombre', 'ver_logo_liga', 'ver_color', 'latitud', 'longitud')
     list_filter = ('liga',)
     search_fields = ('nombre',)
+    autocomplete_fields = ['equipo_sucesor']
+    inlines = [EquipoTrofeoInline]
     
     # Organizar el formulario por secciones
     fieldsets = (
         ('Información Básica', {
-            'fields': ('nombre', 'liga', 'escudo')
+            'fields': ('nombre', 'liga', 'escudo', 'equipo_sucesor')
         }),
         ('Identidad y Ubicación', {
             'fields': ('color', ('latitud', 'longitud'))

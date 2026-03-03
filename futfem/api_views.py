@@ -182,60 +182,51 @@ def jugadora_companeras(request):
     try:
         id_jugadora = int(id_jugadora)
     except (TypeError, ValueError):
-        return JsonResponse({"error": "ID de jugadora no proporcionado o inválido"}, status=400)
+        return JsonResponse({"error": "ID inválido"}, status=400)
 
+    # La lógica de solapamiento de fechas es:
+    # InicioA <= FinB AND FinA >= InicioB
+    # (Tratando NULL en fecha_fin como la fecha de hoy)
+    
     query = """
-    WITH distinct_teams AS (
-        SELECT j2.*, ROW_NUMBER() OVER (PARTITION BY j2.equipo ORDER BY j2.jugadora) as rn
+    WITH companeras_data AS (
+        SELECT 
+            j2.jugadora as id_jug_comp,
+            j2.equipo,
+            j2.fecha_inicio,
+            j2.fecha_fin,
+            j2.equipo_actual,
+            j_info.Nombre,
+            j_info.Apellidos,
+            j_info.imagen as foto_jugadora,
+            ROW_NUMBER() OVER (PARTITION BY j2.equipo ORDER BY j2.fecha_inicio DESC) as rn
         FROM trayectoria j1
-        JOIN trayectoria j2
-        ON j1.equipo = j2.equipo
-        AND j1.jugadora != j2.jugadora
-        AND (SUBSTRING_INDEX(j1.años, '-', 1) <= SUBSTRING_INDEX(REPLACE(j2.años, 'act', '2024'), '-', -1)
-        AND SUBSTRING_INDEX(REPLACE(j1.años, 'act', '2024'), '-', -1) >= SUBSTRING_INDEX(j2.años, '-', 1))
+        JOIN trayectoria j2 ON j1.equipo = j2.equipo AND j1.jugadora != j2.jugadora
+        JOIN jugadoras j_info ON j2.jugadora = j_info.id_jugadora
         WHERE j1.jugadora = %s
-    ),
-    additional_jugadoras AS (
-        SELECT j2.*, 0 as rn
-        FROM trayectoria j1
-        JOIN trayectoria j2
-        ON j1.equipo = j2.equipo
-        AND j1.jugadora != j2.jugadora
-        AND (SUBSTRING_INDEX(j1.años, '-', 1) <= SUBSTRING_INDEX(REPLACE(j2.años, 'act', '2024'), '-', -1)
-        AND SUBSTRING_INDEX(REPLACE(j1.años, 'act', '2024'), '-', -1) >= SUBSTRING_INDEX(j2.años, '-', 1))
-        WHERE j1.jugadora = %s
-        AND j2.jugadora NOT IN (SELECT jugadora FROM distinct_teams WHERE rn = 1)
-    ),
-    combined_results AS (
-        SELECT jugadora, equipo, años, imagen, rn 
-        FROM distinct_teams
-        WHERE rn = 1
-        UNION ALL
-        SELECT jugadora, equipo, años, imagen, rn
-        FROM additional_jugadoras
+          AND j1.fecha_inicio <= COALESCE(j2.fecha_fin, CURDATE())
+          AND COALESCE(j1.fecha_fin, CURDATE()) >= j2.fecha_inicio
     )
-    SELECT jugadora, equipo, años, imagen
-    FROM combined_results
-    ORDER BY rn DESC, jugadora
+    SELECT * FROM companeras_data
+    ORDER BY rn ASC, id_jug_comp ASC
     LIMIT 5
     """
 
     with connection.cursor() as cursor:
-        cursor.execute(query, [id_jugadora, id_jugadora])
-        columns = [col[0] for col in cursor.description]
-        results = [
-            dict(zip(columns, row))
-            for row in cursor.fetchall()
-        ]
+        cursor.execute(query, [id_jugadora])
+        columnas = [col[0] for col in cursor.description]
+        results = [dict(zip(columnas, row)) for row in cursor.fetchall()]
 
-    # Convertir la imagen a base64 si existe
-    for r in results: 
-        if not r["imagen"]: # NULL, vacío o None 
-            with connection.cursor() as cursor: 
-                cursor.execute( "SELECT imagen FROM jugadoras WHERE id_jugadora = %s LIMIT 1", [r["jugadora"]] ) 
-                row = cursor.fetchone() 
-                if row and row[0]: 
-                    r["imagen"] = row[0] # asignar imagen alternativa
+    # Procesamos los nombres cortos para el juego
+    for r in results:
+        n = r.get('Nombre', '')
+        a = r.get('Apellidos', '')
+        # Usamos tu lógica de primera palabra
+        r['Nombre_Completo'] = f"{n.split()[0] if n else ''} {a.split()[0] if a else ''}".strip()
+        
+        # Manejo de imagen predeterminada si no hay en trayectoria ni en jugadora
+        r['imagen'] = r['foto_jugadora'] or '/static/img/predeterm.jpg'
+
     return JsonResponse(results, safe=False)
 
 def jugadora_datos(request):
@@ -354,9 +345,9 @@ def jugadora_trayectoria(request):
     # Traer las trayectorias filtrando la liga != 17
     trayectorias = Trayectoria.objects.filter(
     jugadora_id=id_jugadora
-    ).exclude(
-    equipo__liga__id_liga=17
-    ).select_related('equipo', 'jugadora').order_by('años')
+    #.exclude(
+    #equipo__liga__id_liga=16)
+    ).select_related('equipo', 'jugadora').order_by('fecha_inicio')
 
     data = []
     for t in trayectorias:
@@ -376,7 +367,8 @@ def jugadora_trayectoria(request):
             'jugadora': jug.id_jugadora,
             'equipo': equipo.id_equipo,
             'color': equipo.color,
-            'años': t.años,
+            'fecha_inicio': t.fecha_inicio,
+            'fecha_fin': t.fecha_fin,
             'imagen': t.imagen,  # o t.imagen codificada si quieres
             'equipo_actual': t.equipo_actual,
             'escudo': escudo,
@@ -494,73 +486,68 @@ def jugadora_aleatoria(request):
 
 def jugadoras_por_equipo_y_temporada(request):
     equipo_id = request.GET.get("equipo")
-    temporada = request.GET.get("temporada")  # puede ser None o ""
+    temporada = request.GET.get("temporada")
 
     if not equipo_id:
-        return JsonResponse(
-            {"success": [], "error": "Falta el equipo"},
-            status=400
-        )
+        return JsonResponse({"success": [], "error": "Falta el equipo"}, status=400)
 
-    filtrar_por_temporada = bool(temporada)
-    año_actual = datetime.now().year
+    # 1. Preparar el filtro de temporada
+    query_filtro = ""
+    params = [equipo_id]
 
-    if filtrar_por_temporada:
+    if temporada:
         try:
-            temporada = int(temporada)
+            # Si temporada es "2024", buscamos jugadoras cuya estancia 
+            # se solape con cualquier momento de ese año (01-01 al 31-12)
+            temporada_int = int(temporada)
+            query_filtro = """
+                AND fecha_inicio <= %s 
+                AND (fecha_fin >= %s OR equipo_actual = 1)
+            """
+            # Una jugadora estuvo en 2024 si empezó antes del fin de 2024 
+            # y terminó después del inicio de 2024
+            params.extend([f"{temporada_int}-12-31", f"{temporada_int}-01-01"])
         except ValueError:
-            return JsonResponse(
-                {"success": [], "error": "Temporada inválida"},
-                status=400
-            )
+            return JsonResponse({"success": [], "error": "Temporada inválida"}, status=400)
 
+    # 2. Ejecutar SQL
     with connection.cursor() as cursor:
-        cursor.execute("""
+        cursor.execute(f"""
             SELECT 
                 j.*,
-                tc.años
+                tc.fecha_inicio,
+                tc.fecha_fin,
+                tc.equipo_actual,
+                tc.años  -- Lo mantenemos por ahora como fallback
             FROM trayectoria tc
             JOIN jugadoras j ON j.id_jugadora = tc.jugadora
             WHERE tc.equipo = %s
-        """, [equipo_id])
+            {query_filtro}
+            ORDER BY tc.fecha_inicio ASC
+        """, params)
 
         columnas = [col[0] for col in cursor.description]
         filas = cursor.fetchall()
 
-    jugadoras = []
-
+    # 3. Convertir a lista de diccionarios y formatear nombres
+    resultado = []
     for fila in filas:
-        fila_dict = dict(zip(columnas, fila))
-        años = fila_dict["años"].strip()
+        d = dict(zip(columnas, fila))
+        
+        # Aplicamos tu lógica de nombre corto aquí mismo
+        n = d.get('Nombre', '')
+        a = d.get('Apellidos', '')
+        nombre_prio = n.split()[0] if n else ""
+        apellido_prio = a.split()[0] if a else ""
+        d['Nombre_Completo'] = f"{nombre_prio} {apellido_prio}".strip()
+        
+        # Limpieza de fechas para JSON (evitar errores de objetos date no serializables)
+        if d['fecha_inicio']: d['fecha_inicio'] = str(d['fecha_inicio'])
+        if d['fecha_fin']: d['fecha_fin'] = str(d['fecha_fin'])
+        
+        resultado.append(d)
 
-        # -----------------------------
-        # PROCESAR RANGO DE AÑOS
-        # -----------------------------
-        if "-" in años:
-            inicio, fin = años.split("-")
-            inicio = int(inicio)
-
-            if fin.lower() == "act":
-                fin = año_actual
-            else:
-                fin = int(fin)
-        else:
-            if años.lower() == "act":
-                inicio = fin = año_actual
-            else:
-                inicio = fin = int(años)
-
-        # -----------------------------
-        # FILTRADO
-        # -----------------------------
-        if filtrar_por_temporada:
-            if inicio <= temporada <= fin:
-                jugadoras.append(fila_dict)
-        else:
-            # 🔥 SIN temporada → todas
-            jugadoras.append(fila_dict)
-
-    return JsonResponse({"success": jugadoras})
+    return JsonResponse({"success": resultado})
 
 @csrf_exempt
 def actualizar_soccerdonna_url(request):
@@ -681,19 +668,22 @@ def equiposxid(request):
 def equiposAll(request):
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT id_equipo AS id, nombre, escudo 
+            SELECT id_equipo AS id, nombre, escudo, color, latitud, longitud, liga
             FROM equipos 
             ORDER BY nombre
         """)
         filas = cursor.fetchall()
 
     equipos = []
-    for id_equipo, nombre, escudo, iso in filas:
+    for id_equipo, nombre, escudo, color, latitud, longitud, liga in filas:
         equipos.append({
             "nombre": nombre,
             "id": id_equipo,
             "escudo": escudo,
-            "Iso": iso
+            "color": color,
+            "lat": latitud,
+            "long": longitud,
+            "liga": liga
         })
     
     return JsonResponse({"success": equipos})
@@ -1010,6 +1000,9 @@ def equipo_palmares(request):
     equipo = request.GET.get("equipo")
     print("Equipo recibido:", equipo)
     temporadas = request.GET.get("temporadas", "1950-act")
+
+    if not temporadas or temporadas == "undefined":
+        temporadas = "1950-act"
 
     if not equipo:
         return JsonResponse({"error": "ID de equipo no proporcionado"}, status=400)

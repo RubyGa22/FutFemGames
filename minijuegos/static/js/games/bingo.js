@@ -191,9 +191,8 @@ function handleCellClick(event, jugador) {
 
             if(jugador.trofeos.individual){
                 jugador.trofeos.individual.forEach(item => {
-                    if (Array.isArray(item.success)) {
-                        trofeosIndividuales.push(...item.success);
-                    }
+                    trofeosIndividuales.push(item);
+                    
                 });
             }
             
@@ -205,7 +204,7 @@ function handleCellClick(event, jugador) {
                 });
             }
 
-            if(img.id === 'individual'){
+            if(img.id === 'jugadora'){
                 trofeoMatch = trofeosIndividuales.some(trofeo => `trofeo${trofeo.id}` === imgClass);
             } else if(img.id === 'clubes'){
                 trofeoMatch = trofeosEquipo.some(trofeo => `trofeo${trofeo.id}` === imgClass);

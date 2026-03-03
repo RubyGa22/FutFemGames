@@ -11,6 +11,17 @@ from futfem.models import Equipo, Jugadora, JugadoraPais
 def wiki(request):
     return render(request, 'index.html')
 
+@never_cache
+def mapa(request):
+    return render(request, 'mapa.html')
+
+@never_cache
+def equipos(request):
+    return render(request, 'index.html', {'seccion': 'equipos'})
+
+@never_cache
+def jugadoras(request):
+    return render(request, 'index.html', {'seccion': 'jugadoras'})
 
 @never_cache
 def equipo_detalle(request, equipo_id):
