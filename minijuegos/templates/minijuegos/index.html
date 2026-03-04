@@ -58,13 +58,16 @@
 <script type="module" id="control-acceso" src="{% static 'usuarios/js/control-acceso.js' %}" data-allowed-roles="1,2"></script>
 <script type="module">
     import { obtenerRacha, displayRacha } from '{% static "usuarios/js/rachas.js" %}';
-    const racha1 = await obtenerRacha(1);
-    const racha2 = await obtenerRacha(2);
-    const racha3 = await obtenerRacha(3);
-    const racha4 = await obtenerRacha(4);  
-    const racha5 = await obtenerRacha(5);
-    const racha6 = await obtenerRacha(6);
-    const racha7 = await obtenerRacha(7);
+
+    const  [racha1, racha2, racha3, racha4, racha5, racha6, racha7] = await Promise.all([
+        obtenerRacha(1),
+        obtenerRacha(2),
+        obtenerRacha(3),
+        obtenerRacha(4),
+        obtenerRacha(5),
+        obtenerRacha(6),
+        obtenerRacha(7)
+    ]);
     
     displayRacha(racha1[0].racha_actual, racha1[0].juego.id);
     displayRacha(racha2[0].racha_actual, racha2[0].juego.id);

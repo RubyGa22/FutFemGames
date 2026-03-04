@@ -226,6 +226,20 @@ function debounce(func, wait) {
     };
 }
 
+export function calcularEdad(fechaNacimiento) {
+    const hoy = new Date(); // Fecha actual
+    const nacimiento = new Date(fechaNacimiento); // Convertir la fecha de nacimiento a un objeto Date
+    let edad = hoy.getFullYear() - nacimiento.getFullYear(); // Calcular la diferencia de años
+    const mes = hoy.getMonth() - nacimiento.getMonth(); // Calcular la diferencia de meses
+
+    // Ajustar la edad si el cumpleaños de este año aún no ha ocurrido
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+        edad--;
+    }
+
+    return edad;
+}
+
 export function crearPopupInicialJuego(titulo, explicacion, imagen, tipo, iniciarCallback) {
     // Crear el contenedor del popup
     const popup = document.createElement('div');

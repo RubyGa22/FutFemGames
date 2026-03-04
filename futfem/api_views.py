@@ -271,6 +271,7 @@ def jugadora_datos(request):
     data = {
         "id": j.id_jugadora,
         "nombre": f"{j.Nombre} {j.Apellidos}",
+        "nombre_completo": formatear_nombre_corto(j.Nombre, j.Apellidos),
         "apodo": j.Apodo,
         "Nacionalidad": jp_principal.pais.id_pais if jp_principal else None,
         "TodasNacionalidades": todas_nacionalidades,

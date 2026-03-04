@@ -158,9 +158,7 @@
     import { inicializarMapaEquipos, añadirEquipoMapa, centrarMapaEnEquipos, map } from '{% static "FutFemWiki/js/mapa.js" %}';
     import { fetchEquipoById } from '{% static "futfem/js/equipos.js" %}';
     const color = '{{equipo.color}}';
-        console.log(color);
-    const equipos = await fetchEquipoById('{{equipo.id_equipo}}');
-    const palmares = await displayPalmares('{{equipo.id_equipo}}');
+    const [equipos, palmares] = await Promise.all([fetchEquipoById('{{equipo.id_equipo}}'), displayPalmares('{{equipo.id_equipo}}')]);
     displayEquipoMapa(equipos);
     export function displayEquipoMapa(equipo) {
         console.log(equipo)

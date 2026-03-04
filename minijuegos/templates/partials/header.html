@@ -10,7 +10,7 @@
         <ul>
           <li><a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
           <li class="dropdown">
-            <a href="#" class="{% if request.resolver_match.url_name in 'wiki,equipos,jugadoras,mapa' %}active{% endif %}">
+            <a href="#" class="{% if request.resolver_match.url_name in 'wiki,equipos,players,mapa' %}active{% endif %}">
                 Wiki
             </a>
             <ul class="submenu">

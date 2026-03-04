@@ -3,7 +3,12 @@ import { equiposxliga, handleAutocompleteEquipo, fetchEquipoById } from '/static
 import { fetchAllJugadoras } from '/static/futfem/js/jugadora.js';
 import { getDominantColors, rgbToRgba } from '/static/js/utils/color.thief.js';
 import { inicializarMapaEquipos, añadirEquipoMapa, centrarMapaEnEquipos, map } from './mapa.js';
+
 let jugadorasOriginal;
+let currentPage = 1;
+const itemsPerPage = 10;
+let totalPages = 1;
+let jugadorasGlobal = []; // Guardaremos todas las jugadoras aquí
 const btnMapa = document.getElementById("ver-mapa");
 const mapa = document.getElementById("mapa-equipos");
 const item = document.getElementById("items-container");
@@ -122,17 +127,33 @@ export async function manejarJugadoras() {
         return;
     }
     jugadorasOriginal = await fetchAllJugadoras();
-
-    // Usamos for...of para poder await dentro del loop
-    /*for (const jugadora of jugadorasOriginal) {
-        if (jugadora.equipo) {
-            jugadora.equipo = await fetchEquipoById(jugadora.equipo);
-        } else {
-            jugadora.equipo = null; // si no tiene equipo actual
-        }
-    }*/
-
     return jugadorasOriginal.length;
+}
+
+function filtroJugadoras(equipo, nacionalidad, posicion) {
+    
+    let nuevasJugadoras = jugadorasOriginal.filter(jugadora => {
+        // 1. Filtro de Equipo
+        // Comparamos el ID del equipo (o club) según cómo venga en tu JSON
+        if (equipo && jugadora.equipo.id !== parseInt(equipo)) return false;
+
+        // 2. Filtro de Nacionalidad
+        // Si hay una nacionalidad seleccionada, comprobamos si está en su lista de IDs
+        if (nacionalidad) {
+            const nacioId = parseInt(nacionalidad);
+            if (!jugadora.nacionalidades_ids.includes(nacioId)) {
+                return false;
+            }
+        }
+
+        // 3. Filtro de Posición
+        if (posicion && jugadora.posicion !== posicion) return false;
+
+        // Si sobrevive a todos los 'return false', la jugadora es válida
+        return true;
+    });
+
+    displayJugadoras(nuevasJugadoras);
 }
 
 
@@ -142,12 +163,6 @@ function displayJugadoras(jugadoras){
     totalPages = Math.ceil(jugadorasGlobal.length / itemsPerPage);
     renderJugadorasPage(currentPage);
 }
-
-let currentPage = 1;
-const itemsPerPage = 10;
-let totalPages = 1;
-let jugadorasGlobal = []; // Guardaremos todas las jugadoras aquí
-
 
 function renderJugadorasPage(page = 1) {
     const container = document.getElementById('items-container');
@@ -288,13 +303,10 @@ function updatePaginationUI() {
     };
 }
 
-
-
 async function ligasxpais(id_pais) {
     try {
         const response = await fetch(`/api/ligasxpais?pais=${id_pais}`); 
         const data = await response.json();
-        console.log(data);
         if (data.success) {
             displayLigas(data.success);
         } 
@@ -451,31 +463,4 @@ export function displayEquiposMapa(equipos) {
         });
     });
 
-}
-
-
-function filtroJugadoras(equipo, nacionalidad, posicion) {
-    
-    let nuevasJugadoras = jugadorasOriginal.filter(jugadora => {
-        // 1. Filtro de Equipo
-        // Comparamos el ID del equipo (o club) según cómo venga en tu JSON
-        if (equipo && jugadora.equipo.id !== parseInt(equipo)) return false;
-
-        // 2. Filtro de Nacionalidad
-        // Si hay una nacionalidad seleccionada, comprobamos si está en su lista de IDs
-        if (nacionalidad) {
-            const nacioId = parseInt(nacionalidad);
-            if (!jugadora.nacionalidades_ids.includes(nacioId)) {
-                return false;
-            }
-        }
-
-        // 3. Filtro de Posición
-        if (posicion && jugadora.posicion !== posicion) return false;
-
-        // Si sobrevive a todos los 'return false', la jugadora es válida
-        return true;
-    });
-
-    displayJugadoras(nuevasJugadoras);
 }
