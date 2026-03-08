@@ -3,7 +3,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>{{ jugadora.Nombre }}</title>
     <link rel="icon" href="{% static 'img/logo.png' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
-    <link rel="stylesheet" href="{% static 'FutFemWiki/css/ficha-jugadora.css' %}">
+    <link rel="stylesheet" href="{% static 'FutFemWiki/css/ficha-jugadora.css' %}?v={% now 'U' %}">
     <link rel="stylesheet" href="{% static 'FutFemWiki/css/tarjeta-jugadora.css' %}">
     <style>
         .swiper {
@@ -53,7 +53,7 @@
                     <p>Altura: {{ jugadora.altura }} cm</p>
                     <p>Pie: {{ jugadora.pie_habil }}</p>
 
-                    <p id="posicion">lorem</p>
+                    <div id="posicion"></div>
                     <p>Value: {{ jugadora.market_value }} €</p>
         </div>
         </div>

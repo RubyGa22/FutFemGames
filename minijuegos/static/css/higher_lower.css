@@ -25,6 +25,7 @@ body{
     width: 100%;
     background-repeat: no-repeat;
     background-size: cover;
+    background-position: center !important;
     text-align: center;
 }
 
@@ -48,11 +49,11 @@ body{
 
 
 #game div:nth-child(2){
-    background: rgb(127, 0, 127);
+    background: rgba(127, 0, 127, 0.5);
 }
 
 #game div:nth-child(3){
-    background: rgb(255, 91, 12);
+    background: rgba(255, 91, 12, 0.5);
 }
 
 #game div:nth-child(2):hover{

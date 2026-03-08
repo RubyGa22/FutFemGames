@@ -4,7 +4,7 @@ import { inicializarCounter, startCounter, stopCounter } from '../utils/counter.
 import { victory, wrong, correct } from "../sounds.js";
 import { ponerBanderas, ponerLigas, ponerClubes, ponerTrofeos, ponerEdades, crearPopupInicialJuego, Ganaste, calcularEdad } from "./funciones-comunes.js";
 
-let idres, currentPlayerData, paises, equipos, ligas, trofeos, lastPlayer;
+let idres, currentPlayerData, paises, equipos, ligas, trofeos, lastPlayer, jugadora;;
 const texto = '¡Pon a prueba tu memoria en "Futfem Bingo"! En este juego recibirás jugadoras al azar y deberás colocarlas en las casillas de país, equipo o liga que coincidan con su trayectoria.\n' +
     'Cada jugadora tiene varias características, y tu objetivo es encajarla correctamente en el tablero.\n' +
     'Gana quien logre completar su tarjeta como en un bingo tradicional, ¡pero con fútbol femenino!\n';
@@ -22,12 +22,6 @@ async function iniciar(dificultad) {
     if (popup) {
         popup.style.display = 'none'; // Cambia el estilo para ocultarlo
     }
-    let valor = await fetchData(6);
-    paises = valor.paises;
-    equipos = valor.equipos;
-    ligas = valor.ligas;
-    trofeos = valor.trofeos;
-    idres = paises.map(String).concat(equipos.map(String), ligas.map(String), trofeos.map(String)).join('');
 
     const ultima = await obtenerUltimaRespuesta(6);
     let ultimaArray = JSON.parse(ultima);
@@ -104,12 +98,12 @@ async function iniciar(dificultad) {
 
 play().then(r => r)
 async function play() {
-    let jugadora = await fetchData(6);
-    let paises = [jugadora.paises[0], jugadora.paises[1], jugadora.paises[2]];
-    let clubes = [jugadora.equipos[0], jugadora.equipos[1], jugadora.equipos[2]];
-    let ligas = [jugadora.ligas[0], jugadora.ligas[1], jugadora.ligas[2]];
-    let trofeos = [jugadora.trofeos[0]];
-    idres = paises.map(String).concat(clubes.map(String), ligas.map(String), trofeos.map(String)).join('');
+    jugadora = await fetchData(6);
+    paises = [jugadora.paises[0], jugadora.paises[1], jugadora.paises[2]];
+    equipos = [jugadora.equipos[0], jugadora.equipos[1], jugadora.equipos[2]];
+    ligas = [jugadora.ligas[0], jugadora.ligas[1], jugadora.ligas[2]];
+    trofeos = [jugadora.trofeos[0]];
+    idres = paises.map(String).concat(equipos.map(String), ligas.map(String), trofeos.map(String)).join('');
     const res = localStorage.getItem('res6');
     if(res !== idres || !res){
         localStorage.removeItem('Attr6');
@@ -339,11 +333,6 @@ function initBingoEvents(paises, clubes, ligas, trofeos) {
 
 async function mostrarJugadora(jugadora, paises, clubes, ligas, trofeos) {
 
-    document.getElementById("player-name").textContent = jugadora.nombre;
-    const img = document.getElementById("player-image");
-    localStorage.setItem('last-player-bingo', JSON.stringify(jugadora));
-    img.src = (!jugadora.imagen) ? "/static/img/predeterm.jpg": jugadora.imagen;
-    img.className = jugadora.id;
 
     const edad = calcularEdad(jugadora.Nacimiento);
     // En lugar de 3 awaits secuenciales, haz esto:
@@ -364,6 +353,11 @@ async function mostrarJugadora(jugadora, paises, clubes, ligas, trofeos) {
             'liga': ligasEquipos,
             'trofeos': palmares
         };
+        document.getElementById("player-name").textContent = jugadora.nombre;
+        const img = document.getElementById("player-image");
+        localStorage.setItem('last-player-bingo', JSON.stringify(jugadora));
+        img.src = (!jugadora.imagen) ? "/static/img/predeterm.jpg": jugadora.imagen;
+        img.className = jugadora.id;
     } else {
         console.error('No se encontraron equipos para la jugadora:', jugadora.nombre);
     }

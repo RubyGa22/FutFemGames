@@ -22,7 +22,14 @@ export async function cargarFichaJugadora(id_jugadora) {
     window.palmares = palmares;
 
     edad.textContent = jugadora.Nacimiento + '(' + calcularEdad(jugadora.Nacimiento) + ')';
-    posicion.textContent = 'Posicion: '+jugadora.posicionObj.abreviatura;
+
+    jugadora.Posiciones.forEach(pos => {
+        const abrev = pos.abreviatura || pos.nombre.substring(0, 3).toUpperCase();
+        const span = document.createElement('span');
+        span.textContent = abrev;
+        span.classList.add('pos-'+pos.abreviatura);
+        posicion.appendChild(span);
+    });
     // 1. Limpiamos el contenido previo (por si cambias de jugadora)
     contenedorPais.innerHTML = ''; 
     // 2. Comprobamos que existan nacionalidades
@@ -114,7 +121,7 @@ async function cargarTrayectorias(jugadora, trayectorias, palmares) {
             <p class="nombre">${jugadora.nombre_completo}</p>
             <div class="detalles">
                 <div class="equipo-pais">
-                    <p>${jugadora.posicionObj.abreviatura}</p>
+                    <p>${jugadora.Posiciones[0].abreviatura}</p>
                     <img src="/${equipo.escudo}">
                     <span class="fi fi-${iso}" style="font-size: xx-large;"></span>
                 </div>

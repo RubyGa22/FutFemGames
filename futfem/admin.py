@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib import admin
 from django.utils.html import format_html
 from django.contrib.admin.models import LogEntry
-from .models import Pais ,Jugadora, Trayectoria, Equipo, Liga, JugadoraPais, EquipoTrofeo, Trofeo
+from .models import JugadoraPosicion, Pais ,Jugadora, Trayectoria, Equipo, Liga, JugadoraPais, EquipoTrofeo, Trofeo
 # Register your models here.
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
@@ -44,6 +44,13 @@ class NacionalidadInline(admin.TabularInline):
         if obj.pais:
             return format_html('<span class="fi fi-{}"></span>', obj.pais.iso.lower())
         return ""
+
+class PosicionInline(admin.TabularInline):
+    model = JugadoraPosicion
+    extra = 1  # Número de filas vacías para añadir nuevas posiciones
+    verbose_name = "Posición de la Jugadora"
+    verbose_name_plural = "Posiciones de la Jugadora"
+    fields = ('posicion', 'es_primaria')
 
 @admin.register(Trofeo)
 class TrofeoAdmin(admin.ModelAdmin):
@@ -101,7 +108,7 @@ class JugadoraAdmin(admin.ModelAdmin):
             'fields': (('Nombre', 'Apellidos'), 'Apodo', 'Nacimiento')
         }),
         ('Datos Deportivos', {
-            'fields': ('Posicion', 'altura', 'pie_habil', 'retiro')
+            'fields': ('altura', 'pie_habil', 'retiro')
         }),
         ('Imagen y Enlaces', {
             'fields': ('imagen', 'soccerdonna_url', 'market_value', 'soccerdonna_last_updated')
@@ -109,7 +116,7 @@ class JugadoraAdmin(admin.ModelAdmin):
     )
 
     # Añadimos ambos inlines: Nacionalidades y Trayectoria
-    inlines = [NacionalidadInline, TrayectoriaInline]
+    inlines = [NacionalidadInline, PosicionInline, TrayectoriaInline]
 
     # --- MÉTODOS VISUALES ---
 

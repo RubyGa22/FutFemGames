@@ -1,12 +1,13 @@
 import { handleAutocompletePais } from '/static/futfem/js/pais.js';
 import { equiposxliga, handleAutocompleteEquipo, fetchEquipoById } from '/static/futfem/js/equipos.js';
 import { fetchAllJugadoras } from '/static/futfem/js/jugadora.js';
+import { calcularEdad } from '/static/js/games/funciones-comunes.js';
 import { getDominantColors, rgbToRgba } from '/static/js/utils/color.thief.js';
 import { inicializarMapaEquipos, añadirEquipoMapa, centrarMapaEnEquipos, map } from './mapa.js';
 
 let jugadorasOriginal;
 let currentPage = 1;
-const itemsPerPage = 10;
+const itemsPerPage = 14;
 let totalPages = 1;
 let jugadorasGlobal = []; // Guardaremos todas las jugadoras aquí
 const btnMapa = document.getElementById("ver-mapa");
@@ -39,7 +40,7 @@ const item = document.getElementById("items-container");
 });*/
 
 
-export function inicializarWiki(arg) {
+export async function inicializarWiki(arg) {
 
     const inputPaises = document.getElementsByClassName('input-pais');
 
@@ -67,12 +68,14 @@ export function inicializarWiki(arg) {
     }else if(arg === 'equipos'){
         cabeceraJugadoras.classList.remove('active');
         cabeceraLigas.classList.add('active');
-        ligasxpais(1).then(ligas => {
+        await ligasxpais(1).then(ligas => {
             displayLigas(ligas.success);
         });
-         equiposxliga(1).then(equipos => {
+         await equiposxliga(1).then(equipos => {
         displayEquipos(equipos.success);
         });
+        console.log(ligasContainer.firstChild)
+        ligasContainer.firstChild.classList.add('selected');
     }
 
     botonFiltro.addEventListener('click', () => {
@@ -158,6 +161,7 @@ function filtroJugadoras(equipo, nacionalidad, posicion) {
 
 
 function displayJugadoras(jugadoras){
+    console.log(jugadoras)
     jugadorasGlobal = jugadoras; // Guardar todas las jugadoras
     currentPage = 1;
     totalPages = Math.ceil(jugadorasGlobal.length / itemsPerPage);
@@ -166,15 +170,33 @@ function displayJugadoras(jugadoras){
 
 function renderJugadorasPage(page = 1) {
     const container = document.getElementById('items-container');
+    const cabecera = document.getElementById('cabecera-wiki-equipos');
     const containerLigas = document.getElementById('ligas-container');
     container.innerHTML = '';
     containerLigas.innerHTML = '';
     container.className = '';
     container.className = 'jugadoras';
+    cabecera.classList.add('jugadoras');
+    cabecera.style.borderBottom = 'none';    
     const start = (page - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const jugadoras = jugadorasGlobal.slice(start, end);
-    jugadoras.forEach((jugadora, index) => { 
+    
+    container.innerHTML = ''; // Limpiamos
+    containerLigas.innerHTML = '';
+    container.className = 'jugadoras-grid-container'; // Clase para el contenedor padre
+
+    // --- CREACIÓN DEL ENCABEZADO ---
+    const header = document.createElement('div');
+    header.className = 'jugadora-item header-list'; // Usamos la misma clase para heredar el grid
+    header.innerHTML = `
+        <div class="jugadora-div1"><p><b>JUGADORA</b></p></div>
+        <div class="header-label"><p><b>CLUB</b></p></div>
+        <div class="header-label"><p><b>EDAD</b></p></div>
+    `;
+    container.appendChild(header);
+
+    jugadoras.forEach((jugadora, index) => {
         const nombreCompleto = jugadora.nombre_completo || 'Desconocida';
         const div = document.createElement('div');
         div.classList.add('jugadora-item');
@@ -197,8 +219,12 @@ function renderJugadorasPage(page = 1) {
         imgClub.alt = jugadora.equipo.nombre;
 
         const pNombre = document.createElement('p');
+        pNombre.className = 'jugadora-nombre';
         pNombre.textContent = nombreCompleto; 
         div1_2.appendChild(pNombre);
+
+        const divBanderaYPosicion = document.createElement('div');
+        divBanderaYPosicion.className = 'jugadora-banderas-posicion';
 
         // Contenedor para las banderas
         const divBanderas = document.createElement('div');
@@ -208,6 +234,8 @@ function renderJugadorasPage(page = 1) {
         jugadora.nacionalidades_isos.forEach((iso, index) => {
             const icon = document.createElement('span');
             icon.className = `fi fi-${iso}`; 
+
+            icon.onclick = filtroJugadoras.bind(null, null, jugadora.nacionalidades_ids[index], null);
             
             // Si el index es 0, es la primaria. Si es mayor, es secundaria.
             if (index > 0) {
@@ -221,13 +249,23 @@ function renderJugadorasPage(page = 1) {
             icon.title = `País ID: ${jugadora.nacionalidades_ids[index]}`;
             divBanderas.appendChild(icon);
         });
-        div1_2.appendChild(divBanderas);
 
         const pNacimiento = document.createElement('p');
-        pNacimiento.textContent = jugadora.nacimiento;
+        pNacimiento.textContent = calcularEdad(jugadora.nacimiento);
 
-        const pPosicion = document.createElement('p');
-        pPosicion.textContent = jugadora.posicion;
+        const pPosicion = document.createElement('div');
+        pPosicion.className = 'jugadora-posicion';
+        jugadora.posiciones_abrev.forEach(pos => {
+            const span = document.createElement('span');
+            span.textContent = pos;
+            span.id = jugadora.posiciones_ids[jugadora.posiciones_abrev.indexOf(pos)];
+            span.className = 'pos-'+pos;
+            pPosicion.appendChild(span);
+        });
+        div1_2.appendChild(divBanderaYPosicion);
+        divBanderaYPosicion.appendChild(divBanderas);
+        divBanderaYPosicion.appendChild(pPosicion);
+        
         
         div1.appendChild(div1_2)
         const colorPrimario = jugadora.equipo.color || 'var(--color-primario)'; // fallback
@@ -242,14 +280,12 @@ function renderJugadorasPage(page = 1) {
         `;
         }
 
-        div.addEventListener('click', () => {
+        pNombre.addEventListener('click', () => {
             window.location.href = `/wiki/jugadora/${jugadora.id_jugadora}/`;
         });
-
         div.appendChild(div1);
         div.appendChild(imgClub);
         div.appendChild(pNacimiento);
-        div.appendChild(pPosicion);
         container.appendChild(div);
 
         // Retraso progresivo para efecto fade

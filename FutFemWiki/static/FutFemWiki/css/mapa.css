@@ -41,3 +41,19 @@ body, html {
     z-index: 1;
     width: 300px;
 }
+
+.marker-punto{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    border:2px solid white;
+    display:none;
+}
+
+
+@media (max-width: 768px) {
+    #inputs{
+        left: 50%;
+        width: max-content;
+    }
+}

@@ -7,7 +7,7 @@ import { victory, wrong, correct } from "../sounds.js";
 // ----------------------------------------------------- 
 // Declaracion de variables
 // -----------------------------------------------------
-let idres;
+let idres, columnas, filas;
 let ultimaJugadoraId = null; // Aquí guardamos la ID de la última jugadora verificada
 let jugadorasProhibidas = [];
 const input = document.getElementById('jugadoraInput');
@@ -41,13 +41,6 @@ async function iniciar(dificultad) {
     // ----------------------------------------------------- 
     // 2. Obtener datos de API (paises y clubes) 
     // -----------------------------------------------------
-    let valor = await fetchData(4);
-    let paises = [valor.club4, valor.club5, valor.club6];
-    let clubes = [valor.club1, valor.club2, valor.club3];
-
-    // ID de la respuesta correcta (concatenación)
-    idres = paises.map(String).concat(clubes.map(String)).join('');
-
     // ----------------------------------------------------- 
     // 3. Comprobar si el usuario ya jugó antes 
     // -----------------------------------------------------
@@ -79,8 +72,7 @@ async function iniciar(dificultad) {
     // ----------------------------------------------------- 
     // 5. Colocar clubes y países en la tabla 
     // -----------------------------------------------------
-    ponerClubes(paises, ["Equipo4", "Equipo5", "Equipo6"]);
-    ponerClubes(clubes, ["Equipo1", "Equipo2", "Equipo3"]);
+    await Promise.all([ponerClubes(columnas, ["Equipo4", "Equipo5", "Equipo6"]), ponerClubes(filas, ["Equipo1", "Equipo2", "Equipo3"])]);
 
     // ----------------------------------------------------- 
     // 6. Cargar respuestas previas del usuario 
@@ -140,9 +132,9 @@ async function iniciar(dificultad) {
 play().then(r => r);
 async function play() {
     let jugadora = await fetchData(4);
-    let paises = [jugadora.club4, jugadora.club5, jugadora.club6];
-    let clubes = [jugadora.club1, jugadora.club2, jugadora.club3];
-    idres = paises.map(String).concat(clubes.map(String)).join('');
+    columnas = [jugadora.club4, jugadora.club5, jugadora.club6];
+    filas = [jugadora.club1, jugadora.club2, jugadora.club3];
+    idres = columnas.map(String).concat(filas.map(String)).join('');
     const res = localStorage.getItem('res4');
     if(res !== idres || !res){
         localStorage.removeItem('Attr4');

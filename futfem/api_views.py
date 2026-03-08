@@ -6,7 +6,7 @@ from django.db import connection, IntegrityError
 from django.db.models import Q, CharField, Value
 from django.db.models.functions import Concat
 from datetime import date, datetime
-from .models import Jugadora, Trayectoria, Equipo, Pais, Liga, Trofeo, JugadoraPais
+from .models import Jugadora, JugadoraPosicion, Trayectoria, Equipo, Pais, Liga, Trofeo, JugadoraPais
 from random import shuffle
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
@@ -60,27 +60,31 @@ def jugadoras_All(request):
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT 
-                j.id_jugadora, 
-                j.Nombre, 
-                j.Apellidos, 
-                j.Apodo, 
-                j.Nacimiento, 
-                j.Posicion, 
-                j.imagen, 
-                j.retiro,
-                -- Datos del equipo para crear el objeto (Columnas 8, 9, 10)
-                e.id_equipo, 
-                e.nombre AS nombre_equipo, 
-                e.escudo,
-                e.color,
-                -- Nacionalidades (Columnas 11, 12)
-                GROUP_CONCAT(jp.pais ORDER BY jp.es_primaria DESC) AS ids_paises,
-                GROUP_CONCAT(p.iso ORDER BY jp.es_primaria DESC) AS isos_paises
+                j.id_jugadora, -- 0
+                j.Nombre,      -- 1
+                j.Apellidos,   -- 2
+                j.Apodo,       -- 3
+                j.Nacimiento,  -- 4
+                j.imagen,      -- 5
+                j.retiro,      -- 6
+                -- Datos del equipo
+                e.id_equipo,   -- 7
+                e.nombre AS nombre_equipo, -- 8
+                e.escudo,      -- 9
+                e.color,       -- 10
+                -- Nacionalidades
+                GROUP_CONCAT(DISTINCT jp.pais ORDER BY jp.es_primaria DESC) AS ids_paises, -- 11
+                GROUP_CONCAT(DISTINCT p.iso ORDER BY jp.es_primaria DESC) AS isos_paises,   -- 12
+                -- Posiciones
+                GROUP_CONCAT(DISTINCT pos.idPosicion ORDER BY jpos.es_primaria DESC) AS ids_posiciones, -- 13
+                GROUP_CONCAT(DISTINCT pos.abreviatura ORDER BY jpos.es_primaria DESC) AS abrev_posiciones -- 14
             FROM jugadoras j
             INNER JOIN trayectoria t ON t.jugadora = j.id_jugadora AND t.equipo_actual = TRUE
             INNER JOIN equipos e ON t.equipo = e.id_equipo
             LEFT JOIN `jugadora-pais` jp ON jp.jugadora = j.id_jugadora
             LEFT JOIN `paises` p ON jp.pais = p.id_pais
+            LEFT JOIN `jugadora-posicion` jpos ON jpos.jugadora = j.id_jugadora
+            LEFT JOIN `posiciones` pos ON jpos.posicion = pos.idPosicion
             GROUP BY j.id_jugadora, e.id_equipo
             ORDER BY j.Apellidos;
         """)
@@ -88,28 +92,36 @@ def jugadoras_All(request):
 
     jugadoras = []
     for fila in filas:
-        # Procesar nacionalidades (IDs e ISOs)
-        lista_ids = [int(x) for x in fila[12].split(',')] if fila[11] else []
-        lista_isos = [x.lower() for x in fila[13].split(',')] if fila[12] else []
+        # 1. Procesar nacionalidades (Índices 11 y 12)
+        lista_ids_paises = [int(x) for x in fila[11].split(',')] if fila[11] else []
+        lista_isos_paises = [x.lower() for x in fila[12].split(',')] if fila[12] else []
+
+        # 2. Procesar posiciones (Índices 13 y 14)
+        lista_ids_posiciones = [int(x) for x in fila[13].split(',')] if fila[13] else []
+        lista_abrev_posiciones = [x for x in fila[14].split(',')] if fila[14] else []
         
+        # Posición principal (la primera de la lista por el ORDER BY es_primaria DESC)
+        posicion_display = lista_abrev_posiciones[0] if lista_abrev_posiciones else "N/A"
+
         jugadoras.append({
             "id_jugadora": fila[0],
             "nombre": fila[1],
             "apellido": fila[2],
             "apodo": fila[3],
             "nacimiento": fila[4].strftime("%Y-%m-%d") if fila[4] else None,
-            "posicion": fila[5],
-            "imagen": fila[6],
-            "retiro": fila[7],
-            # AQUÍ ESTÁ EL OBJETO EQUIPO
+            "imagen": fila[5],
+            "retiro": fila[6],
             "equipo": {
-                "id": fila[8],
-                "nombre": fila[9],
-                "escudo": fila[10],
-                "color": fila[11]
+                "id": fila[7],
+                "nombre": fila[8],
+                "escudo": fila[9],
+                "color": fila[10]
             },
-            "nacionalidades_ids": lista_ids,
-            "nacionalidades_isos": lista_isos,
+            "nacionalidades_ids": lista_ids_paises,
+            "nacionalidades_isos": lista_isos_paises,
+            "posiciones_ids": lista_ids_posiciones,
+            "posiciones_abrev": lista_abrev_posiciones,
+            "posicion": posicion_display, # Posición principal para la miniatura/lista
             "nombre_completo": formatear_nombre_corto(fila[1], fila[2])
         })
     
@@ -148,8 +160,10 @@ def jugadoraxid(request):
     try:
         j = Jugadora.objects.get(id_jugadora=id_jugadora)
         nacionalidades_qs = JugadoraPais.objects.filter(jugadora=id_jugadora).select_related('pais')
+        posiciones_qs = JugadoraPosicion.objects.filter(jugadora=id_jugadora).select_related('posicion')
         jp_principal = nacionalidades_qs.filter(es_primaria=True).first()
         todas_nacionalidades = list(nacionalidades_qs.values_list('pais_id', flat=True))
+        todas_posiciones = list(posiciones_qs.values_list('posicion', flat=True))
     except Jugadora.DoesNotExist:
         return JsonResponse({"error": "No se encontraron jugadoras con ese ID."}, status=404)
 
@@ -171,6 +185,7 @@ def jugadoraxid(request):
         "Nacionalidad": jp_principal.pais.id_pais if jp_principal else None,
         "TodasNacionalidades": todas_nacionalidades,
         "Posicion": j.Posicion.idPosicion if j.Posicion else None,
+        "PosicionesIds": todas_posiciones,
         "Retiro": j.retiro,
         "Valor": j.market_value
     }
@@ -238,10 +253,13 @@ def jugadora_datos(request):
         return JsonResponse({"error": "ID de jugadora no proporcionado o inválido"}, status=400)
 
     try:
-        j = Jugadora.objects.select_related('Posicion').get(id_jugadora=id_jugadora)
+        j = Jugadora.objects.get(id_jugadora=id_jugadora)
         nacionalidades_qs = JugadoraPais.objects.filter(jugadora=id_jugadora).select_related('pais')
+        posiciones_qs = JugadoraPosicion.objects.filter(jugadora=j).select_related('posicion').order_by('-es_primaria')
         jp_principal = nacionalidades_qs.filter(es_primaria=True).first()
         todas_nacionalidades = list(nacionalidades_qs.values_list('pais_id', flat=True))
+        todas_posiciones_ids = list(posiciones_qs.values_list('posicion_id', flat=True))
+        posiciones_lista_obj = [posicion_to_dict(p.posicion) for p in posiciones_qs]
         todos_isos = [n.pais.iso.lower() for n in nacionalidades_qs if n.pais and n.pais.iso]
     except Jugadora.DoesNotExist:
         return JsonResponse({"error": "No se encontraron jugadoras con ese ID."}, status=404)
@@ -283,6 +301,8 @@ def jugadora_datos(request):
         "imagen": j.imagen,
         "posicion": j.Posicion.idPosicion if j.Posicion else j.Posicion.idPosicion,
         "posicionObj": posicion_to_dict(j.Posicion),
+        "PosicionesIds": todas_posiciones_ids,
+        "Posiciones": posiciones_lista_obj,
         "edad": edad,
         "equipo": equipo_to_dict(equipo_actual),
         "liga": liga_actual,

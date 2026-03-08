@@ -41,16 +41,19 @@ export function inicializarMapaEquipos() {
             const el = m.el;
 
             // 2. Tamaño según zoom
-            const scale = Math.min(1.3, Math.max(0.5, zoom / 7));
-            el.style.transform = `scale(${scale})`;
+            /*const scale = Math.min(1.3, Math.max(0.5, zoom / 7));
+            el.style.transform = `scale(${scale})`;*/
 
             // 3. Punto vs escudo
-            if (zoom < 6) {
-                el.classList.add("marker-punto");
-                el.classList.remove("marker-escudo");
+            const escudo = m.el.querySelector('.marker-escudo-img');
+            const punto = m.el.querySelector('.marker-punto');
+
+            if (zoom < 10) {
+                escudo.style.display = "none";
+                punto.style.display = "block";
             } else {
-                el.classList.add("marker-escudo");
-                el.classList.remove("marker-punto");
+                escudo.style.display = "block";
+                punto.style.display = "none";
             }
         });
     });
@@ -61,7 +64,6 @@ export function inicializarMapaEquipos() {
         const labelLayerId = layers.find(
             l => l.type === "symbol" && l.layout?.["text-field"]
         )?.id;
-
         /*map.addSource("terrain-dem", {
             type: "raster-dem",
             url: "https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=LYmhz1BKy6QniXWrxK2S",
@@ -152,11 +154,14 @@ export function añadirEquipoMapa(id, nombre, lat, lng, escudoUrl, color) {
     el.innerHTML = `
         <div class="marker-wrapper" id="marker-${id}">
             <!--<div class="marker-pin"></div>-->
+            <div class="marker-punto"></div>
             <img src="${escudoUrl}" class="marker-escudo-img" />
         </div>
     `;
 
     const img = el.querySelector('img');
+    const punto = el.querySelector('.marker-punto');
+    punto.style.background = color;
 
     img.style.background = `
             linear-gradient(
@@ -198,6 +203,32 @@ export function añadirEquipoMapa(id, nombre, lat, lng, escudoUrl, color) {
     });
 
     //setTimeout(() => evitarColision(el, marker), 50);
+}
+
+export function actualizarMarkersZoom() {
+    const zoom = map.getZoom();
+
+    markersGroup.forEach(m => {
+
+        const escudo = m.el.querySelector('.marker-escudo-img');
+        const punto = m.el.querySelector('.marker-punto');
+
+        const scale = Math.min(1.3, Math.max(0.5, zoom / 7));
+        m.el.style.transform = `scale(${scale})`;
+
+        if (zoom < 10) {
+            escudo.style.display = "none";
+            punto.style.display = "block";
+        } else {
+            escudo.style.display = "block";
+            punto.style.display = "none";
+        }
+
+    });
+    map.easeTo({
+        zoom: zoom + 0.1,
+        duration: 600
+    });
 }
 
 let orbitando = false;

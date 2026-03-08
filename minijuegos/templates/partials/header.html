@@ -45,26 +45,48 @@
     </div>
         <!-- Menú desplegable -->
     <div class="dropdown-menu">
-      <nav>
-        <ul>
-          <li><a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
-          <li><a href="{% url 'wiki' %}" class="{% if request.resolver_match.url_name == 'wiki' %}active{% endif %}">Wiki</a></li>
-          <li><a href="#nosotros">Nosotros</a></li>
-          <li><a href="#contacto">Contacto</a></li>
-        </ul>
-      </nav>
-      <div>
+            <div>
           {% if usuario_sesion %}
-              <span class="user-name">Hola, {{ usuario_sesion.username }}</span>
+          <a href="{% url 'perfil' %}" class="user-profile-link">
+              <span class="user-name" style="color: white;">Hola, {{ usuario_sesion.username }}</span>
               {% if usuario_sesion.jugadora_favorita %}
                   <img src="/{{ usuario_sesion.jugadora_favorita.imagen }}" class="avatar">
               {% endif %}
+            </a>
               <a href="{% url 'logout' %}" class="logout-button"><i class="bi bi-power"></i></a>
           {% else %}
               <a href="{% url 'login' %}" class="iniciar-sesion-button">Iniciar sesión</a>
               <a href="{% url 'registro' %}" class="registro-button">Registrarse</a>
           {% endif %}
       </div>
+      <nav>
+        <ul>
+          <li><a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
+          <li class="dropdown">
+            <a href="#" class="{% if request.resolver_match.url_name in 'wiki,equipos,players,mapa' %}active{% endif %}">
+                Wiki
+            </a>
+            <ul class="submenu">
+                <li>
+                    <a href="{% url 'equipos' %}" class="{% if request.resolver_match.url_name == 'equipos' %}active{% endif %}">
+                        Equipos
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'players' %}" class="{% if request.resolver_match.url_name == 'players' %}active{% endif %}" data-active-section="{{ seccion }}">
+                        Jugadoras
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'mapa' %}" class="{% if request.resolver_match.url_name == 'mapa' %}active{% endif %}">
+                        Mapa
+                    </a>
+                </li>
+            </ul>
+        </li>
+          <li><a href="{% url 'nosotros' %}" class="{% if request.resolver_match.url_name == 'nosotros' %}active{% endif %}">Nosotros</a></li>
+        </ul>
+      </nav>
     </div>
     <!-- Botones de inicio de sesión y registro -->
     <div class="botones">
@@ -85,22 +107,80 @@
 </header>
 <script src="{% static 'js/animations/header.js' %}"></script>
 <script>
+    const header = document.querySelector('header'); // O tu clase .navbar
+
+    const updateHeaderHeight = () => {
+    const height = header.offsetHeight;
+    // Guardamos el valor en el :root para que sea accesible desde cualquier CSS
+    document.documentElement.style.setProperty('--header-height', `${height}px`);
+    };
+
+    // Ejecutar al cargar y al cambiar el tamaño de ventana
+    window.addEventListener('load', updateHeaderHeight);
+    window.addEventListener('resize', updateHeaderHeight);
+  function initMobileSubmenu() {
+    // Seleccionamos el enlace "Wiki" que está dentro del menú desplegable (móvil)
+    const wikiToggle = document.querySelector('.dropdown-menu .dropdown > a');
+    const wikiTogglePc = document.querySelector('#main-nav .dropdown');
+    const wikiTogglePcA = document.querySelector('#main-nav .dropdown > a');
+    const submenu = document.querySelector('.dropdown-menu .submenu');
+    const submenuPC = document.querySelector('#main-nav .submenu');
+
+
+    if (wikiToggle && submenu && wikiTogglePc) {
+        wikiToggle.addEventListener('click', (e) => {
+            e.preventDefault(); // Evita que el '#' recargue la página o salte
+            e.stopPropagation(); // Evita que el clic cierre el menú principal
+            
+            submenu.classList.toggle('open');
+            
+            // Opcional: Rotar una flechita si decides ponerla
+            wikiToggle.classList.toggle('expanded');
+        });
+        wikiTogglePc.addEventListener('mouseenter', () => {
+            if (window.innerWidth > 768) { // Solo para escritorio
+                submenuPC.classList.add('open');
+                //wikiTogglePcA.classList.add('active');
+            }
+        });
+        wikiTogglePc.addEventListener('mouseleave', () => {
+            if (window.innerWidth > 768) { // Solo para escritorio
+                submenuPC.classList.remove('open');
+                //wikiTogglePcA.classList.remove('active');
+            }
+          })
+    }
+  }
+
+  // Llama a esta función cuando cargue la página
+  document.addEventListener('DOMContentLoaded', initMobileSubmenu);
   function toggleMenu() {
     const menu = document.querySelector('.dropdown-menu');
     const hamburger = document.querySelector('.hamburger-menu');
-    const header = document.querySelector('header');
+    
+    // Alternamos las clases
     hamburger.classList.toggle('open');
     menu.classList.toggle('open');
-    header.style.background = menu.classList.contains('open') ?  'var(--color-secundario)' : 'transparent';
 
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 768) {
+    // Bloquear el scroll del body para que no se mueva el fondo al estar abierto
+    if (menu.classList.contains('open')) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Limpiar estados al redimensionar
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        const menu = document.querySelector('.dropdown-menu');
+        const hamburger = document.querySelector('.hamburger-menu');
         menu.classList.remove('open');
         hamburger.classList.remove('open');
-        header.style.background = 'transparent';
-      }
-    });
-
-  }
+        document.body.style.overflow = 'auto';
+    }
+});
 </script>
+{% load django_browser_reload %}
+{% django_browser_reload_script %}
 

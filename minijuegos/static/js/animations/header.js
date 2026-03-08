@@ -1,71 +1,49 @@
-const navLinks = document.querySelectorAll('#main-nav a');
+const navLinks = document.querySelectorAll('li a');
 
 navLinks.forEach(link => {
-
-  link.addEventListener('mouseenter', () => {
-
-    // cancelar animaciones previas 
+  // Función para la animación de "Entrada" (Caja cerrándose)
+  const playEnterAnim = () => {
     gsap.killTweensOf(link);
-
-    // flechas aparecen
     gsap.to(link, {
+      scale: 1.1,
       "--arrowOpacity": 1,
       "--arrowScale": 1,
-      "--arrowYTop": 0,
-      "--arrowYBottom": 0,
-      duration: 0.35,
-      ease: "power2.out"
+      "--arrowYTop": "0px",
+      "--arrowYBottom": "0px",
+      duration: 0.4,
+      ease: "expo.out",
+      color: "var(--color-primario)"
     });
+  };
 
-    // color del texto
-    gsap.to(link, {
-      color: "var(--color-primario)",
-      duration: 0.3,
-      ease: "power2.out"
-    });
-  });
-
-  link.addEventListener('mouseleave', () => {
-
-    // cancelar animaciones previas 
-    gsap.killTweensOf(link);
-
-    // flechas desaparecen
+  // Función para la animación de "Salida" (Caja expandiéndose)
+  const playLeaveAnim = () => {
     if (!link.classList.contains("active")) {
+      gsap.killTweensOf(link);
       gsap.to(link, {
+        scale: 1,
         "--arrowOpacity": 0,
-        "--arrowScale": 0.5,
-        "--arrowYTop": -6,
-        "--arrowYBottom": 6,
+        "--arrowScale": 1.5,
+        "--arrowYTop": "-25px",
+        "--arrowYBottom": "25px",
         duration: 0.3,
-        ease: "power2.inOut"
-      });
-
-      gsap.to(link, {
-        color: "white",
-        duration: 0.3,
-        ease: "power2.out"
+        ease: "power2.in",
+        color: "white"
       });
     }
-  });
-});
+  };
 
+  // ESCRITORIO: Hover normal
+  link.addEventListener('mouseenter', playEnterAnim);
+  link.addEventListener('mouseleave', playLeaveAnim);
 
-
-const logo = document.querySelector(".navbar-brand1 img");
-
-logo.addEventListener("mouseenter", () => {
-  gsap.to(logo, {
-    rotateY: 360,
-    duration: 1,
-    ease: "power2.inOut"
-  });
-});
-
-logo.addEventListener("mouseleave", () => {
-  gsap.to(logo, {
-    rotateY: 0,
-    duration: 1,
-    ease: "power2.inOut"
+  // MÓVIL/TOUCH: Al tocar
+  link.addEventListener('pointerdown', () => {
+    playEnterAnim();
+    
+    // Si es un link que NO despliega nada (como "Inicio"), 
+    // queremos que se limpie si el usuario arrastra el dedo fuera.
+    link.addEventListener('pointerup', playLeaveAnim, { once: true });
+    link.addEventListener('pointercancel', playLeaveAnim, { once: true });
   });
 });

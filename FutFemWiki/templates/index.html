@@ -3,7 +3,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>FutfemWiki</title>
     <link rel="icon" href="{% static 'img/logo.png' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +23,7 @@
 
 <section id="wiki-equipos">
     <div id="cabecera-wiki-equipos">
-        <div id="selector" class="selector" style="display: none;">
+        <!--<div id="selector" class="selector" style="display: none;">
             <i class="bi bi-chevron-left arrow" id="arrow-left"></i>
 
             <div class="selector-center">
@@ -35,7 +35,7 @@
             </div>
 
             <i class="bi bi-chevron-right arrow" id="arrow-right"></i>
-        </div>
+        </div>-->
 
 
         <div id="cabecera-equipo" class="panel">
@@ -91,7 +91,7 @@
     // No pases el elemento, pasa el valor
     const elemento = document.getElementById('config-wiki');
     if (elemento) {
-        inicializarWiki(elemento.dataset.seccion);
+        await inicializarWiki(elemento.dataset.seccion);
     }
 </script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>

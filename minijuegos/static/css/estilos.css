@@ -11,6 +11,12 @@
     --color-gray-light: #ecf0f1;
     --color-gray-dark: #7f8c8d;
 
+    /* Colores de posiciones */
+    --color-portera: #e74c3c; /* Rojo */
+    --color-defensa: #f39c12; /* Naranja */
+    --color-mediocampista: #217d48; /* Verde */
+    --color-delantera: #3498db; /* Azul */
+
     /* Colores de alerta */
     --color-danger: #e74c3c; /* Rojo */
     --color-warning: #f39c12; /* Naranja */
@@ -19,6 +25,13 @@
     rgba(252, 114, 28, 1), rgba(255, 220, 0, 1), 
     rgba(27, 206, 255, 1), rgba(42, 107, 255, 1), 
     rgba(217, 41, 255, 1), rgba(255, 10, 92, 1) );
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    max-width: 100vw;
+    max-height: 100vh;
+    overflow: hidden; /* Evita el scroll horizontal */
 }
 body {
     font-family: "Montserrat", sans-serif;
@@ -30,13 +43,32 @@ body {
     z-index: -1; /* Colocamos el pseudo-elemento detrás del contenido del botón */
     /*animation: movimientoOlas 10s ease-in-out infinite;*/
     color: var(--color-detalles);
-    overflow-x: hidden;
+    overflow-x: hidden !important;
     background-image: url("../img/fondo cesped.jpg.png");
     background-size: cover;
     background-repeat: no-repeat;
+    background-position: center;
     background-color: rgba(37, 0, 37, 0.75); /* Color negro con transparencia */
     background-blend-mode: color-dodge; /* Modo de mezcla */
     min-height: 100vh;
+    max-width: 100vw;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: url("../img/estadio.jpg") !important;
+    background-color: rgba(48, 0, 48, 0.5) !important; /* Color negro con transparencia */
+    background-blend-mode: luminosity !important; /* Modo de mezcla */
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    /* Valores iniciales que GSAP sobreescribirá */
+    filter: brightness(0.5);
+    transform: scale(var(--bg-scale));
+    will-change: filter, transform;
 }
 /* Estilos de la barra de scroll */
 /* Estilo general para la scrollbar */
@@ -372,6 +404,22 @@ input::placeholder{
         transform: scale(1);
         color: white;
     }
+}
+
+.pos-POR {
+    color: var(--color-portera);
+}
+
+.pos-LI, .pos-DFC, .pos-LD {
+    color: var(--color-defensa);
+}
+
+.pos-MCD, .pos-MC, .pos-MCO, .pos-MI, .pos-MD {
+    color: var(--color-mediocampista);
+}
+
+.pos-DC, .pos-ED, .pos-EI {
+    color: var(--color-delantera);
 }
 
 @media (max-width: 768px){

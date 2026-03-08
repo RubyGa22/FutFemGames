@@ -186,7 +186,10 @@ export function Ganaste(modo) {
         button.disabled=true;
         button.style.pointerEvents = 'none';
     }
-    input.disabled=true;
+    input.forEach(input => {
+        input.disabled = true;
+        input.style.pointerEvents = 'none';
+    });
     // Llamar a la función que cambia la imagen con flip
     if(modo==='grid'){
         result.textContent = '¡Has Ganado!';

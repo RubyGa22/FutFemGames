@@ -79,43 +79,73 @@ header .navbar-brand img{
   background: rgba(0,0,0,0.25);
   border-bottom: 1px solid rgba(255,255,255,0.1);
 }*/
-#main-nav a {
-  position: relative;
-  display: inline-block;
-  padding: 8px 0;
-  --arrowOpacity: 0;
-  --arrowScale: 0.5;
-  --arrowYTop: -6px;
-  --arrowYBottom: 6px;
+/* Contenedor del enlace */
+li a {
+    position: relative;
+    padding: 8px 16px;
+    text-decoration: none;
+    display: inline-block;
+    transition: text-shadow 0.3s ease;
+    /* Variables iniciales */
+    --arrowOpacity: 0;
+    --arrowScale: 1.5;
+    --arrowYTop: -25px;
+    --arrowYBottom: 25px;
 }
 
-/* Flecha superior */
-#main-nav a::before {
-  content: "\f282"; /* bi-chevron-up */
-  font-family: "bootstrap-icons";
-  position: absolute;
-  left: 50%;
-  top: -12px;
-  transform: translateX(-50%) translateY(var(--arrowYTop)) scale(var(--arrowScale));
-  opacity: var(--arrowOpacity);
-  color: var(--color-primario);
-  pointer-events: none;
+/* Configuración de las esquinas (Base) */
+li a::before,
+li a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: calc(100% - 10px); /* Un poco más ancho que el texto */
+    height: 15px; 
+    background-repeat: no-repeat;
+    background-size: 10px 10px; /* Tamaño de los brazos de la esquina */
+    pointer-events: none;
+    opacity: var(--arrowOpacity);
+    transform: translateX(-50%) translateY(var(--arrowYTop)) scale(var(--arrowScale));
+    
+    /* EFECTO NEÓN: El brillo sigue la forma de la esquina */
+    filter: drop-shadow(0 0 2px var(--color-primario)) 
+            drop-shadow(0 0 8px var(--color-primario));
 }
 
-/* Flecha inferior */
-#main-nav a::after {
-  content: "\f286"; /* bi-chevron-down */
-  font-family: "bootstrap-icons";
-  position: absolute;
-  left: 50%;
-  bottom: -12px;
-  transform: translateX(-50%) translateY(var(--arrowYBottom)) scale(var(--arrowScale));
-  opacity: var(--arrowOpacity);
-  color: var(--color-primario);
-  pointer-events: none;
+/* Esquinas Superiores */
+li a::before {
+    top: 0;
+    background-image: 
+        linear-gradient(to right, var(--color-primario) 2px, transparent 2px),
+        linear-gradient(to bottom, var(--color-primario) 2px, transparent 2px),
+        linear-gradient(to left, var(--color-primario) 2px, transparent 2px),
+        linear-gradient(to bottom, var(--color-primario) 2px, transparent 2px);
+    background-position: 0 0, 0 0, 100% 0, 100% 0;
 }
 
-#main-nav a.active {
+/* Esquinas Inferiores */
+li a::after {
+    bottom: 0;
+    transform: translateX(-50%) translateY(var(--arrowYBottom)) scale(var(--arrowScale));
+    background-image: 
+        linear-gradient(to right, var(--color-primario) 2px, transparent 2px),
+        linear-gradient(to top, var(--color-primario) 2px, transparent 2px),
+        linear-gradient(to left, var(--color-primario) 2px, transparent 2px),
+        linear-gradient(to top, var(--color-primario) 2px, transparent 2px);
+    background-position: 0 100%, 0 100%, 100% 100%, 100% 100%;
+}
+
+/* Estado Hover para el texto (Brillo Neón) */
+header ul li a:hover {
+    color: white;
+    /* Tres capas de sombra para profundidad de neón */
+    text-shadow: 
+        0 0 5px #fff,
+        0 0 10px var(--color-primario),
+        0 0 20px var(--color-primario);
+}
+
+a.active {
   color: var(--color-primario);
   --arrowOpacity: 1;
   --arrowScale: 1;
@@ -141,7 +171,7 @@ header ul li a:link {
 }
 
 header ul li a {
-  color:#999999;
+  color:var(--color-detalles);
   -moz-transition: all 0.2s ease-in;
   -o-transition: all 0.2s ease-in;
   -webkit-transition: all 0.2s ease-in;
@@ -159,7 +189,6 @@ header ul li a:hover {
 }
 
 header ul li a.active {
-    color: white;
     text-shadow:0px 0px 30px var(--color-primario);
 }
 
@@ -178,14 +207,17 @@ li.dropdown {
 
 /* Ocultar el submenú por defecto */
 .submenu {
-    display: none;
+    height: 0;
     position: absolute;
-    background-color: var(--color-secundario);
+    overflow: hidden;   /* Oculta el contenido que sobresale */
+    visibility: hidden;  /* Evita que sea accesible por teclado/lectores si está cerrado */
+    /*background-color: var(--color-secundario);*/
     min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    /*box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);*/
     z-index: 1;
     list-style: none;
     padding: 0;
+    padding: 10px;
 }
 
 /* Mostrar al hacer hover */
@@ -193,16 +225,20 @@ li.dropdown {
     display: block;
 }
 
+.submenu li{
+    margin-inline: 0px;
+}
+
 /* Estilo de los links del submenú */
 .submenu li a {
-    color: black;
+    color: white;
     padding: 12px 16px;
     text-decoration: none;
     display: block;
 }
 
 .submenu li a:hover, .submenu li a.active {
-    color: #007bff; /* Color de tu tema */
+    color: var(--color-primario); /* Color de tu tema */
 }
 
 header .botones button{
@@ -313,7 +349,7 @@ header .icono-hamburguesa{
     cursor: pointer;
     flex-direction: column;
     gap: 5px;
-    z-index: 50;
+    z-index: 1000;
 }
 .hamburger-menu .bar {
     width: 25px;
@@ -331,42 +367,98 @@ header .icono-hamburguesa{
     transform: rotate(-45deg) translate(5px, -5px);
 }
 /* Menú desplegable */
+/* Estado inicial del menú (Escondido arriba) */
 .dropdown-menu {
-    display: flex;              /* siempre existe */
-    flex-direction: column;
-    overflow: hidden;
-
-    max-height: 0;              /* cerrado */
-    opacity: 0;
-    pointer-events: none;
-    border: none;
+    position: fixed;
+    top: -100vh; /* Totalmente fuera por arriba */
+    left: 0;
     width: 100%;
+    height: 100vh; /* Toda la pantalla */
+    background-color: var(--color-secundario);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    transform: translateY(-3px);
-    background: var(--color-secundario);
-    transition:
-        max-height 0.75s cubic-bezier(0.22, 1, 0.36, 1),
-        opacity 0.6s ease-in-out;
+    transition: top 0.5s ease-in-out; /* Animación de caída */
+    overflow-y: auto;
 }
 
-
-/* Cuando esté abierto */
+/* Estado cuando el menú está abierto */
 .dropdown-menu.open {
-    max-height: 400px; /* solo para permitir la animación */
-    opacity: 1;
-    pointer-events: auto;
+    top: 0; /* Baja hasta cubrir todo */
 }
 
-
-.dropdown-menu div {
-    padding: 10px
+/* Ajustes para el contenido interno */
+.dropdown-menu nav ul {
+    list-style: none;
+    padding: 0;
+    text-align: center;
 }
 
-.dropdown-menu div a{
+.dropdown-menu nav ul li {
+    margin: 20px 0;
+}
+
+.dropdown-menu nav ul li a {
+    font-size: 2rem; /* Texto más grande para móvil */
+    color: white;
     text-decoration: none;
-    color: var(--color-detalles);
+    font-weight: bold;
+    display: block;
 }
+
+/* Botones de login/logout dentro del menú móvil */
+.dropdown-menu div {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+    align-items: center;
+}
+
+/* Estilos para el submenú en el menú móvil */
+.dropdown-menu .submenu {
+    display: none; /* Escondido por defecto */
+    list-style: none;
+    padding-left: 0;
+    background: rgba(255, 255, 255, 0.05); /* Un toque de fondo para diferenciarlo */
+    width: 100%;
+}
+
+header .dropdown-menu nav ul li.dropdown .submenu{
+    position: static;
+    background: none;
+    box-shadow: none;
+    flex-direction: column;
+    gap: 10px;
+     display: none;
+}
+
+.submenu.open {
+    display: flex !important; /* Se muestra al hacer clic */
+    visibility: visible;
+    opacity: 1;
+    height: auto;
+}
+
+.dropdown-menu .submenu li a {
+    font-size: 1.4rem !important; /* Un poco más pequeño que los principales */
+    padding: 10px 0;
+    opacity: 0.8;
+}
+
+/* Indicador visual de que está abierto (opcional) */
+/*s.dropdown-menu .dropdown > a::after {
+    content: ' ▾';
+    font-size: 1rem;
+    transition: transform 0.3s;
+    display: inline-block;
+}
+
+.dropdown-menu .dropdown > a.expanded::after {
+    transform: rotate(180deg);
+}*/
 
 @media (max-width: 1157px){
     header ul li{
@@ -433,11 +525,11 @@ header .icono-hamburguesa{
     }
 
     header #header-izquierda{
-        background: linear-gradient(
+        /*background: linear-gradient(
             90deg,
             var(--color-primario) 60%,
             transparent 90%
-        );
+        );*/
         padding: 1% 3.17%;
     }
 
@@ -453,26 +545,34 @@ header .icono-hamburguesa{
         width: 100%;
         padding: unset;
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         justify-content: center;
         gap: 20px;
+        height: 70%;
     }
 
     header .dropdown-menu nav ul{
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
         padding: unset;
         gap: 20px;
+        height: 100%;
     }
 
     header .dropdown-menu nav ul li{
         margin: 0;
     }
 
+    header .dropdown-menu nav ul li.dropdown{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
     header .dropdown-menu nav ul li a{
-        font-size: small;
+        font-size: xx-large;
     }
 
     header .dropdown-menu div{

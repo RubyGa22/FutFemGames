@@ -130,6 +130,19 @@ class JugadoraPais(models.Model):
         tipo = "Primaria" if self.es_primaria else "Secundaria"
         return f"{self.pais.nombre} ({tipo})"
 
+class JugadoraPosicion(models.Model):
+    id = models.AutoField(primary_key=True)
+    jugadora = models.ForeignKey(Jugadora, on_delete=models.CASCADE, db_column='jugadora')
+    posicion = models.ForeignKey(Posicion, on_delete=models.CASCADE, db_column='posicion')
+    es_primaria = models.BooleanField(default=True, db_column='es_primaria') # Por defecto True porque vienen de la FK antigua
+
+    class Meta:
+        db_table = 'jugadora-posicion' # O el nombre que prefieras
+
+    def __str__(self):
+        tipo = "Primaria" if self.es_primaria else "Secundaria"
+        return f"{self.posicion.abreviatura} ({tipo})"
+
 
 class Trofeo(models.Model):
     id = models.AutoField(primary_key=True)

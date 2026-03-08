@@ -88,8 +88,9 @@ async function play() {
 }
 
 async function verificar(){
-    if(vidas===0){
+    if(vidas<=0){
         updateRacha(3, 0, localStorage.getItem('Attr3'))
+        return;
     }
     // 1. Validar entrada
     const nombreJugadora = validarEntrada();
@@ -101,7 +102,7 @@ async function verificar(){
     const equipo = compararIgualONo(jugadora.equipo, jugadoraAnswer.equipo, "equipo");
     const pais = compararIgualONo(jugadora.pais, jugadoraAnswer.pais, "pais");
     const pie = compararIgualONo(jugadora.pie, jugadoraAnswer.pie, "pie");
-    const posicion = compararIgualONo(jugadora.posicionObj, jugadoraAnswer.posicionObj, "posicion");
+    const posicion = compararIgualONo(jugadora.Posiciones[0].id, jugadoraAnswer.Posiciones[0].id, "posicion");
     jugadoraAnswer.pie = pie
     jugadoraAnswer.edad = edad
     jugadoraAnswer.altura = altura
@@ -149,35 +150,53 @@ async function verificar(){
         return jugadora;
     }
 
-    function displayRespuesta(jugadora){
-
+    function displayRespuesta(jugadora, insertarDirecto = true) {
+        console.log(jugadora)   
         const template = document.getElementById("jugadora-template");
         const clone = template.content.cloneNode(true);
-        const container = clone.querySelector(".jugadora-item");
-        console.log(jugadora.id)
-
-        jugadorasProhibidas.push(jugadora.id)
-
-        clone.querySelector(".player-img").src = jugadora.imagen || "/static/img/predeterm.jpg";
-        clone.querySelector(".equipo").classList.add(jugadora.equipo.res);
-        clone.querySelector(".equipo-escudo").src = jugadora.equipo.equipo.escudo;
-        clone.querySelector(".nombre").textContent = jugadora.nombre;
-        clone.querySelector(".edad").classList.add(jugadora.edad.res);
-        clone.querySelector(".edad-texto").textContent = jugadora.edad.edad;
-        clone.querySelector(".pie").classList.add(jugadora.pie.res);
-        clone.querySelector(".pie-texto").textContent = jugadora.pie.pie;
-        clone.querySelector(".altura").classList.add(jugadora.altura.res);
-        clone.querySelector(".altura-texto").textContent = jugadora.altura.altura+" cm";
-        clone.querySelector(".fi").classList.add(`fi-${jugadora.pais_iso}`);
-        clone.querySelector(".pais").classList.add(jugadora.pais.res);
-
-        if (jugadora.nacionalidad?.iso) {
-            clone.querySelector(".flag").classList.add(`fi-${jugadora.nacionalidad.iso.toLowerCase()}`);
+        
+        // Side effect: registrar que esta jugadora ya salió
+        if (!jugadorasProhibidas.includes(jugadora.id)) {
+            jugadorasProhibidas.push(jugadora.id);
         }
-        clone.querySelector(".posicion").classList.add(jugadora.posicion.res);
-        clone.querySelector(".posicion-texto").textContent = jugadora.posicion.posicion.abreviatura;
 
-        div.prepend(clone);
+        // Poblamos el clon (tu lógica impecable)
+        clone.querySelector(".player-img").src = jugadora.imagen || "/static/img/predeterm.jpg";
+        clone.querySelector(".equipo-escudo").src = jugadora.equipo?.equipo.escudo || "/static/img/predeterm.jpg";
+        clone.querySelector(".nombre").textContent = jugadora.nombre_completo;
+        
+        // Clases de acierto/error y textos
+        const campos = ['equipo', 'edad', 'pie', 'altura', 'pais', 'posicion'];
+        campos.forEach(campo => {
+            const el = clone.querySelector(`.${campo}`);
+            if (el) {
+                el.classList.add(jugadora[campo].res); // 'correct', 'partial', 'incorrect'
+                
+                // Lógica específica para textos si existen
+                const txt = clone.querySelector(`.${campo}-texto`);
+                if (txt) {
+                    if (campo === 'altura') txt.textContent = `${jugadora.altura.altura} cm`;
+                    else if (campo === 'posicion') txt.textContent = jugadora.Posiciones[0].abreviatura;
+                    else txt.textContent = jugadora[campo][campo]; 
+                }
+            }
+        });
+
+        // Iconos de banderas
+        const iso = jugadora.nacionalidad?.iso || jugadora.pais_iso;
+        if (iso) {
+            const flagEl = clone.querySelector(".fi") || clone.querySelector(".flag");
+            if (flagEl) flagEl.classList.add(`fi-${iso[0].toLowerCase()}`);
+        }
+
+        // SI estamos cargando una sola (jugada actual)
+        if (insertarDirecto) {
+            const contenedorPrincipal = document.getElementById("game-results");
+            contenedorPrincipal.prepend(clone);
+        }
+
+        // Devolvemos el clon por si queremos usarlo en un Fragment
+        return clone;
     }
 
     function compararMayorMenorIgual(item1, item2, tipo){
@@ -222,25 +241,49 @@ async function verificar(){
         let jugadoras = gameState.jugadoras;
         vidasContainer.textContent = "Vidas restantes: "+gameState.vidas;
 
-        for (const nombreJugadora of jugadoras) {
-            const jugadoraAnswer = await obtenerJugadora(nombreJugadora);
-            console.log(jugadora.posicionObj, jugadoraAnswer.posicionObj)
+        try{
 
-            const edad = compararMayorMenorIgual(jugadora.edad, jugadoraAnswer.edad, "edad");
-            const altura = compararMayorMenorIgual(jugadora.altura, jugadoraAnswer.altura, "altura");
-            const equipo = compararIgualONo(jugadora.equipo, jugadoraAnswer.equipo, "equipo");
-            const pais = compararIgualONo(jugadora.pais, jugadoraAnswer.pais, "pais");
-            const pie = compararIgualONo(jugadora.pie, jugadoraAnswer.pie, "pie");
-            const posicion = compararIgualONo(jugadora.posicionObj, jugadoraAnswer.posicionObj, "posicion");
+            // 1. LANZAMOS TODAS LAS PETICIONES AL MISMO TIEMPO
+            // Map crea un array de promesas, y Promise.all las resuelve todas juntas
+            const jugadorasData = await Promise.all(
+                jugadoras.map(nombre => obtenerJugadora(nombre))
+            );
 
-            jugadoraAnswer.pie = pie;
-            jugadoraAnswer.edad = edad;
-            jugadoraAnswer.altura = altura;
-            jugadoraAnswer.equipo = equipo;
-            jugadoraAnswer.pais = pais;
-            jugadoraAnswer.posicion = posicion;
+            // 2. DOCUMENT FRAGMENT: Para no "machacar" el DOM en cada iteración
+            const fragmento = document.createDocumentFragment();
 
-            displayRespuesta(jugadoraAnswer);
+            // 3. PROCESAMIENTO SÍNCRONO: 
+            // Como ya tenemos todos los datos en respuestasJugadoras, 
+            // el forEach aquí es instantáneo y seguro.
+            jugadorasData.forEach(jugadoraAnswer => {
+                console.log(jugadora.Posiciones[0], jugadoraAnswer.Posiciones[0])
+
+                // Realizamos las comparaciones (que son síncronas)
+                const stats = {
+                    edad: compararMayorMenorIgual(jugadora.edad, jugadoraAnswer.edad, "edad"),
+                    altura: compararMayorMenorIgual(jugadora.altura, jugadoraAnswer.altura, "altura"),
+                    equipo: compararIgualONo(jugadora.equipo, jugadoraAnswer.equipo, "equipo"),
+                    pais: compararIgualONo(jugadora.pais, jugadoraAnswer.pais, "pais"),
+                    pie: compararIgualONo(jugadora.pie, jugadoraAnswer.pie, "pie"),
+                    posicion: compararIgualONo(jugadora.Posiciones[0].id, jugadoraAnswer.Posiciones[0].id, "posicion")
+                };
+
+                // Inyectamos los resultados en el objeto
+                Object.assign(jugadoraAnswer, stats);
+
+                // Generamos el elemento visual y lo añadimos al fragmento
+                // Nota: Aquí podrías usar tu función displayRespuesta adaptada para devolver un elemento
+                const fila = displayRespuesta(jugadoraAnswer, false); 
+                fragmento.prepend(fila);
+
+            });
+
+            // 4. UN SOLO PINTADO: El navegador solo trabaja una vez
+            const contenedor = document.getElementById('game-results');
+            contenedor.prepend(fragmento);
+        }
+        catch (error) {
+            console.error("Error al cargar las jugadoras anteriores:", error);
         }
     }
 

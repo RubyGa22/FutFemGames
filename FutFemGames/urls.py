@@ -24,6 +24,7 @@ admin.site.site_title = "Panel de Control"          # Título de la pestaña del
 admin.site.index_title = "Gestión del Juego"        # Subtítulo en la página de inicio
 
 urlpatterns = [
+    path("__reload__/", include("django_browser_reload.urls")),
     path('admin/', admin.site.urls),
     path('', include('minijuegos.urls')),
     path('api/', include('futfem.urls')),

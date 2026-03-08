@@ -248,3 +248,15 @@ body.no-scroll {
     transform: scale(1.1);
 
 }
+
+@media (max-width: 768px){
+   .row{
+        flex-direction: column;
+        height: auto;
+   }
+
+   .row div:nth-child(2){
+        display: none;
+   }
+
+}
