@@ -143,6 +143,17 @@ summary, details{
     overflow-y: scroll;
 }
 
+.ver-filtros{
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    z-index: 999;
+    top: 30px;
+    right: 50px;
+    height: fit-content;
+    width: fit-content;
+}
+
 .jugadoras-grid-container::-webkit-scrollbar{
     display: none;
 }
@@ -168,6 +179,7 @@ summary, details{
 
 .jugadora-item.header-list .jugadora-div1 p{
     text-align: center;
+    width: 100%;
 }
 
 .jugadora-item.header-list p {
@@ -203,7 +215,7 @@ summary, details{
 
 .jugadora-item{
     display: grid;
-    grid-template-columns: 2fr 0.6fr 1.2fr; /* 6 columnas iguales */
+    grid-template-columns: 1fr max-content 0.5fr 0.5fr; /* 4 columnas iguales */
     grid-template-rows: 1fr;              /* 1 fila */
 
     width: 50%;
@@ -298,12 +310,15 @@ summary, details{
 }
 
 .jugadora-item p{
-    width: 100%;
-    font-size: x-small;
+    width: fit-content
 }
 
 .pagination{
-    height: 10%;
+    align-items: center;
+}
+
+.pagination span{
+    height: fit-content;
 }
 
 #wiki-equipos{
@@ -581,15 +596,27 @@ display: flex;
     height: 40%;
 }
 
+@media (max-width: 1280px) {
+    .jugadora-item{
+        width: 80%;
+    }
+}
+
 @media (max-width: 992px) {
     #equipos-container {
         grid-template-columns: repeat(3, 1fr); /* 2 columnas en pantallas medianas */
+    }
+    .jugadoras-grid-container .jugadora-item{
+        width: 80%;
     }
 }
 
 @media (max-width: 750px) {
     #cabecera-equipo{
         height: 100% !important;
+    }
+    #wiki-equipos{
+            max-height: calc(100vh - var(--header-height) - 60px);
     }
     #ligas-container {
         max-width: 100vw;
@@ -622,19 +649,53 @@ display: flex;
     }
 
     #cabecera-wiki-equipos.jugadoras {
-        display: none;
+        opacity: 0;
+        visibility: hidden;
+        position: absolute;
+        z-index: 998;
+        background: var(--color-secundario);
+        height: calc(100vh - var(--header-height)) !important;
+    }
+
+    #cabecera-wiki-equipos.jugadoras.active{
+        opacity: 1;
+        visibility: visible;
+    }
+
+    #cabecera-wiki-equipos.jugadoras #cabecera-jugadora {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        z-index: 999;
+        gap: 10px;
+    }
+
+    #cabecera-wiki-equipos.jugadoras #cabecera-jugadora #filtros {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    #cabecera-wiki-equipos.jugadoras #cabecera-jugadora #filtros label{
+        margin-bottom: 0;
     }
 
     #items-container.equipos {
         grid-template-columns: repeat(2, 1fr); /* 1 columna en pantallas pequeñas */
     }
+    
+    .ver-filtros{
+        visibility: visible;
+        opacity: 1;
+    }
 
     .jugadora-item{
-        width: 100%;
+        width: 100% !important;
         height: 50px;
         min-height: 50px;
         padding-inline: 0px;
-        grid-template-columns: 1fr 0.5fr 0.5fr; 
+        grid-template-columns: 1fr 0.5fr 0.5fr 0.5fr; /* 4 columnas: nombre, club, edad, valor */
     }
 
     .jugadora-item .jugadora-div1{
@@ -665,7 +726,7 @@ display: flex;
 
 @media (max-width: 350px) {
     .jugadora-item {
-        grid-template-columns: 1.5fr 0.5fr 0.5fr; 
+        grid-template-columns: 1.5fr 0.5fr 0.5fr 0.5fr; 
         height: 50px;
     }
 

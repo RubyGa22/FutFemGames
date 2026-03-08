@@ -330,13 +330,10 @@ async function wordlePerder() {
     //lockAllRows();
     
     const resultDiv = document.getElementById('message');
-    //const player = await sacarJugadora(jugadora.idJugadora);
 
     resultDiv.textContent = 'Has perdido';
     const div = document.getElementById('trayectoria');
-    /*const jugadora_id = 'loss';
-    localStorage.setItem('Attr2', jugadora_id);*/
-    //await loadJugadoraById(jugadoraId, true);
+    
     // Agregar un delay de 2 segundos (2000 ms)
     if(localStorage.length>0){
         await updateRacha(2, 0, localStorage.getItem('Attr2'));

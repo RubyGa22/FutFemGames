@@ -45,7 +45,6 @@ def jugadora_detalle(request, id_jugadora):
         "apodo": jugadora.Apodo,
         "nacimiento": jugadora.Nacimiento.isoformat(),
         "nacionalidad": jp_principal.pais.id_pais if jp_principal else None,
-        "posicion": jugadora.Posicion.abreviatura if jugadora.Posicion else None,
         "imagen": jugadora.imagen if jugadora.imagen else None,
     })
 

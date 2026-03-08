@@ -77,7 +77,8 @@ def jugadoras_All(request):
                 GROUP_CONCAT(DISTINCT p.iso ORDER BY jp.es_primaria DESC) AS isos_paises,   -- 12
                 -- Posiciones
                 GROUP_CONCAT(DISTINCT pos.idPosicion ORDER BY jpos.es_primaria DESC) AS ids_posiciones, -- 13
-                GROUP_CONCAT(DISTINCT pos.abreviatura ORDER BY jpos.es_primaria DESC) AS abrev_posiciones -- 14
+                GROUP_CONCAT(DISTINCT pos.abreviatura ORDER BY jpos.es_primaria DESC) AS abrev_posiciones, -- 14
+                j.market_value AS valor -- 15
             FROM jugadoras j
             INNER JOIN trayectoria t ON t.jugadora = j.id_jugadora AND t.equipo_actual = TRUE
             INNER JOIN equipos e ON t.equipo = e.id_equipo
@@ -122,6 +123,7 @@ def jugadoras_All(request):
             "posiciones_ids": lista_ids_posiciones,
             "posiciones_abrev": lista_abrev_posiciones,
             "posicion": posicion_display, # Posición principal para la miniatura/lista
+            "market_value": fila[15], # Valor de mercado
             "nombre_completo": formatear_nombre_corto(fila[1], fila[2])
         })
     
@@ -184,7 +186,6 @@ def jugadoraxid(request):
         "Nacimiento": j.Nacimiento,
         "Nacionalidad": jp_principal.pais.id_pais if jp_principal else None,
         "TodasNacionalidades": todas_nacionalidades,
-        "Posicion": j.Posicion.idPosicion if j.Posicion else None,
         "PosicionesIds": todas_posiciones,
         "Retiro": j.retiro,
         "Valor": j.market_value
@@ -299,8 +300,6 @@ def jugadora_datos(request):
         "altura": j.altura,
         "pie": j.pie_habil,
         "imagen": j.imagen,
-        "posicion": j.Posicion.idPosicion if j.Posicion else j.Posicion.idPosicion,
-        "posicionObj": posicion_to_dict(j.Posicion),
         "PosicionesIds": todas_posiciones_ids,
         "Posiciones": posiciones_lista_obj,
         "edad": edad,
@@ -337,7 +336,7 @@ def jugadoraxnombre(request):
         )
 
     # 5. Limitamos resultados para que el autocompletado sea rápido
-    jugadoras = queryset.select_related('Posicion')[:10]
+    jugadoras = queryset.only('id_jugadora')[:10]
 
     if not jugadoras.exists():
         return JsonResponse([], safe=False) # Mandar lista vacía es mejor que un 404 para el JS
@@ -954,11 +953,11 @@ def posicion_por_jugadora(request):
         return JsonResponse({"error": "ID inválido"}, status=400)
 
     query = """
-        SELECT posiciones.idPosicion
+        SELECT posiciones.idPosicion, posiciones.nombre, posiciones.abreviatura, posiciones.idPosicionPadre
         FROM posiciones
-        INNER JOIN jugadoras j
-            ON posiciones.idPosicion = j.Posicion
-        WHERE j.id_jugadora = %s;
+        LEFT JOIN jugadora_posicion j
+            ON posiciones.idPosicion = j.posicion
+        WHERE j.jugadora = %s;
     """
 
     with connection.cursor() as cursor:

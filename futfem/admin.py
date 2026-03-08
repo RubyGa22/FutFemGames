@@ -97,9 +97,18 @@ class PaisAdmin(admin.ModelAdmin):
 @admin.register(Jugadora)
 class JugadoraAdmin(admin.ModelAdmin):
     # En list_display sustituimos 'Nacionalidad' por nuestro método 'ver_nacionalidades'
-    list_display = ('ver_foto', 'Nombre', 'Apellidos', 'ver_nacionalidades', 'Posicion', 'market_value')
+    list_display = ('ver_foto', 'Nombre', 'Apellidos', 'ver_nacionalidades', 'market_value')
     # Eliminamos 'Nacionalidad' de list_filter ya que ahora es una relación M2M
-    list_filter = ('Posicion', 'retiro')
+    list_filter = (
+        'retiro',
+        # Filtro por País (via tabla intermedia JugadoraPais -> Pais)
+        'jugadorapais__pais', 
+        # Filtro por Posición (via tabla intermedia JugadoraPosicion -> Posicion)
+        'jugadoraposicion__posicion',
+        # Filtro por Equipo Actual (via Trayectoria -> Equipo)
+        # Filtramos solo por los equipos donde equipo_actual es True
+        ('trayectoria__equipo', admin.RelatedOnlyFieldListFilter),
+    )
     search_fields = ('Nombre', 'Apellidos', 'Apodo')
     
     fieldsets = (

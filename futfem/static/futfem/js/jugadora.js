@@ -240,6 +240,22 @@ export function calcularEdad(fechaNacimiento) {
     return edad;
 }
 
+export function formatearValorMercado(valor) {
+    if (!valor || isNaN(valor)) return 'N/A';
+    
+    const num = parseFloat(valor);
+    
+    if (num >= 1000000) {
+        // Millones: 1.5M (con 1 decimal si no es exacto)
+        return (num / 1000000).toFixed(num % 1000000 === 0 ? 0 : 1) + 'M €';
+    } else if (num >= 1000) {
+        // Miles: 250k
+        return (num / 1000).toFixed(num % 1000 === 0 ? 0 : 1) + 'k €';
+    }
+    
+    return num + ' €';
+};
+
 /** * Obtener trofeos individuales de una jugadora por ID
  * @param {*} id 
  * @return {Promise<Array>}

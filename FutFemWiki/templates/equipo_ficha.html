@@ -155,7 +155,7 @@
 </script>
 <script type="module">
     import { crearFichaJugadorasActuales, crearFichaJugadorasDeSiempre, displayPalmares } from '{% static "FutFemWiki/js/ficha-equipo.js" %}';
-    import { inicializarMapaEquipos, añadirEquipoMapa, centrarMapaEnEquipos, map } from '{% static "FutFemWiki/js/mapa.js" %}';
+    import { inicializarMapaEquipos, añadirEquipoMapa, centrarMapaEnEquipos, map, actualizarMarkersZoom } from '{% static "FutFemWiki/js/mapa.js" %}';
     import { fetchEquipoById } from '{% static "futfem/js/equipos.js" %}';
     const color = '{{equipo.color}}';
     const [equipos, palmares] = await Promise.all([fetchEquipoById('{{equipo.id_equipo}}'), displayPalmares('{{equipo.id_equipo}}')]);
@@ -165,37 +165,24 @@
         inicializarMapaEquipos();
 
         // Solo añadimos el equipo si tiene latitud y longitud
-        if (equipo.lat && equipo.long) {
-            map.once("idle", () => {
-               setTimeout(() => { 
-            if (map) {
-                map.resize();
-                centrarMapaEnEquipos(); 
-            }
-        }, 50);
+            map.on("load", async () => {
+            if (equipo.lat != null && equipo.long != null) {
 
-                requestAnimationFrame(() => {
-                    añadirEquipoMapa(
-                        equipo.id,
-                        equipo.nombre,
-                        equipo.lat,
-                        equipo.long,
-                        '/' + equipo.escudo,
-                        equipo.color
-                    );
-
-                    requestAnimationFrame(() => {
-                        centrarMapaEnEquipos();
-                    });
-                });
-            });
-        }
-        setTimeout(() => { 
-            if (map) {
-                map.resize();
-                centrarMapaEnEquipos(); 
+                añadirEquipoMapa(
+                    equipo.id,
+                    equipo.nombre,
+                    parseFloat(equipo.lat),
+                    parseFloat(equipo.long),
+                    '/' + equipo.escudo,
+                    equipo.color
+                );
             }
-        }, 50);
+
+
+        actualizarMarkersZoom();
+        centrarMapaEnEquipos([equipo.id]);
+
+    });
     }
 
     actualizarHeader();

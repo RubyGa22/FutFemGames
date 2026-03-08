@@ -99,7 +99,6 @@ class Jugadora(models.Model):
     Apellidos = models.TextField()     
     Apodo = models.TextField()     
     Nacimiento = models.DateField(max_length=255)     
-    Posicion = models.ForeignKey(Posicion, on_delete=models.CASCADE, db_column='Posicion')     
     imagen = models.TextField(null=True, blank=True) 
     altura = models.FloatField(null=True, blank=True)
     pie_habil = models.TextField(null=True, blank=True, max_length=12)

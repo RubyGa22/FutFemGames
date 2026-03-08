@@ -68,18 +68,45 @@ export async function crearFichaJugadorasDeSiempre(equipo, color) {
 }
 
 function displayJugadoras(id, jugadoras, color) {
-    console.log(jugadoras);
     const container = document.getElementById(id);
     container.innerHTML = '';
-    jugadoras.forEach((jugadora, index) => {
+
+    // 1. Agrupamos las jugadoras por su ID
+    const jugadorasAgrupadas = [];
+    const mapaJugadoras = {};
+
+    jugadoras.forEach(j => {
+        const anyoInicio = j.fecha_inicio ? j.fecha_inicio.toString().split('-')[0] : '????';
+
+        // Si fecha_fin existe y no es 'act', sacamos el año; si no, ponemos 'act'
+        const anyoFin = (j.fecha_fin && j.fecha_fin !== 'act') ? j.fecha_fin.toString().split('-')[0] : 'act';
+        const fechaTexto = `${anyoInicio} - ${anyoFin}`;
+        
+        if (!mapaJugadoras[j.id_jugadora]) {
+            // Si es la primera vez que vemos a esta jugadora, la añadimos al mapa
+            mapaJugadoras[j.id_jugadora] = {
+                ...j,
+                etapas: [fechaTexto] // Creamos un array para guardar sus etapas
+            };
+            jugadorasAgrupadas.push(mapaJugadoras[j.id_jugadora]);
+        } else {
+            // Si ya existe, solo añadimos la nueva etapa a su array
+            mapaJugadoras[j.id_jugadora].etapas.push(fechaTexto);
+        }
+    });
+
+    jugadorasAgrupadas.forEach((jugadora, index) => {
         const jugadoraElement = document.createElement('div');
         jugadoraElement.className = 'jugadora-item';
         jugadoraElement.id = jugadora.id_jugadora;
+
+        // Unimos todas las etapas con una coma
+        const todasLasEtapas = jugadora.etapas.join(', ');
         jugadoraElement.innerHTML = `
             <!--<img src="/${jugadora.imagen || '/static/img/predeterm.jpg'}" alt="${jugadora.nombre}" class="jugadora-img">-->
             <div class="jugadora-info">
                 <h3>${jugadora.Apodo}</h3>
-                <p>${jugadora.años}</p>
+                <p>${todasLasEtapas}</p>
             </div>
         `;  
         jugadoraElement.style.backgroundImage = `

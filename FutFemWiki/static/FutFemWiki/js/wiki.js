@@ -1,6 +1,6 @@
 import { handleAutocompletePais } from '/static/futfem/js/pais.js';
 import { equiposxliga, handleAutocompleteEquipo, fetchEquipoById } from '/static/futfem/js/equipos.js';
-import { fetchAllJugadoras } from '/static/futfem/js/jugadora.js';
+import { fetchAllJugadoras, formatearValorMercado } from '/static/futfem/js/jugadora.js';
 import { calcularEdad } from '/static/js/games/funciones-comunes.js';
 import { getDominantColors, rgbToRgba } from '/static/js/utils/color.thief.js';
 import { inicializarMapaEquipos, añadirEquipoMapa, centrarMapaEnEquipos, map } from './mapa.js';
@@ -156,6 +156,10 @@ function filtroJugadoras(equipo, nacionalidad, posicion) {
         return true;
     });
 
+    if (window.screen.width < 768) {
+        document.getElementById('cabecera-wiki-equipos').classList.remove('active');
+    }
+
     displayJugadoras(nuevasJugadoras);
 }
 
@@ -191,8 +195,9 @@ function renderJugadorasPage(page = 1) {
     header.className = 'jugadora-item header-list'; // Usamos la misma clase para heredar el grid
     header.innerHTML = `
         <div class="jugadora-div1"><p><b>JUGADORA</b></p></div>
-        <div class="header-label"><p><b>CLUB</b></p></div>
         <div class="header-label"><p><b>EDAD</b></p></div>
+        <div class="header-label"><p><b>CLUB</b></p></div>
+        <div class="header-label"><p><b>VALOR</b></p></div>
     `;
     container.appendChild(header);
 
@@ -222,6 +227,10 @@ function renderJugadorasPage(page = 1) {
         pNombre.className = 'jugadora-nombre';
         pNombre.textContent = nombreCompleto; 
         div1_2.appendChild(pNombre);
+
+        const pValor = document.createElement('p');
+        pValor.className = 'jugadora-valor';
+        pValor.textContent = formatearValorMercado(jugadora.market_value) || 'N/A';
 
         const divBanderaYPosicion = document.createElement('div');
         divBanderaYPosicion.className = 'jugadora-banderas-posicion';
@@ -284,8 +293,9 @@ function renderJugadorasPage(page = 1) {
             window.location.href = `/wiki/jugadora/${jugadora.id_jugadora}/`;
         });
         div.appendChild(div1);
-        div.appendChild(imgClub);
         div.appendChild(pNacimiento);
+        div.appendChild(imgClub);
+        div.appendChild(pValor);
         container.appendChild(div);
 
         // Retraso progresivo para efecto fade

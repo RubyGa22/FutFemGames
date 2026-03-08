@@ -207,6 +207,11 @@ body{
     border-color: rgba(255, 255, 255, 0.45);
 }
 
+.jugadora-item p{
+    width: 100%;
+    text-align: center;
+}
+
 .tabla-jugadoras.fullscreen {
     z-index: 9999;
     /*background: rgba(15, 15, 20, 0.96);*/
@@ -251,12 +256,107 @@ body.no-scroll {
 
 @media (max-width: 768px){
    .row{
-        flex-direction: column;
-        height: auto;
+        flex-direction: row;
+        height: 35%;
+        align-items: center;
+        justify-content: center;
    }
 
-   .row div:nth-child(2){
+   .row>div{
+        height: 100%;
+        width: 50%;
+    }
+
+    .row .left #palmares{
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 100%;
+    }
+
+   .row>div:nth-child(2){
         display: none;
    }
+
+   .row .left #tabla-trofeos a{
+        opacity: 0;
+        visibility: hidden;
+    }
+
+   .row .left .trofeo{
+        width: 100%;
+        height: 100%;
+        min-width: 70%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .row .left .trofeo img{
+        width: auto;
+        height: 30%;
+    }
+
+    .row .left .trofeo h3{
+        font-size: small;
+    }
+
+    .row .left p{
+        font-size: x-small !important;
+    }
+
+   .down{
+        display: flex;
+        flex-direction: column;
+   }
+
+   .down section{
+        width: 100% !important;
+        max-width: 100vw !important;
+        padding-bottom: 0% !important;
+    }
+
+    .down section:first-child{
+        padding-top: 0px !important;
+    }
+
+    .down section .container-jugadoras{
+        gap: 7px;
+    }
+
+    .tabla-jugadoras .cabecera-tabla h3{
+        font-size: medium;
+    }
+
+    .tabla-jugadoras .cabecera-tabla a{
+        font-size: small;
+    }
+
+    .tabla-jugadoras.fullscreen{
+        max-height: calc(100vh - var(--header-height) + 15px); /* Ajusta el valor según el tamaño de tu header y footer */
+    }
+
+    .tabla-jugadoras.fullscreen .container-jugadoras {
+        grid-template-columns: repeat(3, 1fr); /* 3 columnas en móvil */
+        grid-template-rows: auto;    /* filas automáticas */
+    }
+
+    .down section .jugadora-item{
+        min-height: 120px;
+        min-width: 100px;
+        width: fit-content;
+    }
+
+    .down section .jugadora-item h3{
+        font-size: small;
+        margin-bottom: unset;
+    }
+
+     .down section .jugadora-item p{
+        font-size: x-small;
+        text-align: center;
+    }
+
 
 }
