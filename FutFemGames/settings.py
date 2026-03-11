@@ -51,9 +51,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django_browser_reload.middleware.BrowserReloadMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware', 
+    'django.middleware.common.CommonMiddleware',       # <--- SUBE AQUÍ
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -73,6 +74,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'usuarios.context_processors.usuario_sesion',
+                'django.template.context_processors.i18n',
             ],
         },
     },
@@ -82,6 +84,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://futfemgames.gti-ia.upv.es',
     'https://*.trycloudflare.com',
     'http://*.trycloudflare.com',
+    'https://127.0.0.1:8000',
 ]
 
 WSGI_APPLICATION = 'FutFemGames.wsgi.application'
@@ -129,15 +132,24 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es'
+
+LANGUAGES = [
+    ('es', 'Español'),
+    ('ca', 'Valencià'), # Usamos 'ca' o 'ca-es-valencia' según tu preferencia
+    ('en', 'English'),
+    ('sv', 'Svenska'),
+    ('nl', 'Nederlands'),
+]
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
+USE_L10N = True
 
 USE_TZ = True
 
-
+LOCALE_PATHS = [BASE_DIR / 'locale']
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 

@@ -5,10 +5,6 @@ import { victory, wrong, correct } from "../sounds.js";
 import { ponerBanderas, ponerLigas, ponerClubes, ponerTrofeos, ponerEdades, crearPopupInicialJuego, Ganaste, calcularEdad } from "./funciones-comunes.js";
 
 let idres, currentPlayerData, paises, equipos, ligas, trofeos, lastPlayer, jugadora;;
-const texto = '¡Pon a prueba tu memoria en "Futfem Bingo"! En este juego recibirás jugadoras al azar y deberás colocarlas en las casillas de país, equipo o liga que coincidan con su trayectoria.\n' +
-    'Cada jugadora tiene varias características, y tu objetivo es encajarla correctamente en el tablero.\n' +
-    'Gana quien logre completar su tarjeta como en un bingo tradicional, ¡pero con fútbol femenino!\n';
-const imagen = '/static/img/Bingo.png';
 
 
 async function iniciar(dificultad) {
@@ -105,10 +101,12 @@ async function play() {
     trofeos = [jugadora.trofeos[0]];
     idres = paises.map(String).concat(equipos.map(String), ligas.map(String), trofeos.map(String)).join('');
     const res = localStorage.getItem('res6');
+    const texto = gettext('¡Pon a prueba tu memoria en "Futfem Bingo"! En este juego recibirás jugadoras al azar y deberás colocarlas en las casillas de país, equipo o liga que coincidan con su trayectoria. Cada jugadora tiene varias características, y tu objetivo es encajarla correctamente en el tablero. Gana quien logre completar su tarjeta como en un bingo tradicional, ¡pero con fútbol femenino!');
+    const imagen = '/static/img/Bingo.png';
     if(res !== idres || !res){
         localStorage.removeItem('Attr6');
         localStorage.removeItem('last-player-bingo');
-        crearPopupInicialJuego('Futfem Bingo', texto, imagen, '', iniciar);
+        crearPopupInicialJuego(gettext('Futfem Bingo'), texto, imagen, '', iniciar);
     } else {
         await iniciar('');
     }
@@ -489,7 +487,7 @@ async function bingoPerder() {
     const celdas = document.querySelectorAll('td');
     celdas.disabled = true;
     boton.disabled = true;
-    resultDiv.textContent = 'Has perdido';
+    resultDiv.textContent = gettext('Has perdido');
     let grid = localStorage.getItem('Attr6');
     let retrievedGrid = grid ? JSON.parse(grid) : [];
     retrievedGrid[retrievedGrid.length - 1].answer = 'loss'+idres;

@@ -323,7 +323,7 @@ input::placeholder{
     /*width: 75%; /* El popup ocupará el 75% del ancho de su contenedor principal */
     /*max-width: 600px; /* Establece un límite de ancho máximo para evitar que se haga demasiado grande */
     background: var(--color-gray-dark); /* Color de fondo con una variable CSS */
-    z-index: 1000; /* Asegura que el popup esté por encima de otros elementos */
+    z-index: 4; /* Asegura que el popup esté por encima de otros elementos */
     overflow: hidden; /* Previene que el contenido se desborde */
     opacity: 0; /* Inicialmente oculto para efectos de transición */
     animation: fadeIn 0.3s forwards; /* Animación para mostrar el popup de manera suave */
@@ -407,19 +407,24 @@ input::placeholder{
 }
 
 .pos-POR {
-    color: var(--color-portera);
+    color: var(--color-portera) !important;
 }
 
 .pos-LI, .pos-DFC, .pos-LD {
-    color: var(--color-defensa);
+    color: var(--color-defensa) !important;
 }
 
 .pos-MCD, .pos-MC, .pos-MCO, .pos-MI, .pos-MD {
-    color: var(--color-mediocampista);
+    color: var(--color-mediocampista) !important;
 }
 
 .pos-DC, .pos-ED, .pos-EI {
-    color: var(--color-delantera);
+    color: var(--color-delantera) !important;
+}
+
+.fi-cat{
+    background-image: url('/static/img/valencia.png') !important;
+    background-size: cover !important;
 }
 
 @media (max-width: 768px){

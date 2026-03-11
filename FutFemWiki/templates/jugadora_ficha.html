@@ -1,6 +1,7 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -47,14 +48,14 @@
         <div id="datos-jugadora">
             <h3>{{ jugadora.Nombre }} {{ jugadora.Apellidos }}</h3>
             <div class="grid">   
-                    <p>Nacimiento: {{ jugadora.Nacimiento }}</p>
+                    <p>{% trans 'Nacimiento' %}: {{ jugadora.Nacimiento }}</p>
                     <div id="pais"></div>
       
-                    <p>Altura: {{ jugadora.altura }} cm</p>
-                    <p>Pie: {{ jugadora.pie_habil }}</p>
+                    <p>{% trans 'Altura' %}: {{ jugadora.altura }} cm</p>
+                    <p>{% trans 'Pie' %}: {{ jugadora.pie_habil }}</p>
 
                     <div id="posicion"></div>
-                    <p>Value: {{ jugadora.market_value }} €</p>
+                    <p>{% trans 'Value' %}: {{ jugadora.market_value }} €</p>
         </div>
         </div>
     </div>
@@ -83,7 +84,10 @@
     </div>
     <div class="swiper-pagination"></div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="{% url 'javascript-catalog' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 <script type="module" data-player="{{ jugadora.id_jugadora }}"  src="{% static 'FutFemWiki/js/ficha-jugadora.js' %}"></script>
 <script type="module">
     import { cargarFichaJugadora } from '/static/FutFemWiki/js/ficha-jugadora.js';

@@ -9,13 +9,20 @@
 #sugerencias-pais,
 #sugerencias-equipo,
 #sugerencias-pais1,
-#sugerencias-pais2 {
+#sugerencias-pais2,
+#sugerencias-posicion {
     position: absolute;
     padding: unset;
     margin: unset;
-    width: max-content;
+    width: max-content !important;
     z-index: 10;
     width: 100%;
+} 
+#sugerencias-posicion li{
+    gap: 5px;
+}
+#sugerencias-posicion strong{
+    font-size: small;
 }
 .suggestion-item {
     display: flex;

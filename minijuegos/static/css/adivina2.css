@@ -53,7 +53,7 @@ body{
     border: 1px solid var(--color-gray-dark);
 }
 
-.fi{
+#game-results .fi{
     font-size: xx-large;
 }
 #game{

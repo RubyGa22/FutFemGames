@@ -1,0 +1,192 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-10 12:20+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\FutFemWiki\templates\equipo_ficha.html:31
+msgid "Palmarés"
+msgstr "Onderscheidingen"
+
+#: .\FutFemWiki\templates\equipo_ficha.html:32
+#: .\FutFemWiki\templates\equipo_ficha.html:51
+#: .\FutFemWiki\templates\equipo_ficha.html:60
+msgid "Ver Más"
+msgstr "Zie Meer"
+
+#: .\FutFemWiki\templates\equipo_ficha.html:50
+msgid "Plantilla"
+msgstr "Team"
+
+#: .\FutFemWiki\templates\equipo_ficha.html:59
+msgid "All Time"
+msgstr "Altijd"
+
+#: .\FutFemWiki\templates\index.html:8
+msgid "FutfemWiki"
+msgstr ""
+
+#: .\FutFemWiki\templates\index.html:43
+msgid "Seleccione un país"
+msgstr "Kies een land"
+
+#: .\FutFemWiki\templates\index.html:47 .\FutFemWiki\templates\index.html:69
+msgid "Buscar por país..."
+msgstr "Zoeken op nationaliteit..."
+
+#: .\FutFemWiki\templates\index.html:52 .\FutFemWiki\templates\index.html:82
+msgid "Confirmar"
+msgstr "Bevestigen"
+
+#: .\FutFemWiki\templates\index.html:61
+msgid "Equipo:"
+msgstr "Club:"
+
+#: .\FutFemWiki\templates\index.html:62 .\FutFemWiki\templates\mapa.html:26
+msgid "Buscar por equipo..."
+msgstr "Zoeken op club..."
+
+#: .\FutFemWiki\templates\index.html:68
+msgid "Nacionalidad:"
+msgstr "Nationaliteit:"
+
+#: .\FutFemWiki\templates\index.html:75
+msgid "Posicion:"
+msgstr "Positie"
+
+#: .\FutFemWiki\templates\index.html:76
+msgid "Buscar por posicion..."
+msgstr "Zoeken op positie..."
+
+#: .\FutFemWiki\templates\jugadora_ficha.html:51
+msgid "Nacimiento"
+msgstr "Geboorte"
+
+#: .\FutFemWiki\templates\jugadora_ficha.html:54
+msgid "Altura"
+msgstr "Hoogte"
+
+#: .\FutFemWiki\templates\jugadora_ficha.html:55
+msgid "Pie"
+msgstr "Voet"
+
+#: .\FutFemWiki\templates\jugadora_ficha.html:58
+msgid "Value"
+msgstr "Marktwaarde"
+
+#: .\FutFemWiki\templates\mapa.html:8
+msgid "Futfem Map"
+msgstr "FutFem Kaart"
+
+#: .\minijuegos\templates\minijuegos\adivina2.html:9
+#: .\minijuegos\templates\minijuegos\index.html:40
+#: .\minijuegos\templates\minijuegos\trayectoria.html:10
+msgid "Futfem Guess"
+msgstr "FutFem Gok"
+
+#: .\minijuegos\templates\minijuegos\adivina2.html:33
+#: .\minijuegos\templates\minijuegos\grid.html:64
+#: .\minijuegos\templates\minijuegos\trayectoria.html:50
+msgid "Verificar"
+msgstr "Controleren"
+
+#: .\minijuegos\templates\minijuegos\bingo.html:28
+msgid "SKIP"
+msgstr "overslaan"
+
+#: .\minijuegos\templates\minijuegos\grid.html:26
+#: .\minijuegos\templates\minijuegos\index.html:28
+msgid "Futfem Grid"
+msgstr "FutFem Raster"
+
+#: .\minijuegos\templates\minijuegos\grid.html:59
+#: .\minijuegos\templates\minijuegos\trayectoria.html:45
+msgid "Escribe el nombre de la jugadora"
+msgstr "Schrijf de naam van de speelster op"
+
+#: .\minijuegos\templates\minijuegos\higher-lower.html:8
+msgid "Higher Or Lower"
+msgstr ""
+
+#: .\minijuegos\templates\minijuegos\index.html:27
+#: .\minijuegos\templates\minijuegos\trayectoria.html:22
+msgid "Futfem Career"
+msgstr "FutFem Carrière"
+
+#: .\minijuegos\templates\minijuegos\index.html:29
+msgid "Futfem Bingo"
+msgstr ""
+
+#: .\minijuegos\templates\minijuegos\index.html:39
+#: .\minijuegos\templates\minijuegos\wordle.html:10
+msgid "Futfem Wordle"
+msgstr ""
+
+#: .\minijuegos\templates\minijuegos\index.html:41
+msgid "Futfem Mates"
+msgstr "FutFem Vrienden"
+
+#: .\minijuegos\templates\minijuegos\index.html:45
+msgid "Juegos Regulares"
+msgstr "Reguliere Wedstrijden"
+
+#: .\minijuegos\templates\minijuegos\index.html:48
+msgid "Higher or Lower"
+msgstr ""
+
+#: .\minijuegos\templates\minijuegos\wordle.html:20
+msgid "Wordle Game"
+msgstr "Wordle-spel"
+
+#: .\minijuegos\templates\partials\header.html:12
+msgid "Inicio"
+msgstr "Hem"
+
+#: .\minijuegos\templates\partials\header.html:15
+msgid "Wiki"
+msgstr ""
+
+#: .\minijuegos\templates\partials\header.html:20
+msgid "Equipos"
+msgstr "Clubs"
+
+#: .\minijuegos\templates\partials\header.html:25
+msgid "Jugadoras"
+msgstr "Spelers"
+
+#: .\minijuegos\templates\partials\header.html:30
+msgid "Mapa"
+msgstr "Kaart"
+
+#: .\minijuegos\templates\partials\header.html:35
+msgid "Nosotros"
+msgstr "Ons"
+
+#: .\minijuegos\templates\partials\popup_gameover.html:4
+msgid "¡Fin del Juego!"
+msgstr "Einde van het spel!"
+
+#: .\minijuegos\templates\partials\popup_gameover.html:5
+msgid "Tu racha actual ha sido:"
+msgstr "Je huidige streak is:"
+
+#: .\minijuegos\templates\partials\popup_gameover.html:7
+msgid "Jugar"
+msgstr "Spelen"
+
+#: .\minijuegos\templates\partials\popup_gameover.html:8
+msgid "Salir"
+msgstr "Uitgaan"

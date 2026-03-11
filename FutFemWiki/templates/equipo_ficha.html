@@ -1,6 +1,7 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -12,6 +13,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
     <link rel="stylesheet" href="{% static 'css/combo.css' %}">
     <link rel="stylesheet" href="{% static 'FutFemWiki/css/wiki.css' %}">
@@ -26,8 +28,8 @@
     <div class="left">
         <div id="tabla-trofeos" class="tabla-jugadoras">
             <div id="cabecera-tabla" class="cabecera-tabla">
-                <h3>Palmarés</h3>
-                <a id="ver-trofeos" href="#">Ver Más</a>
+                <h3>{% trans "Palmarés" %}</h3>
+                <a id="ver-trofeos" href="#">{% trans "Ver Más" %}</a>
             </div>
                 <div id="palmares" class="container-jugadoras"></div>
         </div>
@@ -45,8 +47,8 @@
     <section id="jugadoras-actuales">
         <div id="tabla-jugadoras-actuales" class="tabla-jugadoras">
             <div id="cabecera-tabla" class="cabecera-tabla">
-                <h3>Plantilla</h3>
-                <a id="ver-jugadoras-actuales" href="#">Ver Más</a>
+                <h3>{% trans "Plantilla" %}</h3>
+                <a id="ver-jugadoras-actuales" href="#">{% trans "Ver Más" %}</a>
             </div>
             <div id="jugadoras-actuales-container" class="container-jugadoras"></div>
         </div>
@@ -54,8 +56,8 @@
     <section id="jugadoras-alltime">
         <div id="tabla-jugadoras" class="tabla-jugadoras">
             <div id="cabecera-tabla-alltime" class="cabecera-tabla">
-                <h3>All Time</h3>
-                <a id="ver-jugadoras-all-time" href="#">Ver Más</a>
+                <h3>{% trans "All Time" %}</h3>
+                <a id="ver-jugadoras-all-time" href="#">{% trans "Ver Más" %}</a>
             </div>
             <div id="jugadoras-container" class="container-jugadoras"></div>
         </div>
@@ -64,8 +66,11 @@
 
 </div>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="{% url 'javascript-catalog' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/maplibre-gl@5.18.0/dist/maplibre-gl.js"></script>
-<script type="module" src="{% static 'FutFemWiki/js/mapstyles/CapaControl.js' %}"></script>
+<script type="module" src="{% static 'FutFemWiki/mapstyles/CapaControl.js' %}"></script>
 <script type="module" src="{% static 'FutFemWiki/js/mapa.js' %}"></script>
 <script type="module" src="{% static 'FutFemWiki/js/ficha-equipo.js' %}"></script>
 <script>

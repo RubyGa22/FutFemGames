@@ -192,17 +192,17 @@ export function Ganaste(modo) {
     });
     // Llamar a la función que cambia la imagen con flip
     if(modo==='grid'){
-        result.textContent = '¡Has Ganado!';
+        result.textContent = gettext('¡Has Ganado!');
     }
     if(modo==='bingo'){
         const button = document.querySelector('.skip-button'); // usa querySelector
         button.disabled = true;
         reloj.style.display = 'none';
-        result.textContent = '¡Has Ganado!';
+        result.textContent = gettext('¡Has Ganado!');
     }else if(modo==='trayectoria'){
         const div = document.getElementById('trayectoria');
         const jugadora_id = div.getAttribute('Attr1');
-        reloj.textContent = '¡Has Ganado!';
+        reloj.textContent = gettext('¡Has Ganado!');
         localStorage.setItem('Attr1', jugadora_id);
         cambiarImagenConFlip();
     }else if(modo==='compañeras'){
@@ -212,11 +212,11 @@ export function Ganaste(modo) {
         cambiarImagenConFlip();
     }else if(modo === 'Guess Player'){
         const button = document.querySelector('button');
-        result.textContent = '¡Has Ganado!';
+        result.textContent = gettext('¡Has Ganado!');
         vidas.style.display = 'none';
     }else if(modo === 'wordle'){
         const textoDiv = document.getElementById('message');
-        textoDiv.textContent = '¡Has Ganado!';
+        textoDiv.textContent = gettext('¡Has Ganado!');
     }
 }
 
@@ -281,7 +281,7 @@ export function crearPopupInicialJuego(titulo, explicacion, imagen, tipo, inicia
         contenedorBoton.classList.add('boton-unico');
 
         const botonIniciar = document.createElement('button');
-        botonIniciar.textContent = "Iniciar";
+        botonIniciar.textContent = gettext("Iniciar");
         botonIniciar.addEventListener('click', () => iniciarCallback());
 
         contenedorBoton.appendChild(botonIniciar);
@@ -292,7 +292,7 @@ export function crearPopupInicialJuego(titulo, explicacion, imagen, tipo, inicia
     const selectorDificultad = document.createElement('div');
     selectorDificultad.classList.add('selector-dificultad');
     const textoSelectorDificultad = document.createElement('p');
-    textoSelectorDificultad.textContent = 'Selecciona dificultad';
+    textoSelectorDificultad.textContent = gettext('Selecciona dificultad');
     const botonesSelectorDificultad = document.createElement('div');
 
 
@@ -302,15 +302,15 @@ export function crearPopupInicialJuego(titulo, explicacion, imagen, tipo, inicia
     botonSinTiempo.addEventListener('click', () => iniciarCallback('infinito'));  // Usamos una función de flecha para pasar el parámetro 'facil'
     
     const botonFacil = document.createElement('button');
-    botonFacil.textContent = 'Fácil';
+    botonFacil.textContent = gettext('Fácil');
     botonFacil.addEventListener('click', () => iniciarCallback('facil'));  // Usamos una función de flecha para pasar el parámetro 'facil'
 
     const botonMedio = document.createElement('button');
-    botonMedio.textContent = 'Medio';
+    botonMedio.textContent = gettext('Medio');
     botonMedio.addEventListener('click', () => iniciarCallback('medio'));  // Usamos una función de flecha para pasar el parámetro 'normal'
     
     const botonDificil = document.createElement('button');
-    botonDificil.textContent = 'Difícil';
+    botonDificil.textContent = gettext('Difícil');
     botonDificil.addEventListener('click', () => iniciarCallback('dificil'));  // Usamos una función de flecha para pasar el parámetro 'dificil'
 
     // Añadir los botones al contenedor de dificultad

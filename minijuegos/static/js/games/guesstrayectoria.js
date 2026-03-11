@@ -20,8 +20,6 @@ let answer;
 const textoInput = document.getElementById("jugadoraInput");
 const btn = document.getElementById('botonVerificar');
 textoInput.addEventListener('input', debounce(handleAutocompletePlayer, 300)); // Debounce de 300ms
-const texto = 'Adivina la Jugadora de Fútbol es un juego de trivia donde debes identificar a una futbolista según los equipos en los que ha jugado. Usa las pistas, demuestra tu conocimiento y compite para ver quién acierta más.';
-const imagen = '/static/img/trayectoria.jpg';
 
 // Función principal que controla el flujo de carga
 async function iniciar(dificultad) {
@@ -98,12 +96,14 @@ async function play() {
     let jugadora = await fetchData(1);
     jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
     const res = localStorage.getItem('res1');
+    const texto = gettext('Adivina la Jugadora de Fútbol es un juego de trivia donde debes identificar a una futbolista según los equipos en los que ha jugado. Usa las pistas, demuestra tu conocimiento y compite para ver quién acierta más.');
+    const imagen = '/static/img/trayectoria.jpg';
     if(res !== jugadoraId || !res){
         /*if(lastAnswer !== res || !lastAnswer){
             updateRacha(1, 0, 'loss'+jugadoraId);
         }*/
         localStorage.removeItem('Attr1');
-        crearPopupInicialJuego('Guess Trayectoria', texto, imagen, '', iniciar);
+        crearPopupInicialJuego(gettext('Futfem Career'), texto, imagen, '', iniciar);
     } else {       
         await iniciar('');
     }
@@ -239,7 +239,7 @@ async function checkAnswer() {
         Ganaste('trayectoria');
     }else{
         wrong.play()
-        resultText.textContent = 'Sigue intentando!'
+        resultText.textContent = gettext('Sigue intentando!');
     }
 }
 

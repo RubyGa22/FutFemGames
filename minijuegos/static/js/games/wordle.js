@@ -49,7 +49,7 @@ async function iniciar() {
         localStorage.setItem('res2', jugadora.idJugadora);
         //stopCounter("wordle");  // ⬅️ Detenemos el temporizador si el usuario gana
         Ganaste('wordle');
-        displayMessage("¡Correcto! Has ganado.");
+        displayMessage(gettext("¡Has Ganado!"));
     } else {
         await loadJugadoraApodo(jugadora.idJugadora, false);
 
@@ -87,7 +87,7 @@ async function loadJugadoraApodo(id, ganaste) {
         })
         .catch(error => {
             console.error('Error fetching word:', error);
-            displayMessage('Error loading word.');
+            displayMessage(gettext('Error loading word.'));
         });
 }
 
@@ -151,7 +151,7 @@ async function checkWord() {
     const answerSanitized = quitarAcentos(answer.toLowerCase());
 
     if (guessSanitized === answerSanitized) {
-        displayMessage("¡Correcto! Has ganado.");
+        displayMessage(gettext("¡Has Ganado!"));
         if(localStorage.length>0){
             setTimeout(async () => {
                 victory.play()
@@ -169,7 +169,7 @@ async function checkWord() {
         currentRow++;
 
         if (currentRow === maxRows) {
-            displayMessage(`¡Has perdido! La palabra era: ${answer}.`);
+            displayMessage(gettext(`¡Has perdido! La palabra era: ${answer}.`));
             await updateRacha(2, 0, localStorage.getItem('Attr2'));
             lockAllRows();
         } else {
@@ -331,7 +331,7 @@ async function wordlePerder() {
     
     const resultDiv = document.getElementById('message');
 
-    resultDiv.textContent = 'Has perdido';
+    resultDiv.textContent = gettext('Has perdido');
     const div = document.getElementById('trayectoria');
     
     // Agregar un delay de 2 segundos (2000 ms)
@@ -344,7 +344,7 @@ async function wordlePerder() {
 }
 
 
-const texto = 'Adivina la Jugadora de Fútbol es un juego de trivia donde debes identificar a una futbolista según los equipos en los que ha jugado. Usa las pistas, demuestra tu conocimiento y compite para ver quién acierta más.';
+const texto = gettext('¡Bienvenida a Wordle! Adivina la palabra oculta en 6 intentos. Cada letra correcta en la posición correcta se marcará en verde, las letras correctas en la posición incorrecta se marcarán en amarillo, y las letras incorrectas se marcarán en gris. ¡Buena suerte!');
 const imagen = "static/img/wordle.png";
 play().then(r => r);
 async function play() {

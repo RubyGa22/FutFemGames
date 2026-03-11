@@ -190,7 +190,8 @@ section::-webkit-scrollbar{
 .game-button:hover {
     transform: scale(1.05); /* Aumenta ligeramente el tamaño al pasar el ratón */
     color: var(--color-texto); /* Cambiar el color del texto en hover */
-    background: var(--color-detalles);
+    background: var(--color-primario); /* Cambiar el fondo en hover */
+    transition: scale 0.5s, background-color 0.2s, color 0.2s; /* Suavizar las transiciones */
 }
 
 

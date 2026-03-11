@@ -1,4 +1,5 @@
 import { handleAutocompletePais } from '/static/futfem/js/pais.js';
+import { handleAutocompletePosicion } from '/static/futfem/js/posiciones.js';
 import { equiposxliga, handleAutocompleteEquipo, fetchEquipoById } from '/static/futfem/js/equipos.js';
 import { fetchAllJugadoras, formatearValorMercado } from '/static/futfem/js/jugadora.js';
 import { calcularEdad } from '/static/js/games/funciones-comunes.js';
@@ -44,6 +45,8 @@ export async function inicializarWiki(arg) {
 
     const inputPaises = document.getElementsByClassName('input-pais');
 
+    const inputPosiciones = document.getElementById('input-posicion');
+
     const cabeceraLigas = document.getElementById('cabecera-equipo');
 
     const cabeceraJugadoras = document.getElementById('cabecera-jugadora');
@@ -82,7 +85,7 @@ export async function inicializarWiki(arg) {
         const paisInput = inputPaises[1];
         if (!paisInput) return;
         console.log(inputPaises)
-        filtroJugadoras(Number(inputEquipo.dataset.id), Number(paisInput.dataset.id), null);
+        filtroJugadoras(Number(inputEquipo.dataset.id), Number(paisInput.dataset.id), Number(inputPosiciones.dataset.id));
     });
 
     /*botonJugadoras.addEventListener('click', async (event) => {
@@ -93,7 +96,10 @@ export async function inicializarWiki(arg) {
         handleAutocompleteEquipo(event, 'sugerencias-equipo');
     });
 
-    
+    inputPosiciones.addEventListener('input', async (event) => {
+        handleAutocompletePosicion(event);
+    });
+
         inputPaises[0].addEventListener('input', async (event) => {
             handleAutocompletePais(event, 'sugerencias-pais1');
         });
@@ -150,7 +156,7 @@ function filtroJugadoras(equipo, nacionalidad, posicion) {
         }
 
         // 3. Filtro de Posición
-        if (posicion && jugadora.posicion !== posicion) return false;
+        if (posicion && !jugadora.posiciones_ids.includes(parseInt(posicion))) return false;
 
         // Si sobrevive a todos los 'return false', la jugadora es válida
         return true;
@@ -194,10 +200,10 @@ function renderJugadorasPage(page = 1) {
     const header = document.createElement('div');
     header.className = 'jugadora-item header-list'; // Usamos la misma clase para heredar el grid
     header.innerHTML = `
-        <div class="jugadora-div1"><p><b>JUGADORA</b></p></div>
-        <div class="header-label"><p><b>EDAD</b></p></div>
-        <div class="header-label"><p><b>CLUB</b></p></div>
-        <div class="header-label"><p><b>VALOR</b></p></div>
+        <div class="jugadora-div1"><p><b>${gettext('JUGADORA')}</b></p></div>
+        <div class="header-label"><p><b>${gettext('EDAD')}</b></p></div>
+        <div class="header-label"><p><b>${gettext('CLUB')}</b></p></div>
+        <div class="header-label"><p><b>${gettext('VALOR')}</b></p></div>
     `;
     container.appendChild(header);
 
@@ -266,7 +272,7 @@ function renderJugadorasPage(page = 1) {
         pPosicion.className = 'jugadora-posicion';
         jugadora.posiciones_abrev.forEach(pos => {
             const span = document.createElement('span');
-            span.textContent = pos;
+            span.textContent = gettext(pos);
             span.id = jugadora.posiciones_ids[jugadora.posiciones_abrev.indexOf(pos)];
             span.className = 'pos-'+pos;
             pPosicion.appendChild(span);

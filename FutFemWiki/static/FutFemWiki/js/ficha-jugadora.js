@@ -26,7 +26,7 @@ export async function cargarFichaJugadora(id_jugadora) {
     jugadora.Posiciones.forEach(pos => {
         const abrev = pos.abreviatura || pos.nombre.substring(0, 3).toUpperCase();
         const span = document.createElement('span');
-        span.textContent = abrev;
+        span.textContent = gettext(abrev);
         span.classList.add('pos-'+pos.abreviatura);
         posicion.appendChild(span);
     });
@@ -121,7 +121,7 @@ async function cargarTrayectorias(jugadora, trayectorias, palmares) {
             <p class="nombre">${jugadora.nombre_completo}</p>
             <div class="detalles">
                 <div class="equipo-pais">
-                    <p>${jugadora.Posiciones[0].abreviatura}</p>
+                    <p>${gettext(jugadora.Posiciones[0].abreviatura)}</p>
                     <img src="/${equipo.escudo}">
                     <span class="fi fi-${iso}" style="font-size: xx-large;"></span>
                 </div>

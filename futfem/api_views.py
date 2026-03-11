@@ -6,7 +6,7 @@ from django.db import connection, IntegrityError
 from django.db.models import Q, CharField, Value
 from django.db.models.functions import Concat
 from datetime import date, datetime
-from .models import Jugadora, JugadoraPosicion, Trayectoria, Equipo, Pais, Liga, Trofeo, JugadoraPais
+from .models import Jugadora, JugadoraPosicion, Posicion, Trayectoria, Equipo, Pais, Liga, Trofeo, JugadoraPais
 from random import shuffle
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
@@ -970,6 +970,42 @@ def posicion_por_jugadora(request):
     resultado = [{"Posicion": fila[0]} for fila in filas]
 
     return JsonResponse({"success": resultado})
+
+def posicionxnombre(request):
+    query_input = request.GET.get('nombre', '').strip()
+    if not query_input:
+        return JsonResponse({'error': 'Falta nombre'}, status=400)
+
+    # 1. Normalizamos espacios
+    query_input = re.sub(' +', ' ', query_input)
+    # 2. Dividimos por palabras: "Emma H" -> ["Emma", "H"]
+    palabras = query_input.split(' ')
+
+    # 3. Creamos el campo anotado
+    queryset = Posicion.objects.annotate(
+        nombre_completo=Concat('nombre', Value(' '), 'abreviatura', output_field=CharField())
+    )
+
+    # 4. Filtramos: CADA palabra debe estar en el nombre_completo
+    # Esto permite buscar "H Emma" o "Emma Holmgren" o "Emma H"
+    for palabra in palabras:
+        queryset = queryset.filter(
+            Q(nombre__icontains=palabra) | Q(abreviatura__icontains=palabra)
+        )
+
+    # 5. Limitamos resultados para que el autocompletado sea rápido
+    posiciones = queryset.only('idPosicion')[:10]
+
+    if not posiciones.exists():
+        return JsonResponse([], safe=False) # Mandar lista vacía es mejor que un 404 para el JS
+
+    data = [{
+        'id_posicion': j.idPosicion,
+        'abreviatura': j.abreviatura,
+        'nombre': j.nombre,
+    } for j in posiciones]
+
+    return JsonResponse(data, safe=False)
 
 def posicion_to_dict(posicion):
     if not posicion:

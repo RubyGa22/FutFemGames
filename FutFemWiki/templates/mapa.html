@@ -1,10 +1,11 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <title>FutFem Map</title>
+    <title>{% trans "Futfem Map" %}</title>
     <link rel="icon" href="{% static 'img/logo.png' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +23,7 @@
     {% include 'partials/header.html' %}
     <div id="mapa-container" style="width: 100vw; height: 100vh;">
         <div id="inputs">
-            <input id="input-equipo" type="text" name="equipo" placeholder="Buscar por equipo..." autocomplete="off">
+            <input id="input-equipo" type="text" name="equipo" placeholder="{% trans 'Buscar por equipo...' %}" autocomplete="off">
             <div class="sugerencias-container">
                 <ul id="sugerencias-equipo"></ul>
             </div>

@@ -1,0 +1,196 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-11 13:13+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\FutFemWiki\static\FutFemWiki\js\ficha-equipo.js:19
+msgid "Ganado"
+msgstr "Won"
+
+#: .\FutFemWiki\static\FutFemWiki\js\ficha-equipo.js:19
+msgid "veces"
+msgstr "times"
+
+#: .\FutFemWiki\static\FutFemWiki\js\wiki.js:203
+msgid "JUGADORA"
+msgstr "Player"
+
+#: .\FutFemWiki\static\FutFemWiki\js\wiki.js:204
+msgid "EDAD"
+msgstr "Age"
+
+#: .\FutFemWiki\static\FutFemWiki\js\wiki.js:205
+msgid "CLUB"
+msgstr ""
+
+#: .\FutFemWiki\static\FutFemWiki\js\wiki.js:206
+msgid "VALOR"
+msgstr "Market value"
+
+#: .\minijuegos\static\js\games\adivina2.js:34
+#: .\minijuegos\static\js\games\adivina2.js:121
+#: .\minijuegos\static\js\games\adivina2.js:242
+msgid "Vidas restantes: "
+msgstr "Lives left: "
+
+#: .\minijuegos\static\js\games\bingo.js:104
+msgid ""
+"¡Pon a prueba tu memoria en \"Futfem Bingo\"! En este juego recibirás "
+"jugadoras al azar y deberás colocarlas en las casillas de país, equipo o "
+"liga que coincidan con su trayectoria. Cada jugadora tiene varias "
+"características, y tu objetivo es encajarla correctamente en el tablero. "
+"Gana quien logre completar su tarjeta como en un bingo tradicional, ¡pero "
+"con fútbol femenino!"
+msgstr ""
+"Test your memory in ‘Futfem Bingo’! In this game, you will be given random "
+"players and must place them in the country, team, or league boxes that match "
+"their career. Each player has several characteristics, and your goal is to "
+"fit them correctly on the board. The winner is whoever manages to complete "
+"their card like in traditional bingo, but with women's football!"
+
+#: .\minijuegos\static\js\games\bingo.js:109
+msgid "Futfem Bingo"
+msgstr ""
+
+#: .\minijuegos\static\js\games\bingo.js:490
+#: .\minijuegos\static\js\games\grid.js:531
+#: .\minijuegos\static\js\games\wordle.js:334
+msgid "Has perdido"
+msgstr "You Lose"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:195
+#: .\minijuegos\static\js\games\funciones-comunes.js:201
+#: .\minijuegos\static\js\games\funciones-comunes.js:205
+#: .\minijuegos\static\js\games\funciones-comunes.js:215
+#: .\minijuegos\static\js\games\funciones-comunes.js:219
+#: .\minijuegos\static\js\games\wordle.js:52
+#: .\minijuegos\static\js\games\wordle.js:154
+msgid "¡Has Ganado!"
+msgstr "You Win!"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:284
+msgid "Iniciar"
+msgstr "Start"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:295
+msgid "Selecciona dificultad"
+msgstr "Choose difficulty"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:305
+msgid "Fácil"
+msgstr "Easy"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:309
+msgid "Medio"
+msgstr "Medium"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:313
+msgid "Difícil"
+msgstr "Hard"
+
+#: .\minijuegos\static\js\games\grid.js:133
+msgid ""
+"¡Pon a prueba tu conocimiento! Rellena la cuadrícula con nombres de "
+"jugadoras que hayan militado en los dos equipos que coinciden en cada celda "
+"(fila y columna). ¡Completa el tablero y demuestra que eres quien más sabe "
+"de fútbol femenino!"
+msgstr ""
+"Test your knowledge! Fill in the grid with the names of players who have "
+"played for both teams that match in each cell (row and column). Complete the "
+"board and prove that you know the most about women's football!"
+
+#: .\minijuegos\static\js\games\grid.js:135
+msgid "Futfem Grid"
+msgstr ""
+
+#: .\minijuegos\static\js\games\grid.js:263
+msgid "No encontrada en las columnas."
+msgstr "Not found in the columns."
+
+#: .\minijuegos\static\js\games\grid.js:315
+msgid "No se han encontrado coincidencias."
+msgstr "No matches found."
+
+#: .\minijuegos\static\js\games\guesstrayectoria.js:99
+msgid ""
+"Adivina la Jugadora de Fútbol es un juego de trivia donde debes identificar "
+"a una futbolista según los equipos en los que ha jugado. Usa las pistas, "
+"demuestra tu conocimiento y compite para ver quién acierta más."
+msgstr ""
+"Guess the Football Player is a trivia game where you have to identify a "
+"female footballer based on the teams she has played for. Use the clues, show "
+"off your knowledge and compete to see who can get the most right."
+
+#: .\minijuegos\static\js\games\guesstrayectoria.js:106
+msgid "Futfem Career"
+msgstr ""
+
+#: .\minijuegos\static\js\games\guesstrayectoria.js:242
+msgid "Sigue intentando!"
+msgstr "Keep trying!"
+
+#: .\minijuegos\static\js\games\wordle.js:90
+msgid "Error loading word."
+msgstr ""
+
+#: .\minijuegos\static\js\games\wordle.js:347
+msgid ""
+"¡Bienvenida a Wordle! Adivina la palabra oculta en 6 intentos. Cada letra "
+"correcta en la posición correcta se marcará en verde, las letras correctas "
+"en la posición incorrecta se marcarán en amarillo, y las letras incorrectas "
+"se marcarán en gris. ¡Buena suerte!"
+msgstr ""
+"Welcome to Wordle! Guess the hidden word in 6 attempts. Each correct letter "
+"in the correct position will be marked green, correct letters in the wrong "
+"position will be marked yellow, and incorrect letters will be marked gray. "
+"Good luck!"
+
+ msgid "POR"
+ msgstr "GK"
+
+ msgid "LI"
+ msgstr "LB"
+
+ msgid "DFC"
+ msgstr "CB"
+
+ msgid "LD"
+ msgstr "RB"
+
+ msgid "MC"
+ msgstr "CM"
+
+ msgid "MCD"
+ msgstr "CDM"
+
+ msgid "MCO"
+ msgstr "CAM"
+
+ msgid "MI"
+ msgstr "LM"
+
+ msgid "MD"
+ msgstr "RM"
+
+ msgid "EI"
+ msgstr "LW"
+
+ msgid "DC"
+ msgstr "ST"
+
+ msgid "ED"
+ msgstr "RW"

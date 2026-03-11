@@ -91,6 +91,7 @@ li a {
     --arrowScale: 1.5;
     --arrowYTop: -25px;
     --arrowYBottom: 25px;
+    width: max-content;
 }
 
 /* Configuración de las esquinas (Base) */
@@ -137,7 +138,6 @@ li a::after {
 
 /* Estado Hover para el texto (Brillo Neón) */
 header ul li a:hover {
-    color: white;
     /* Tres capas de sombra para profundidad de neón */
     text-shadow: 
         0 0 5px #fff,
@@ -180,7 +180,6 @@ header ul li a {
 }
 
 header ul li a:hover {
-  color: white;
   text-shadow:0px 0px 30px var(--color-primario);
   -moz-transition: all 0.2s ease-in;
   -o-transition: all 0.2s ease-in;
@@ -205,6 +204,17 @@ li.dropdown {
     display: inline-block;
 }
 
+/* Estilo base del icono */
+.bi-chevron-down {
+    display: inline-block; /* Necesario para que el transform funcione */
+    transition: transform 0.3s ease; /* Duración de la animación */
+}
+
+/* Estado rotado cuando el menú está abierto */
+.expanded .bi-chevron-down {
+    transform: rotate(180deg);
+}
+
 /* Ocultar el submenú por defecto */
 .submenu {
     height: 0;
@@ -214,9 +224,8 @@ li.dropdown {
     /*background-color: var(--color-secundario);*/
     min-width: 160px;
     /*box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);*/
-    z-index: 1;
+    z-index: 10000;
     list-style: none;
-    padding: 0;
     padding: 10px;
 }
 
@@ -250,6 +259,32 @@ header .botones button{
     font-family: 'Oswald', sans-serif;
     color: var(--color-primario);
     width: max-content;
+}
+
+header .container .dropdown{
+    position: relative;
+}
+
+header .container .dropdown .dropdown-toggle{
+    background: var(--color-secundario);
+    color: var(--color-detalles);
+}
+
+header .container .dropdown .dropdown-menu{
+    background: var(--color-secundario);
+    z-index: 500;
+}
+
+header .container .dropdown .dropdown-menu button{
+    gap: 15px;
+    padding-inline: 5px;
+    color: var(--color-detalles);
+    background: none;
+    width: 100%;
+}
+
+header .container .dropdown .dropdown-menu button:hover{
+    background: var(--color-primario);
 }
 
 header .botones a{
@@ -368,7 +403,7 @@ header .icono-hamburguesa{
 }
 /* Menú desplegable */
 /* Estado inicial del menú (Escondido arriba) */
-.dropdown-menu {
+header .container .dropdown-menu1 {
     position: fixed;
     top: -100vh; /* Totalmente fuera por arriba */
     left: 0;
@@ -385,22 +420,22 @@ header .icono-hamburguesa{
 }
 
 /* Estado cuando el menú está abierto */
-.dropdown-menu.open {
-    top: 0; /* Baja hasta cubrir todo */
+.dropdown-menu1.open {
+    top: 0 !important; /* Baja hasta cubrir todo */
 }
 
 /* Ajustes para el contenido interno */
-.dropdown-menu nav ul {
+.dropdown-menu1 nav ul {
     list-style: none;
     padding: 0;
     text-align: center;
 }
 
-.dropdown-menu nav ul li {
+.dropdown-menu1 nav ul li {
     margin: 20px 0;
 }
 
-.dropdown-menu nav ul li a {
+.dropdown-menu1 nav ul li a {
     font-size: 2rem; /* Texto más grande para móvil */
     color: white;
     text-decoration: none;
@@ -409,7 +444,7 @@ header .icono-hamburguesa{
 }
 
 /* Botones de login/logout dentro del menú móvil */
-.dropdown-menu div {
+.dropdown-menu1 div {
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -418,7 +453,7 @@ header .icono-hamburguesa{
 }
 
 /* Estilos para el submenú en el menú móvil */
-.dropdown-menu .submenu {
+.dropdown-menu1 .submenu {
     display: none; /* Escondido por defecto */
     list-style: none;
     padding-left: 0;
@@ -426,7 +461,7 @@ header .icono-hamburguesa{
     width: 100%;
 }
 
-header .dropdown-menu nav ul li.dropdown .submenu{
+header .dropdown-menu1 nav ul li.dropdown .submenu{
     position: static;
     background: none;
     box-shadow: none;
@@ -442,21 +477,21 @@ header .dropdown-menu nav ul li.dropdown .submenu{
     height: auto;
 }
 
-.dropdown-menu .submenu li a {
+.dropdown-menu1 .submenu li a {
     font-size: 1.4rem !important; /* Un poco más pequeño que los principales */
     padding: 10px 0;
     opacity: 0.8;
 }
 
 /* Indicador visual de que está abierto (opcional) */
-/*s.dropdown-menu .dropdown > a::after {
+/*s.dropdown-menu1 .dropdown > a::after {
     content: ' ▾';
     font-size: 1rem;
     transition: transform 0.3s;
     display: inline-block;
 }
 
-.dropdown-menu .dropdown > a.expanded::after {
+.dropdown-menu1 .dropdown > a.expanded::after {
     transform: rotate(180deg);
 }*/
 
@@ -541,7 +576,7 @@ header .dropdown-menu nav ul li.dropdown .submenu{
         width: 80px;
     }
 
-    header .dropdown-menu nav{
+    header .dropdown-menu1 nav{
         width: 100%;
         padding: unset;
         display: flex;
@@ -551,7 +586,7 @@ header .dropdown-menu nav ul li.dropdown .submenu{
         height: 70%;
     }
 
-    header .dropdown-menu nav ul{
+    header .dropdown-menu1 nav ul{
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -561,27 +596,27 @@ header .dropdown-menu nav ul li.dropdown .submenu{
         height: 100%;
     }
 
-    header .dropdown-menu nav ul li{
+    header .dropdown-menu1 nav ul li{
         margin: 0;
     }
 
-    header .dropdown-menu nav ul li.dropdown{
+    header .dropdown-menu1 nav ul li.dropdown{
         display: flex;
         flex-direction: column;
         align-items: center;
     }
 
-    header .dropdown-menu nav ul li a{
+    header .dropdown-menu1 nav ul li a{
         font-size: xx-large;
     }
 
-    header .dropdown-menu div{
+    header .dropdown-menu1 div{
         display: flex;
         flex-direction: row;
         gap: 15px;
     }
 
-    header .dropdown-menu div button{
+    header .dropdown-menu1 div button{
         font-size: small;
     }
 

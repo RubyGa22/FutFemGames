@@ -17,7 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
+from django.views.i18n import JavaScriptCatalog, set_language
 from django.conf.urls.static import static
+from django.views.decorators.csrf import csrf_exempt
 
 admin.site.site_header = "FutFem Games Admin"       # Título de la barra superior
 admin.site.site_title = "Panel de Control"          # Título de la pestaña del navegador
@@ -30,6 +32,8 @@ urlpatterns = [
     path('api/', include('futfem.urls')),
     path('', include('usuarios.urls')),
     path('', include('FutFemWiki.urls')),
+    path('i18n/setlang/', csrf_exempt(set_language), name='set_language'),
+    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 ]
 
 

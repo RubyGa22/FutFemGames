@@ -10,16 +10,7 @@ import { victory, wrong, correct } from "../sounds.js";
 let idres, columnas, filas;
 let ultimaJugadoraId = null; // Aquí guardamos la ID de la última jugadora verificada
 let jugadorasProhibidas = [];
-const input = document.getElementById('jugadoraInput');
-const boton = document.getElementById('botonVerificar');
-const resultDiv = document.getElementById('resultado');
-// Añadir el evento de input al campo de texto
-input.addEventListener('input', debounce(handleAutocompletePlayer, 300)); // Debounce de 300ms
-
-const texto = '¡Pon a prueba tu conocimiento! Rellena la cuadrícula con nombres de jugadoras que hayan militado en los dos equipos que coinciden en cada celda (fila y columna). ¡Completa el tablero y demuestra que eres quien más sabe de fútbol femenino!';
-const imagen = 'static/img/grid.png';
-
-
+let boton, input, resultDiv;
 // --------------------------------------------------------- 
 // INICIAR JUEGO (modo grid) 
 // dificultad = "facil" | "medio" | "dificil" 
@@ -29,13 +20,12 @@ async function iniciar(dificultad) {
     // 1. Preparar popup y botón de verificar 
     // -----------------------------------------------------
     const popup = document.getElementById('popup-ex'); // Selecciona el primer elemento con la clase 'popup-ex'
-    const btn = document.getElementById('botonVerificar');
     
-    if (btn) {
-        btn.addEventListener('click', Verificar); // Habilitar el botón al iniciar el juego
+    if (boton) {
+        boton.addEventListener('click', Verificar); // Habilitar el botón al iniciar el juego
     }
     if (popup) {
-        popup.style.display = 'none'; // Cambia el estilo para ocultarlo
+        popup.remove(); // Cambia el estilo para ocultarlo
     }
 
     // ----------------------------------------------------- 
@@ -129,17 +119,24 @@ async function iniciar(dificultad) {
 // Play (modo grid) 
 // Inicia el juego 
 // ---------------------------------------------------------
-play().then(r => r);
-async function play() {
+export async function play() {
     let jugadora = await fetchData(4);
+    input = document.getElementById('jugadoraInput');
+    boton = document.getElementById('botonVerificar');
+    resultDiv = document.getElementById('resultado');
+    // Añadir el evento de input al campo de texto
+    input.addEventListener('input', debounce(handleAutocompletePlayer, 300)); // Debounce de 300ms
     columnas = [jugadora.club4, jugadora.club5, jugadora.club6];
     filas = [jugadora.club1, jugadora.club2, jugadora.club3];
     idres = columnas.map(String).concat(filas.map(String)).join('');
     const res = localStorage.getItem('res4');
+    const texto = gettext('¡Pon a prueba tu conocimiento! Rellena la cuadrícula con nombres de jugadoras que hayan militado en los dos equipos que coinciden en cada celda (fila y columna). ¡Completa el tablero y demuestra que eres quien más sabe de fútbol femenino!');
+    const imagen = 'static/img/grid.png';
+    const titulo = gettext('Futfem Grid');
     if(res !== idres || !res){
         localStorage.removeItem('Attr4');
         jugadorasProhibidas.pop()
-        crearPopupInicialJuego('Futfem Grid', texto, imagen, '', iniciar);
+        crearPopupInicialJuego(titulo, texto, imagen, '', iniciar);
     } else {
         await iniciar('');
     }
@@ -262,9 +259,9 @@ async function Verificar() {
         // Mostrar resultado
         //const resultado = document.getElementById("resultado");
         resultado.textContent = columnasEncontradas.length > 0
-            ? `Equipos encontrados en columnas: ${columnasEncontradas.join(", ")}.`
-            : `No encontrada en las columnas.`;
-        console.log(`Equipos encontrados en columnas: ${columnasEncontradas.join(", ")}.`)
+            ? gettext(`Equipos encontrados en columnas: ${columnasEncontradas.join(", ")}.`)
+            : gettext(`No encontrada en las columnas.`);
+        console.log(gettext(`Equipos encontrados en columnas: ${columnasEncontradas.join(", ")}.`))
 
         return columnasEncontradas;
     }
@@ -312,10 +309,10 @@ async function Verificar() {
             const lista = resultadosEncontrados
                 .map(r => `c${r.fila},${r.columna}`)
                 .join(" | ");
-            resultado.textContent = `La jugadora tiene coincidencias en: ${lista}.`;
+            resultado.textContent = gettext(`La jugadora tiene coincidencias en: ${lista}.`);
             return resultadosEncontrados;
         } else {
-            resultado.textContent = `No se han encontrado coincidencias.`;
+            resultado.textContent = gettext(`No se han encontrado coincidencias.`);
             wrong.play()
             return [];
         }
@@ -531,7 +528,7 @@ async function gridPerder() {
     boton.disabled = true;
     input.disabled = true;
 
-    resultDiv.textContent = 'Has perdido';//+jugadora[0].Nombre_Completo;
+    resultDiv.textContent = gettext('Has perdido');//+jugadora[0].Nombre_Completo;
     //const div = document.getElementById('trayectoria');
     const jugadora_id = 'loss';
     let grid = localStorage.getItem('Attr4');

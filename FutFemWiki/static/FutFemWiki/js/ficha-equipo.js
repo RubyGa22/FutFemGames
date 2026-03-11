@@ -12,11 +12,11 @@ export async function displayPalmares(equipo) {
     palmaresAgrupado.forEach(trofeo => {
         const div = document.createElement("div");
         div.classList.add("trofeo");
-
+        
         div.innerHTML = `
             <img src="/${trofeo.icono}" alt="${trofeo.nombre}">
             <h3>${trofeo.nombre}</h3>
-            <p>Ganado ${trofeo.count} veces</p>
+            <p>${gettext("Ganado")} ${trofeo.count} ${gettext("veces")}</p>
             <!--<p>Temporadas: ${trofeo.temporadas.join(", ")}</p>-->
         `;
 

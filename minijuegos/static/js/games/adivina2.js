@@ -31,7 +31,7 @@ async function iniciar(dificultad) {
     //jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
     jugadora = jugadoraid.idJugadora;
     localStorage.setItem('res3', jugadora);
-    vidasContainer.textContent = 'Vidas restantes: '+vidas;
+    vidasContainer.textContent = gettext('Vidas restantes: ') + vidas;
 
      if(ultimaObj.answer === jugadoraId){
         console.log('Se ha guardado la respuesta'); 
@@ -118,7 +118,7 @@ async function verificar(){
         updateRacha(3, 1, localStorage.getItem('Attr3'))
     }else{
         vidas--;
-        vidasContainer.textContent = 'Vidas restantes: '+vidas;
+        vidasContainer.textContent = gettext('Vidas restantes: ') + vidas;
         if(vidas===0){
             //ponerBanderas()
             console.log('perdiste')
@@ -239,7 +239,7 @@ async function verificar(){
         };
 
         let jugadoras = gameState.jugadoras;
-        vidasContainer.textContent = "Vidas restantes: "+gameState.vidas;
+        vidasContainer.textContent = gettext("Vidas restantes: ") + gameState.vidas;
 
         try{
 

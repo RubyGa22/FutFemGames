@@ -218,6 +218,10 @@ body{
     border-radius: 20px;
 }
 
+.tabla-jugadoras .container-jugadoras h3{
+    margin-bottom: unset;
+}
+
 .tabla-jugadoras.fullscreen .container-jugadoras {
     flex: 1;
     overflow-y: auto;
