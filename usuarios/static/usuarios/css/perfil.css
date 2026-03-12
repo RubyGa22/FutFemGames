@@ -19,9 +19,38 @@ body{
     
 }
 
-.container-perfil div{
+.container-perfil #datos-personales{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.text-success{
+    font-size: x-large;
+    align-self: center;
+}
+
+.container-perfil #datos-personales h1{
+    font-size: xx-large;
+    margin-bottom: 0;
+}
+
+.container-perfil #datos-personales h2{
+    font-size: large;
+    margin-bottom: 0;
+}
+
+.container-perfil #datos-personales #username-container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.container-perfil>div{
     width: 100%;
     height: 100%;
+    cursor: default !important;
 }
 
 .container-perfil .right{
@@ -36,6 +65,7 @@ body{
     display: flex;
     flex-direction: column;
     justify-content: center;
+    cursor: default !important;
 }
 
 @media (max-width: 768px) {
@@ -48,7 +78,7 @@ body{
     th{
         font-size: xx-small;
     }
-    .container-perfil #datos-personales img{
+    .container-perfil #datos-personales .profile-img{
         width: 100px !important;
         padding-inline: 0;
         margin-inline: 0;

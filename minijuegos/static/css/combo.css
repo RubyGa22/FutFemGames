@@ -10,7 +10,9 @@
 #sugerencias-equipo,
 #sugerencias-pais1,
 #sugerencias-pais2,
-#sugerencias-posicion {
+#sugerencias-posicion,
+#sugerencias-user
+ {
     position: absolute;
     padding: unset;
     margin: unset;
@@ -18,6 +20,19 @@
     z-index: 10;
     width: 100%;
 } 
+
+#sugerencias::-webkit-scrollbar,
+#sugerenciasLiga::-webkit-scrollbar,
+#sugerencias-pais::-webkit-scrollbar,
+#sugerencias-equipo::-webkit-scrollbar,
+#sugerencias-pais1::-webkit-scrollbar,
+#sugerencias-pais2::-webkit-scrollbar,
+#sugerencias-posicion::-webkit-scrollbar,
+#sugerencias-user::-webkit-scrollbar
+ {
+    display: none !important;   
+}
+
 #sugerencias-posicion li{
     gap: 5px;
 }

@@ -19,10 +19,6 @@
 </head>
 <body>
     {% include 'partials/header.html' %}
-    <div style="background: #000; color: #0fb; padding: 10px; font-size: 12px; position: fixed; bottom: 0; z-index: 9999;">
-    Idioma actual (Django): {{ LANGUAGE_CODE }} <br>
-    Cookie de idioma: <script>document.write(document.cookie.match(/django_language=([^;]+)/)?.[1] || 'No hay cookie');</script>
-</div>
 <h1>{% trans "Futfem Grid" %}</h1>
 <table id="grid">
     <thead>

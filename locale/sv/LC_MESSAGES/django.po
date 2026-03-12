@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-11 12:46+0100\n"
+"POT-Creation-Date: 2026-03-12 17:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,11 +94,12 @@ msgstr "FutFem Karta"
 #: .\minijuegos\templates\minijuegos\adivina2.html:9
 #: .\minijuegos\templates\minijuegos\index.html:40
 #: .\minijuegos\templates\minijuegos\trayectoria.html:10
+#: .\usuarios\templates\ranking.html:31
 msgid "Futfem Guess"
 msgstr "FutFem Gissa"
 
 #: .\minijuegos\templates\minijuegos\adivina2.html:33
-#: .\minijuegos\templates\minijuegos\grid.html:64
+#: .\minijuegos\templates\minijuegos\grid.html:60
 #: .\minijuegos\templates\minijuegos\trayectoria.html:50
 msgid "Verificar"
 msgstr "Verifiera"
@@ -107,12 +108,13 @@ msgstr "Verifiera"
 msgid "SKIP"
 msgstr "hoppa över"
 
-#: .\minijuegos\templates\minijuegos\grid.html:26
+#: .\minijuegos\templates\minijuegos\grid.html:22
 #: .\minijuegos\templates\minijuegos\index.html:28
+#: .\usuarios\templates\ranking.html:32
 msgid "Futfem Grid"
 msgstr "FutFem Nät"
 
-#: .\minijuegos\templates\minijuegos\grid.html:59
+#: .\minijuegos\templates\minijuegos\grid.html:55
 #: .\minijuegos\templates\minijuegos\trayectoria.html:45
 msgid "Escribe el nombre de la jugadora"
 msgstr "Skriv spelarens namn"
@@ -123,19 +125,23 @@ msgstr ""
 
 #: .\minijuegos\templates\minijuegos\index.html:27
 #: .\minijuegos\templates\minijuegos\trayectoria.html:22
+#: .\usuarios\templates\ranking.html:29
 msgid "Futfem Career"
-msgstr ""
+msgstr "Futfem Karriär"
 
 #: .\minijuegos\templates\minijuegos\index.html:29
+#: .\usuarios\templates\ranking.html:34
 msgid "Futfem Bingo"
 msgstr ""
 
 #: .\minijuegos\templates\minijuegos\index.html:39
 #: .\minijuegos\templates\minijuegos\wordle.html:10
+#: .\usuarios\templates\ranking.html:30
 msgid "Futfem Wordle"
 msgstr ""
 
 #: .\minijuegos\templates\minijuegos\index.html:41
+#: .\usuarios\templates\ranking.html:33
 msgid "Futfem Mates"
 msgstr "FutFem Kompisar"
 
@@ -144,6 +150,7 @@ msgid "Juegos Regulares"
 msgstr "Vanliga Spel"
 
 #: .\minijuegos\templates\minijuegos\index.html:48
+#: .\usuarios\templates\ranking.html:35
 msgid "Higher or Lower"
 msgstr ""
 
@@ -152,28 +159,47 @@ msgid "Wordle Game"
 msgstr "Wordle-spel"
 
 #: .\minijuegos\templates\partials\header.html:12
+#: .\minijuegos\templates\partials\header.html:67
 msgid "Inicio"
 msgstr "Hem"
 
 #: .\minijuegos\templates\partials\header.html:15
+#: .\minijuegos\templates\partials\header.html:70
 msgid "Wiki"
 msgstr ""
 
 #: .\minijuegos\templates\partials\header.html:20
+#: .\minijuegos\templates\partials\header.html:75
 msgid "Equipos"
 msgstr "Lag"
 
 #: .\minijuegos\templates\partials\header.html:25
+#: .\minijuegos\templates\partials\header.html:80
 msgid "Jugadoras"
 msgstr "Spelare"
 
 #: .\minijuegos\templates\partials\header.html:30
+#: .\minijuegos\templates\partials\header.html:85
 msgid "Mapa"
 msgstr "Karta"
 
 #: .\minijuegos\templates\partials\header.html:35
+#: .\minijuegos\templates\partials\header.html:90
+msgid "Rankings"
+msgstr ""
+
+#: .\minijuegos\templates\partials\header.html:36
+#: .\minijuegos\templates\partials\header.html:91
 msgid "Nosotros"
 msgstr "Oss"
+
+#: .\minijuegos\templates\partials\header.html:61
+msgid "Iniciar sesión"
+msgstr "Logga in"
+
+#: .\minijuegos\templates\partials\header.html:62
+msgid "Registrarse"
+msgstr "Registrera"
 
 #: .\minijuegos\templates\partials\popup_gameover.html:4
 msgid "¡Fin del Juego!"
@@ -190,3 +216,176 @@ msgstr "Spela"
 #: .\minijuegos\templates\partials\popup_gameover.html:8
 msgid "Salir"
 msgstr "Gå ut"
+
+#: .\usuarios\templates\findusers.html:21
+msgid "Buscar Usuarios"
+msgstr "Sök användare"
+
+#: .\usuarios\templates\findusers.html:23
+msgid "Buscar por usuario..."
+msgstr "Sök efter användare..."
+
+#: .\usuarios\templates\login.html:8 .\usuarios\templates\login.html:32
+msgid "Login"
+msgstr ""
+
+#: .\usuarios\templates\login.html:23 .\usuarios\templates\login.html:24
+#: .\usuarios\templates\ranking.html:47
+msgid "Usuario"
+msgstr "Användare"
+
+#: .\usuarios\templates\login.html:27 .\usuarios\templates\login.html:28
+msgid "Contraseña"
+msgstr "Lösenord"
+
+#: .\usuarios\templates\login.html:30
+msgid "¿No tienes cuenta? Regístrate aquí"
+msgstr "Har du inget konto?"
+
+#: .\usuarios\templates\login.html:31
+msgid "¿Olvidaste tu contraseña? Restablecela aquí"
+msgstr "Har du glömt ditt lösenord?"
+
+#: .\usuarios\templates\nuevo_password_form.html:8
+#: .\usuarios\templates\nuevo_password_form.html:21
+#: .\usuarios\templates\nuevo_password_form.html:30
+msgid "Cambiar Contraseña"
+msgstr "Ändra Lösenord"
+
+#: .\usuarios\templates\nuevo_password_form.html:23
+#: .\usuarios\templates\nuevo_password_form.html:24
+msgid "Nueva Contraseña"
+msgstr "Nytt Lösenord"
+
+#: .\usuarios\templates\nuevo_password_form.html:27
+#: .\usuarios\templates\nuevo_password_form.html:28
+msgid "Repetir Contraseña"
+msgstr "Upprepa Lösenord"
+
+#: .\usuarios\templates\partials\email.html:25
+msgid "Restablecer Contraseña"
+msgstr "Återställ Lösenord"
+
+#: .\usuarios\templates\partials\email.html:28
+msgid "Hola"
+msgstr "Hej"
+
+#: .\usuarios\templates\partials\email.html:32
+msgid ""
+"Has solicitado restablecer tu contraseña en FutFem Games. Haz clic en el "
+"botón de abajo para continuar:"
+msgstr "Du har begärt att återställa ditt lösenord på FutFem Games. Klicka på knappen nedan för att fortsätta:"
+
+#: .\usuarios\templates\partials\email.html:38
+msgid "Cambiar mi contraseña"
+msgstr "Ändra mitt lösenord"
+
+#: .\usuarios\templates\partials\email.html:43
+msgid "Si no has sido tú, puedes ignorar este correo de forma segura."
+msgstr "Om det inte var du kan du ignorera detta e-postmeddelande."
+
+#: .\usuarios\templates\perfil.html:29 .\usuarios\templates\ranking.html:111
+msgid "Miembro del equipo"
+msgstr "Teammedlem"
+
+#: .\usuarios\templates\perfil.html:32
+msgid "Jugadora"
+msgstr "Spelare"
+
+#: .\usuarios\templates\perfil.html:44
+msgid "Nombre"
+msgstr "Namn"
+
+#: .\usuarios\templates\perfil.html:56
+msgid "Apellidos"
+msgstr "Efternamn"
+
+#: .\usuarios\templates\perfil.html:68
+msgid "Jugadora favorita"
+msgstr "Favoritspelare"
+
+#: .\usuarios\templates\perfil.html:69
+msgid "Ninguna"
+msgstr "None"
+
+#: .\usuarios\templates\perfil.html:82
+#, fuzzy
+#| msgid "Tu racha actual ha sido:"
+msgid "Rachas actuales"
+msgstr "Din nuvarande svit har varit:"
+
+#: .\usuarios\templates\ranking.html:23
+msgid "Clasificación Global"
+msgstr "Global Klassificering"
+
+#: .\usuarios\templates\ranking.html:27
+msgid "Filtrar por juego:"
+msgstr "Filtrera efter spel:"
+
+#: .\usuarios\templates\ranking.html:39
+msgid "Top 10 Jugadores"
+msgstr "Top 10 Spelare"
+
+#: .\usuarios\templates\ranking.html:48
+msgid "Juego"
+msgstr "Spel"
+
+#: .\usuarios\templates\ranking.html:49
+msgid "Racha"
+msgstr "Sträcka"
+
+#: .\usuarios\templates\ranking.html:66
+msgid "Cargando..."
+msgstr "Laddar..."
+
+#: .\usuarios\templates\ranking.html:72
+msgid "Error al cargar los datos"
+msgstr ""
+
+#: .\usuarios\templates\ranking.html:87
+msgid "No hay puntuaciones para este juego"
+msgstr ""
+
+#: .\usuarios\templates\reset_password.html:8
+#: .\usuarios\templates\reset_password.html:21
+msgid "Reestablecer Contraseña"
+msgstr "Återställ lösenord"
+
+#: .\usuarios\templates\reset_password.html:23
+#: .\usuarios\templates\reset_password.html:24
+msgid "Email"
+msgstr ""
+
+#: .\usuarios\templates\reset_password.html:26
+msgid "Enviar correo"
+msgstr "Skicka E-post"
+
+#: .\usuarios\views.py:80
+msgid "Restablecer Contraseña - FutFem Games"
+msgstr "Återställ lösenord - FutFem Games"
+
+#: .\usuarios\views.py:94
+msgid "Error al enviar el correo."
+msgstr "Fel vid sändning av e-post."
+
+#: .\usuarios\views.py:96
+msgid "No encontramos ese email."
+msgstr "Vi hittade inte det e-postmeddelandet."
+
+#: .\usuarios\views.py:107
+msgid "El enlace es inválido o ha expirado."
+msgstr "Länken är ogiltig eller har gått ut."
+
+#: .\usuarios\views.py:116
+msgid "Las contraseñas no coinciden."
+msgstr "Lösenorden stämmer inte överens."
+
+#, fuzzy
+#~| msgid "Wordle Game"
+#~ msgid "Wordle"
+#~ msgstr "Wordle-spel"
+
+#, fuzzy
+#~| msgid "Jugadoras"
+#~ msgid "Guess Jugadora"
+#~ msgstr "Spelare"

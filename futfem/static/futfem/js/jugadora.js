@@ -17,7 +17,7 @@ export async function handleAutocompletePlayer(event) {
     suggestionsList.innerHTML = '';
 
     if (texto.length > 2) { // Solo si hay más de 2 caracteres
-        const url = `../api/jugadoraxnombre?nombre=${encodeURIComponent(texto)}`;
+        const url = `/api/jugadoraxnombre?nombre=${encodeURIComponent(texto)}`;
 
         try {
             const response = await fetch(url);
@@ -37,7 +37,7 @@ export async function handleAutocompletePlayer(event) {
                     listItem.classList.add('suggestion-item');
 
                     listItem.innerHTML = `
-                        <img src="${imagen}" alt="${Nombre_Completo}" class="jugadora-img">
+                        <img src="/${imagen}" alt="${Nombre_Completo}" class="jugadora-img">
                         <div class="jugadora-info">
                             <strong>${Nombre_Completo}</strong>
                             <!--<p>Nacimiento: ${Nacimiento}</p>-->

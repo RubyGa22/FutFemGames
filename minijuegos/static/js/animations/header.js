@@ -1,6 +1,7 @@
 const navLinks = document.querySelectorAll('li a');
-let persistentLink = null; // Guardará el enlace del dropdown activo (Wiki)
+let persistentLink = null; // Guardará el enlace del dropdown activo
 
+// 1. Modificamos las funciones para que acepten un "el" (elemento)
 const playEnterAnim = (el) => {
   if (!el) return;
   gsap.killTweensOf(el);
@@ -18,6 +19,7 @@ const playEnterAnim = (el) => {
 
 const playLeaveAnim = (el) => {
   if (!el) return;
+  // Solo animamos la salida si NO es el link activo por URL y NO es el link persistente
   if (!el.classList.contains("active") && el !== persistentLink) {
     gsap.killTweensOf(el);
     gsap.to(el, {
@@ -36,21 +38,16 @@ const playLeaveAnim = (el) => {
 navLinks.forEach(link => {
   
   link.addEventListener('mouseenter', () => {
+    // LÓGICA DE EXCLUSIÓN:
     if (persistentLink && persistentLink !== link) {
-      // 1. Comprobar si el link actual es hijo del menú persistente
-      const parentLi = persistentLink.closest('li');
-      const isSubmenuItem = parentLi.querySelector('.submenu')?.contains(link);
+      // Comprobamos si el 'link' actual está DENTRO del submenú del persistentLink
+      const isSubmenuItem = persistentLink.closest('li').querySelector('.submenu')?.contains(link);
 
       if (!isSubmenuItem) {
-        // --- LÓGICA DE CIERRE AUTOMÁTICO ---
-        const submenu = parentLi.querySelector('.submenu');
-        if (submenu) submenu.classList.remove('open'); // Oculta el submenú
-        
-        persistentLink.classList.remove('expanded'); // Rota la flecha de vuelta
-        
+        // Si NO es parte de su submenú, liberamos el persistentLink y lo animamos hacia afuera
         const oldLink = persistentLink;
-        persistentLink = null; // Liberamos la persistencia
-        playLeaveAnim(oldLink); // Animación GSAP de salida para el Wiki
+        persistentLink = null; 
+        playLeaveAnim(oldLink);
       }
     }
     
@@ -62,26 +59,25 @@ navLinks.forEach(link => {
   });
 
   link.addEventListener('click', (e) => {
-    const parentLi = link.closest('li');
-    const submenu = parentLi.querySelector('.submenu');
-    
-    if (submenu) {
-      // Si clicamos en Wiki, lo hacemos persistente
+    // Si el link tiene un submenú (es el del Wiki), lo volvemos persistente
+    const hasSubmenu = link.closest('li').querySelector('.submenu');
+    if (hasSubmenu) {
       persistentLink = link;
-      link.classList.add('expanded');
-      submenu.classList.add('open');
       playEnterAnim(link);
     }
   });
+
+  // MÓVIL
+  link.addEventListener('pointerdown', () => {
+    playEnterAnim(link);
+    link.addEventListener('pointerup', () => playLeaveAnim(link), { once: true });
+    link.addEventListener('pointercancel', () => playLeaveAnim(link), { once: true });
+  });
 });
 
-// Cerrar si se hace click fuera (seguridad extra)
+// Opcional: Cerrar persistencia si se hace click fuera del menú
 document.addEventListener('click', (e) => {
   if (persistentLink && !persistentLink.closest('li').contains(e.target)) {
-    const parentLi = persistentLink.closest('li');
-    parentLi.querySelector('.submenu')?.classList.remove('open');
-    persistentLink.classList.remove('expanded');
-    
     const oldLink = persistentLink;
     persistentLink = null;
     playLeaveAnim(oldLink);

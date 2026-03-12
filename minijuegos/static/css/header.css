@@ -36,7 +36,7 @@ header .container .user-profile-link:hover{
     color: var(--color-detalles);
 }
 
-header .container .avatar{
+.avatar{
     border-radius: 20px;
     border: 2px solid var(--color-secundario);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
@@ -472,9 +472,11 @@ header .dropdown-menu1 nav ul li.dropdown .submenu{
 
 .submenu.open {
     display: flex !important; /* Se muestra al hacer clic */
-    visibility: visible;
-    opacity: 1;
-    height: auto;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateY(0) !important; /* Si usas desplazamientos */
+    height: auto !important; /* Si usas altura para animar */
 }
 
 .dropdown-menu1 .submenu li a {
@@ -497,10 +499,11 @@ header .dropdown-menu1 nav ul li.dropdown .submenu{
 
 @media (max-width: 1157px){
     header ul li{
-        margin: 0% 3%;
+        margin: 0% 1.5%;
     }
     header nav ul li a{
         font-size: large;
+        padding: 5px 7.5px;
     }
 
     header #header-izquierda{

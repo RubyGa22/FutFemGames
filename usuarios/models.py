@@ -32,6 +32,8 @@ class Usuario(AbstractUser):
         on_delete=models.SET_NULL
     )
 
+    es_jugadora = models.IntegerField(default=None, blank=True, null=True)  # Nuevo campo para indicar si el usuario es jugadora
+
     class Meta:
         db_table = 'usuarios'
         #managed = True  # Mantenlo en False si no quieres que Django modifique la tabla

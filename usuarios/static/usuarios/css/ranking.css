@@ -1,0 +1,127 @@
+:root{
+    --color-dorado: #FFD700;
+    --color-plata: #C0C0C0;
+    --color-bronce: #CD7F32;
+}
+.container-ranking{
+    display: flex;
+    height: 100%;
+    width: 100vw;
+    align-items: center;
+    justify-content: center;
+}
+
+.container-ranking .p-4{
+    width: 70%;
+    cursor: default;
+}
+
+tbody{
+    border: none;
+}
+
+tbody tr{
+    border-radius: 20px;
+    border: none !important;
+}
+
+tbody tr:nth-child(1){
+    background: linear-gradient(to bottom, 
+    color-mix(in srgb, var(--color-dorado) 60%, transparent), 
+    color-mix(in srgb, var(--color-secundario) 30%, transparent));
+}
+
+tbody tr:nth-child(2){
+    background: linear-gradient(to bottom, 
+    color-mix(in srgb, var(--color-plata) 60%, transparent), 
+    color-mix(in srgb, var(--color-secundario) 30%, transparent));
+}
+
+tbody tr:nth-child(3){
+    background: linear-gradient(to bottom, 
+    color-mix(in srgb, var(--color-bronce) 60%, transparent), 
+    color-mix(in srgb, var(--color-secundario) 30%, transparent));
+}
+
+table td{
+    border-top: none !important;
+}
+
+table tr td:nth-child(1){
+    border-radius: 20px 0 0 20px;
+}
+
+table tr td:last-child{
+    border-radius: 0 20px 20px 0;
+}
+
+#sugerencias::-webkit-scrollbar{
+    display: none !important;
+}
+
+@media (max-width: 875px){
+    .container-ranking .p-4{
+        width: 85%;
+        cursor: default;
+    }
+}
+
+@media (max-width: 768px){
+    .container-ranking .p-4{
+        width: 90%;
+        cursor: default;
+        padding-inline: 7.5px !important;
+    }
+
+    table td, table th{
+        font-size: small;
+        padding-inline: 0.2rem !important;
+    }
+
+    #tabla-ranking-container table th:nth-child(4),
+    #tabla-ranking-container table td:nth-child(4) {
+        width: 1%;               /* Fuerza a la columna a colapsar al mínimo */
+        white-space: nowrap;     /* Evita que el número y el texto se rompan en dos líneas */
+        text-align: center;      /* Mantiene el centrado */
+        width: fit-content !important; /* Permite que la columna se ajuste al contenido */
+    }
+
+    .container-ranking .p-4 .avatar{
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 10px;
+    }
+
+}
+
+@media (max-width: 465px){
+    .container-ranking .p-4 .filtros{
+        max-width: 100%;
+        margin-bottom: 1rem !important;
+    }
+    .container-ranking .p-4 .avatar{
+        width: 30px !important;
+        height: 30px !important;
+        border-radius: 10px;
+    }
+    .container-ranking .p-4 .filtros div{
+        max-width: 50%;
+    }
+    .container-ranking .p-4 .filtros div label{
+        font-size: small;
+    }
+    .container-ranking .p-4 .filtros div select{
+        max-width: 100%;
+    }
+    table td, table th{
+        font-size: xx-small;
+    }
+    #tabla-ranking-container table th:nth-child(4),
+    #tabla-ranking-container table td:nth-child(4) {
+        width: 1%;               /* Fuerza a la columna a colapsar al mínimo */
+        white-space: nowrap;     /* Evita que el número y el texto se rompan en dos líneas */
+        text-align: center;      /* Mantiene el centrado */
+    }
+
+}
+

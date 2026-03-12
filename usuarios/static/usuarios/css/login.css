@@ -7,30 +7,44 @@ body{
     min-height: 100vh;
 }
 
-.container{
+header .botones a{
+    display: none;
+}
+
+header #main-nav>ul>li:nth-child(1), header #main-nav>ul>li:nth-child(3){
+    display: none;
+}
+
+.container-login{
     display: flex;
     flex-direction: column;
     height: 100vh;
+    width: 90vw;
     align-items: center;
     justify-content: center;
+    cursor: default !important;
 }
 
-.container form{
+.container-login button{
+    width: fit-content;
+}
+
+.container-login form{
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 15px;
     padding: 25px;
     width: 30%;
-    border: 0.5px solid color-mix(in srgb, var(--color-primario) 50%, transparent),
-
+    border: 0.5px solid color-mix(in srgb, var(--color-primario) 50%, transparent);
+    cursor: default !important;
 }
 
-.container form h2{
+.container-login form h2{
     margin-bottom: unset;
 }
 
-.container form div{
+.container-login form div{
     display: flex;
     flex-direction: column;
     text-align: left;
@@ -38,10 +52,10 @@ body{
     width: 100%;
 }
 
-.container form div label{
+.container-login form div label{
     width: 90%;
 }
-.container form div input{
+.container-login form div input{
     width: 90%;
     align-self: center;
     border: 0.75px solid color-mix(in srgb, var(--color-primario) 50%, transparent),
@@ -49,13 +63,21 @@ body{
 }
 
 @media (max-width: 990px){
-    .container form{
+    .container-login form{
         width: 45%;
     }
 }
 
 @media (max-width: 768px){
-    .container form{
-        width: 60%;
+    .container-login form{
+        width: 70%;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 400px){
+    .container-login form{
+        width: 85%;
+        padding: 15px;
     }
 }

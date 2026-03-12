@@ -32,7 +32,8 @@
                 </li>
             </ul>
         </li>
-          <li><a href="{% url 'nosotros' %}" class="{% if request.resolver_match.url_name == 'nosotros' %}active{% endif %}">{% trans "Nosotros" %}</a></li>
+        <li><a href="{% url 'rankings' %}" class="{% if request.resolver_match.url_name == 'rankings' %}active{% endif %}">{% trans "Rankings" %}</a></li>
+        <li><a href="{% url 'nosotros' %}" class="{% if request.resolver_match.url_name == 'nosotros' %}active{% endif %}">{% trans "Nosotros" %}</a></li>
         </ul>
       </nav>
     </div>
@@ -46,11 +47,11 @@
     </div>
         <!-- Menú desplegable -->
     <div class="dropdown-menu1">
+        {% include 'partials/language_selector.html' %}
             <div>
-                {% include 'partials/language_selector.html' %}
           {% if usuario_sesion %}
           <a href="{% url 'perfil' %}" class="user-profile-link">
-              <span class="user-name" style="color: white;">Hola, {{ usuario_sesion.username }}</span>
+              <span class="user-name" style="color: white;">{{ usuario_sesion.username }}</span>
               {% if usuario_sesion.jugadora_favorita %}
                   <img src="/{{ usuario_sesion.jugadora_favorita.imagen }}" class="avatar">
               {% endif %}
@@ -86,6 +87,7 @@
                 </li>
             </ul>
         </li>
+          <li><a href="{% url 'rankings' %}" class="{% if request.resolver_match.url_name == 'rankings' %}active{% endif %}">{% trans "Rankings" %}</a></li>
           <li><a href="{% url 'nosotros' %}" class="{% if request.resolver_match.url_name == 'nosotros' %}active{% endif %}">{% trans "Nosotros" %}</a></li>
         </ul>
       </nav>
@@ -110,90 +112,82 @@
 </header>
 <script src="{% static 'js/animations/header.js' %}"></script>
 <script>
-    const header = document.querySelector('header'); // O tu clase .navbar
+    const header = document.querySelector('header');
 
     const updateHeaderHeight = () => {
-    const height = header.offsetHeight;
-    // Guardamos el valor en el :root para que sea accesible desde cualquier CSS
-    document.documentElement.style.setProperty('--header-height', `${height}px`);
+        if (!header) return;
+        const height = header.offsetHeight;
+        document.documentElement.style.setProperty('--header-height', `${height}px`);
     };
 
-    // Ejecutar al cargar y al cambiar el tamaño de ventana
     window.addEventListener('load', updateHeaderHeight);
     window.addEventListener('resize', updateHeaderHeight);
+
     function initSubmenuToggle() {
+        // Selectores corregidos y más específicos
         const wikiToggleMobile = document.querySelector('.dropdown-menu1 .dropdown > a');
         const submenuMobile = document.querySelector('.dropdown-menu1 .submenu');
 
         const wikiTogglePc = document.querySelector('#main-nav .dropdown > a');
-        const submenuPc = document.querySelector('#main-nav .submenu');
+        const submenuPc = document.querySelector('#main-nav .dropdown .submenu'); // Corregido: añadido .dropdown
 
         const handleToggle = (e, toggleLink, submenu) => {
-            if (!submenu || !toggleLink) return;
-            
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // 1. Togleamos la clase 'open' en el submenu
-            submenu.classList.toggle('open');
-            
-            // 2. Togleamos la clase 'expanded' en el <a> para que rote el icono
-            toggleLink.classList.toggle('expanded');
+        if (!submenu || !toggleLink) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Usamos setTimeout para que se ejecute después de cualquier otro evento de click
+        setTimeout(() => {
+            const isOpen = submenu.classList.contains('open');
 
-            // Cerramos el otro si estuviera abierto
-            if (submenu === submenuPc && submenuMobile) {
-                submenuMobile.classList.remove('open');
-                wikiToggleMobile.classList.remove('expanded');
-            }
-            if (submenu === submenuMobile && submenuPc) {
-                submenuPc.classList.remove('open');
-                wikiTogglePc.classList.remove('expanded');
-            }
-        };
+            // Limpiamos todos
+            document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
+            document.querySelectorAll('.dropdown > a').forEach(a => a.classList.remove('expanded'));
 
-        if (wikiToggleMobile && submenuMobile) {
+            // Si no estaba abierto, lo abrimos
+            if (!isOpen) {
+                submenu.classList.add('open');
+                toggleLink.classList.add('expanded');
+                console.log("Clase forzada con éxito");
+            }
+        }, 10); // 10ms es suficiente para "saltarse la cola"
+    };
+        if (wikiToggleMobile) {
             wikiToggleMobile.addEventListener('click', (e) => handleToggle(e, wikiToggleMobile, submenuMobile));
         }
 
-        if (wikiTogglePc && submenuPc) {
+        if (wikiTogglePc) {
             wikiTogglePc.addEventListener('click', (e) => handleToggle(e, wikiTogglePc, submenuPc));
         }
 
-        // Al hacer clic fuera, cerramos todo y reseteamos iconos
-        document.addEventListener('click', () => {
-            [submenuMobile, submenuPc].forEach(s => s?.classList.remove('open'));
-            [wikiToggleMobile, wikiTogglePc].forEach(t => t?.classList.remove('expanded'));
+        // Cerrar al hacer clic en cualquier otra parte de la pantalla
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown')) {
+                [submenuMobile, submenuPc].forEach(s => s?.classList.remove('open'));
+                [wikiToggleMobile, wikiTogglePc].forEach(t => t?.classList.remove('expanded'));
+            }
         });
     }
 
-  // Llama a esta función cuando cargue la página
-  document.addEventListener('DOMContentLoaded', initSubmenuToggle);
-  function toggleMenu() {
-    const menu = document.querySelector('.dropdown-menu1');
-    const hamburger = document.querySelector('.hamburger-menu');
-    
-    // Alternamos las clases
-    hamburger.classList.toggle('open');
-    menu.classList.toggle('open');
-
-    // Bloquear el scroll del body para que no se mueva el fondo al estar abierto
-    if (menu.classList.contains('open')) {
-        document.body.style.overflow = 'hidden';
+    // Inicialización
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSubmenuToggle);
     } else {
-        document.body.style.overflow = 'auto';
+        initSubmenuToggle();
     }
-}
 
-// Limpiar estados al redimensionar
-window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
+    // Función global para el botón hamburguesa
+    window.toggleMenu = function() {
         const menu = document.querySelector('.dropdown-menu1');
         const hamburger = document.querySelector('.hamburger-menu');
-        menu.classList.remove('open');
-        hamburger.classList.remove('open');
-        document.body.style.overflow = 'auto';
-    }
-});
+        
+        if (!menu || !hamburger) return;
+
+        hamburger.classList.toggle('open');
+        menu.classList.toggle('open');
+        document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : 'auto';
+    };
 </script>
 {% load django_browser_reload %}
 {% django_browser_reload_script %}
