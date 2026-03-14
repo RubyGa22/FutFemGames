@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
     <link rel="stylesheet" href="{% static 'css/combo.css' %}">
 </head>
-<body>
+<body {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
     {% include 'partials/header.html' %}
 <h1>{% trans "Futfem Grid" %}</h1>
 <table id="grid">
@@ -51,7 +51,7 @@
     </tbody>
 </table>
 <div class="cont">
-<label for="input">
+<label for="jugadoraInput">
     <input type="search" id="jugadoraInput" placeholder="{% trans 'Escribe el nombre de la jugadora' %}">
     <div id="sugerencias-container">
         <ul id="sugerencias"></ul>

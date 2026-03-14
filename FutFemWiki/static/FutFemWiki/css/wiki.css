@@ -171,6 +171,7 @@ summary, details{
     box-shadow: none;
     pointer-events: none; /* No clickable */
     text-align: center;
+    background: var(--color-secundario);
 }
 
 .jugadora-item.header-list .jugadora-div1{
@@ -183,7 +184,7 @@ summary, details{
 }
 
 .jugadora-item.header-list p {
-    color: var(--color-primario);
+    color: var(--color-texto);
     text-transform: uppercase;
     font-weight: 800;
     letter-spacing: 1px;
@@ -280,9 +281,9 @@ summary, details{
 .jugadora-item:hover {
     box-shadow:
         0 12px 40px rgba(0, 0, 0, 0.35),
-        0 0 20px rgba(255, 255, 255, 0.25);
+        0 0 20px color-mix(in srgb, var(--color-texto) 30%, transparent);
 
-    border-color: rgba(255, 255, 255, 0.45);
+    border-color: var(--color-texto);
 }
 
 .jugadora-item .jugadora-posicion{

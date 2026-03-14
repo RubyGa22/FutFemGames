@@ -95,18 +95,34 @@
     <!-- Botones de inicio de sesión y registro -->
     <div class="botones">
         {% include 'partials/language_selector.html' %}
+
         {% if usuario_sesion %}
-          <a href="{% url 'perfil' %}" class="user-profile-link">
-              <span class="user-name">{{ usuario_sesion.username }}</span>
-              {% if usuario_sesion.jugadora_favorita %}
-                  <img src="/{{ usuario_sesion.jugadora_favorita.imagen }}" class="avatar">
-              {% endif %}
-          </a>
-              <a href="{% url 'logout' %}" class="logout-button"><i class="bi bi-power"></i></a>
-          {% else %}
-              <a href="{% url 'login' %}" class="iniciar-sesion-button">Iniciar sesión</a>
-              <a href="{% url 'registro' %}" class="registro-button">Registrarse</a>
-          {% endif %}
+            <a href="{% url 'perfil' %}" class="user-profile-link">
+                <span class="user-name">{{ usuario_sesion.username }}</span>
+
+                {% with usuario_sesion.equipo_favorito.color|default:"var(--color-primario)" as color_equipo %}
+                    {% if usuario_sesion.jugadora_favorita %}
+                        <img src="/{{ usuario_sesion.jugadora_favorita.imagen }}"
+                            class="avatar"
+                            style="--team-color: {{ color_equipo }};
+                            background: linear-gradient(
+                                to bottom,
+                                color-mix(in srgb, var(--team-color) 60%, transparent),
+                                color-mix(in srgb, var(--color-secundario) 30%, transparent)
+                            );">
+                    {% endif %}
+                {% endwith %}
+
+            </a>
+
+            <a href="{% url 'logout' %}" class="logout-button">
+                <i class="bi bi-power"></i>
+            </a>
+
+        {% else %}
+            <a href="{% url 'login' %}" class="iniciar-sesion-button">{% trans "Iniciar sesión" %}</a>
+            <a href="{% url 'registro' %}" class="registro-button">{% trans "Registrarse" %}</a>
+        {% endif %}
     </div>
   </div>
 </header>

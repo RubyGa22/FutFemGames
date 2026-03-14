@@ -1,4 +1,7 @@
-@import url("header.css");
+@import url("header.css?v={% now 'U' %}");
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&family=Russo+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 :root {
     /* Colores principales */
     --color-primario: rgb(172, 0, 172);
@@ -8,6 +11,8 @@
     /* Colores neutrales */
     --color-detalles: #ffffff;
     --color-texto: #000000;
+    --font-titulos: 'Bebas Neue', sans-serif;
+    --font-cuerpo: 'Plus Jakarta Sans', sans-serif;
     --color-gray-light: #ecf0f1;
     --color-gray-dark: #7f8c8d;
 
@@ -34,7 +39,7 @@ html, body {
     overflow: hidden; /* Evita el scroll horizontal */
 }
 body {
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-cuerpo), sans-serif !important;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -52,6 +57,72 @@ body {
     background-blend-mode: color-dodge; /* Modo de mezcla */
     min-height: 100vh;
     max-width: 100vw;
+}
+
+[data-team="2"], [data-team="11"], [data-team="27"]{
+    --color-danger: #DA121A; /* Rojo */
+    --color-warning: #FCDD09; /* Naranja */
+}
+
+/* --- TEMA LEVANTE UD (ID: 2) --- */
+[data-team="2"] {
+    --color-primario: #7a0019;/* Azul Granota */
+    --color-secundario: #003f7e; /* Grana */
+    --color-texto: #dca43e;
+    --bg-overlay-body: rgba(0, 45, 90, 0.8);
+    --bg-overlay-before: rgba(122, 0, 25, 0.5);
+    --gradient: linear-gradient(135deg, #004d9c, #7a0019);
+}
+
+[data-team="2"]::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: url("/static/img/estadio-bunyol.jpg") !important;
+    background-blend-mode: luminosity !important; /* Modo de mezcla */
+    background-color: rgba(17, 0, 52, 0.5) !important; /* Color negro con transparencia */
+}
+
+/* --- TEMA VALENCIA CF (ID: 11) --- */
+[data-team="11"] {
+    --color-primario: #ff7300; /* Naranja */
+    --color-secundario: #1a1a1a; /* Negro Murciélago */
+    --color-texto: #ffffff;
+    --color-gray-dark: #1a1a1a;
+    --bg-overlay-body: rgba(20, 20, 20, 0.85);
+    --bg-overlay-before: rgba(255, 115, 0, 0.3);
+    --gradient: linear-gradient(135deg, #ff7300, #000000);
+}
+
+[data-team="11"]::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: url("/static/img/estadio-paterna.jpg") !important;
+    background-blend-mode: luminosity !important; /* Modo de mezcla */
+    background-color: rgba(52, 33, 0, 0.5) !important; /* Color negro con transparencia */
+}
+
+/* --- TEMA VILLARREAL CF (ID: 27) --- */
+[data-team="27"] {
+    --color-primario: #003366; /* Amarillo Groguet */
+    --color-secundario: #f1ef00; /* Azul Submarino */
+    --color-texto: white;
+    --bg-overlay-body: rgba(241, 239, 0, 0.15);
+    --bg-overlay-before: rgba(0, 51, 102, 0.7);
+    --blend-mode-before: normal;
+    --gradient: linear-gradient(135deg, #f1ef00, #003366);
+}
+
+[data-team="27"]::before{
+    background-image: url("/static/img/estadio-vilareal.png") !important;
+    background-color: rgba(52, 49, 0, 0.5) !important; /* Color negro con transparencia */
+}
+
+[data-team="27"] .game-button, [data-team="27"] .dropdown-toggle, [data-team="27"] .dropdown-item{
+    color: #000000 !important;
 }
 
 body::before {
@@ -75,10 +146,14 @@ body::before {
 html::-webkit-scrollbar {
     display: none; /* Ancho de la scrollbar */
 }
+h1, h2, .nombre-jugadora {
+    font-family: var(--font-titulos);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
 h1{
     text-align: center;
     margin-top: unset;
-    font-family: "Bauhaus 93", sans-serif;
 }
 img{
     pointer-events: none;
@@ -104,6 +179,9 @@ body>div.cont label{
 h1,p{
     color: white;
 }
+p{
+    font-family: var(--font-cuerpo) !important;
+}
 button{
     border-radius: 20px;
     height: 35px;
@@ -111,17 +189,28 @@ button{
     width: 100px;
     color: white;
     font-weight: bold;
-    background: purple;
+    background: var(--color-primario);
+    font-family: 'Oswald', sans-serif !important;
 }
-
+button:hover{
+    background: var(--color-texto);
+    color: var(--color-primario);
+    transition: background 0.3s ease;
+}
 input {
     padding: 10px;
     font-size: 16px;
     width: 200px;
-    background: rgba(128, 0, 128, 0.3);
-    border: 2px solid purple;
+    background: color-mix(in srgb, var(--color-secundario), transparent 50%);
+    border: 2px solid var(--color-primario);
     border-radius: 20px;
     color: white;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: 0 0 5px var(--color-primario);
 }
 
 input#jugadoraInput{
@@ -295,13 +384,13 @@ input::placeholder{
     background: linear-gradient(
         to bottom,
         color-mix(in srgb, var(--color-primario) 30%, transparent),
-        color-mix(in srgb, var(--color-secundario) 30%, transparent)
+        color-mix(in srgb, var(--color-secundario) 50%, transparent)
     );
 
     color: white; /* Color del texto */
     margin-bottom: 10px; /* Espaciado inferior entre botones */
     transition: transform 0.2s; /* Suavizar el efecto de transformación */
-    border: 0.5px solid rgb(255, 255, 255);
+    border: 0.5px solid var(--color-secundario);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
@@ -331,11 +420,11 @@ input::placeholder{
     border-radius: 20px; /* Bordes redondeados */
     text-align: center; /* Centrar el contenido dentro del botón */
     padding: 10px; /* Espaciado interior */
-    background-color: rgba(128,0,128,0.45); /* Color de fondo primario */
+    background-color: color-mix(in srgb, var(--color-secundario) 45%, transparent); /* Color de fondo primario */
     color: white; /* Color del texto */
     margin-bottom: 20px; /* Espaciado inferior entre botones */
     transition: transform 0.2s; /* Suavizar el efecto de transformación */
-    border: 0.5px solid rgb(255, 255, 255);
+    border: 0.5px solid var(--color-secundario);
     box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);
 
     backdrop-filter: blur(10px);
@@ -351,7 +440,10 @@ input::placeholder{
     }
 }
 .popup-ex>h2{
-    font-family: "Bauhaus 93", sans-serif;
+    font-family: var(--font-titulos);
+}
+.popup-ex>p{
+    font-family: var(--font-cuerpo);
 }
 .popup-ex .explicar{
     display: flex;
@@ -454,17 +546,38 @@ input::placeholder{
         font-size: 20px;
     }
 }
+
+@media (max-width: 1300px){
+    .popup-ex{
+        width: 75%;
+    }
+    .popup-ex .explicar p{
+        font-size: small;
+    } 
+}
+@media (max-width: 1000px){
+    .popup-ex{
+        width: 80%;
+    }
+    .popup-ex .explicar p{
+        font-size: small;
+    } 
+}
 @media (max-width: 650px) {
     body>div.cont{
         display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
+        flex-direction: row;
+    }
+    body>div.cont label{
+        margin: 0;
+        width: fit-content;
     }
     input#jugadoraInput{
         width: 90%;
     }
     .popup-ex{
         width: 90%;
+        font-size: medium;
     }
     .popup-ex button{
         font-size: small;

@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="{% static 'FutFemWiki/css/wiki.css' %}">
     <link rel="stylesheet" href="{% static 'FutFemWiki/css/ficha-equipo.css' %}?v={% now 'U' %}">
 </head>
-<body>
+<body {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
     {% include 'partials/header.html' %}
     <div id="equipo-container">
 

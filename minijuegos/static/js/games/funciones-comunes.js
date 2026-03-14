@@ -178,7 +178,7 @@ async function sacarJugadora(id) {
 
 export function Ganaste(modo) {
     const input = document.querySelectorAll('input');
-    const button = document.querySelector('button');
+    const button = document.getElementById('botonVerificar');
     const result = document.getElementById('resultado');
     const reloj = document.getElementById('reloj');
     const vidas = document.getElementById('vidas');
@@ -206,9 +206,9 @@ export function Ganaste(modo) {
         localStorage.setItem('Attr1', jugadora_id);
         cambiarImagenConFlip();
     }else if(modo==='compañeras'){
-        const div = document.getElementById('compañeras');
-        const jugadora_id = div.getAttribute('Attr8');
-        localStorage.setItem('Attr8', jugadora_id);
+        const button = document.getElementById('botonVerificar');
+        result.textContent = gettext('¡Has Ganado!');
+        button.disabled = true;
         cambiarImagenConFlip();
     }else if(modo === 'Guess Player'){
         const button = document.querySelector('button');

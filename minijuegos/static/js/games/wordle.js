@@ -326,8 +326,6 @@ function colocarRespuestas(palabra, results, row) {
 }
 
 async function wordlePerder() {
-    // Bloquear el botón y el input
-    //lockAllRows();
     
     const resultDiv = document.getElementById('message');
 
@@ -338,9 +336,6 @@ async function wordlePerder() {
     if(localStorage.length>0){
         await updateRacha(2, 0, localStorage.getItem('Attr2'));
     }
-    setTimeout(() => {
-        //cambiarImagenConFlip();
-    }, 1000);
 }
 
 

@@ -121,6 +121,9 @@ function displayJugadoras(id, jugadoras, color) {
         jugadoraElement.style.backgroundSize = 'cover';
         jugadoraElement.style.backgroundPosition = 'center';
         jugadoraElement.style.backgroundRepeat = 'no-repeat';
+        jugadoraElement.addEventListener("click", () => {
+            location.href = `/wiki/jugadora/${jugadora.id_jugadora}`;
+        });
         container.appendChild(jugadoraElement);
         // Retraso progresivo para efecto fade
         setTimeout(() => {

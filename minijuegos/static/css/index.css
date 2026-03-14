@@ -185,6 +185,7 @@ section::-webkit-scrollbar{
     margin-top: 10px; /* Espaciado superior para el título */
     font-size: 20px; /* Tamaño de fuente predeterminado */
     font-weight: bold; /* Título en negrita */
+    font-family: 'Oswald', sans-serif; /* Fuente personalizada para el título */
 }
 
 .game-button:hover {

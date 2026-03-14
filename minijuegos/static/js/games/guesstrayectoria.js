@@ -186,6 +186,7 @@ function displayTrayectoria(data, acertaste) {
                 jugadoraImg.src = item.imagen;
                 jugadoraImg.alt = 'Imagen de la Jugadora';
                 jugadoraImg.className = 'glass';
+                jugadoraImg.style.borderColor = item.color;
                 back.appendChild(jugadoraImg);
 
                 const anyos = document.createElement('p');
@@ -199,6 +200,7 @@ function displayTrayectoria(data, acertaste) {
                 jugadoraImg.src = data[0].ImagenJugadora;
                 jugadoraImg.alt = 'Imagen de la Jugadora';
                 jugadoraImg.className = 'glass';
+                jugadoraImg.style.borderColor = item.color;
                 back.appendChild(jugadoraImg);
 
                 const anyos = document.createElement('p');

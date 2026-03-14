@@ -45,7 +45,7 @@ body{
 h1{
     text-align: center;
     margin-top: unset;
-    font-family: "Bauhaus 93", sans-serif;
+    font-family: var(--font-titulos);
 }
 .mystery{
     width: 150px;
@@ -61,7 +61,7 @@ h1{
 #foto-jug{
     margin-bottom: 1%;
 }
-button{
+#trayectoria-container button{
     width: 30%;
 }
 /* Añade esto a tu archivo CSS o dentro de una etiqueta <style> en el HTML */
@@ -171,7 +171,7 @@ p {
         font-size: 14px;
     }
 
-    button {
+    #trayectoria-container button {
         padding: 8px;
     }
 
@@ -214,7 +214,7 @@ p {
         font-size: 14px;
     }
 
-    button {
+    #trayectoria-container button {
         width: 30%;
         padding: 8px;
     }
@@ -276,7 +276,7 @@ p {
         font-size: 14px;
     }
 
-    button {
+    #trayectoria-container button {
         width: 30%;
         padding: 8px;
     }

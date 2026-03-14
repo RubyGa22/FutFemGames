@@ -51,6 +51,7 @@ async function actualizarCampoPerfil(campo, valor, extraData = {}) {
 document.querySelectorAll('.editable-group').forEach(group => {
     const btnEdit = group.querySelector('.edit-trigger');
     const btnSave = group.querySelector('.save-trigger');
+    const btnCancel = group.querySelector('.cancel-trigger');
     const display = group.querySelector('.display-value');
     const editMode = group.querySelector('.edit-mode');
     const input = group.querySelector('.edit-input');
@@ -63,6 +64,13 @@ document.querySelectorAll('.editable-group').forEach(group => {
         input.focus();
     });
 
+    btnCancel?.addEventListener('click', () => {
+        editMode.style.display = 'none';
+        display.style.display = 'inline';
+        btnEdit.style.display = 'inline';
+        location.reload(); // Revertir cambios no guardados
+    });
+
     btnSave?.addEventListener('click', async () => {
         let value = input.value.trim();
         let extra = {};
@@ -70,6 +78,8 @@ document.querySelectorAll('.editable-group').forEach(group => {
         // Caso especial: Jugadora favorita
         if (fieldType === 'jugadora_favorita') {
             extra.jugadora_id = input.getAttribute('data-id');
+        }else if (fieldType === 'equipo_favorito') {
+            extra.equipo_id = input.getAttribute('data-id');
         }
 
         const result = await actualizarCampoPerfil(fieldType, value, extra);

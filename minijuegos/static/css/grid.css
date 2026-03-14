@@ -37,7 +37,7 @@ th{
     color-mix(in srgb, var(--color-secundario) 30%, transparent));
 }
 th, td {
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-detalles);
     padding: 0;
     text-align: center;
     width: 100px;
@@ -49,6 +49,7 @@ td{
     background: linear-gradient(to bottom, 
     color-mix(in srgb, var(--color-primario) 0%, transparent), 
     color-mix(in srgb, var(--color-secundario) 30%, transparent)) !important;
+    border: 1px solid var(--color-secundario);
 }
 td:has(img){
     border: 1px solid var(--color-success);

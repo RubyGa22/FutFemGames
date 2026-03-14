@@ -17,7 +17,6 @@
 
 .container-wordle h1{
     margin-top: 0;
-    font-family: "Bauhaus 93", sans-serif;
 }
 #board {
     display: grid;

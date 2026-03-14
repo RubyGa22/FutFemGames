@@ -15,7 +15,7 @@ body{
     padding: 80px;
 }
 .glass{
-    border: 0.25px solid rgba(227, 163, 249, 0.838);
+    border: 0.25px solid var(--color-secundario);
     
 }
 
@@ -25,7 +25,7 @@ body{
     align-items: center;
 }
 
-.text-success{
+.text-success, .text-danger{
     font-size: x-large;
     align-self: center;
 }
@@ -66,6 +66,22 @@ body{
     flex-direction: column;
     justify-content: center;
     cursor: default !important;
+}
+
+.container-perfil .field-container img{
+    max-height: 100px;
+}
+
+@media (max-width: 1200px) {
+    .container-perfil{
+        padding-inline: 25px;
+    }
+}
+
+@media (max-width: 1030px) {
+    .container-perfil{
+        padding-inline: 0px;
+    }
 }
 
 @media (max-width: 768px) {

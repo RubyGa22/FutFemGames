@@ -14,14 +14,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
-    <link rel="stylesheet" href="{% static 'css/index.css' %}">
-    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}?v={% now 'U' %}">
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}?v={% now 'U' %}">
     <link rel="stylesheet" href="{% static 'css/glow-border.css' %}">
 </head>
-<body>
-    <div id="bg-dynamic"></div>
+<body {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
 {% include 'partials/header.html' %}
 <section class="juegos">
+<h1>
+    {% with id=usuario_sesion.equipo_favorito.id_equipo user=usuario_sesion.username %}
+        {% if id == 2 %}
+            ¡Matxo {{ user }}!
+        {% elif id == 11 %}
+            ¡Amunt, {{ user }}!
+        {% elif id == 27 %}
+            ¡Endavant, {{ user }}!
+        {% else %}
+            ¡Hola, {{ user }}!
+        {% endif %}
+    {% endwith %}
+</h1>
 <div class="container mt-5 sibling-fade">
     <div class="row sibling-fade d-flex justify-content-center">
         {% include 'partials/game_card.html' with racha_id="racha-1" destino_js="career" imagen="img/trayectoria.png" titulo=_("Futfem Career") %}

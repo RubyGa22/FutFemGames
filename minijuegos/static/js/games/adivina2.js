@@ -97,27 +97,25 @@ async function verificar(){
     if (!nombreJugadora) return;
 
     const jugadoraAnswer = await obtenerJugadora(nombreJugadora)
-    const edad = compararMayorMenorIgual(jugadora.edad, jugadoraAnswer.edad, "edad")
-    const altura = compararMayorMenorIgual(jugadora.altura, jugadoraAnswer.altura, "altura");
-    const equipo = compararIgualONo(jugadora.equipo, jugadoraAnswer.equipo, "equipo");
-    const pais = compararIgualONo(jugadora.pais, jugadoraAnswer.pais, "pais");
-    const pie = compararIgualONo(jugadora.pie, jugadoraAnswer.pie, "pie");
-    const posicion = compararIgualONo(jugadora.Posiciones[0].id, jugadoraAnswer.Posiciones[0].id, "posicion");
-    jugadoraAnswer.pie = pie
-    jugadoraAnswer.edad = edad
-    jugadoraAnswer.altura = altura
-    jugadoraAnswer.equipo = equipo
-    jugadoraAnswer.pais = pais
-    jugadoraAnswer.posicion = posicion
-    
+
+    const stats = {
+        edad: compararMayorMenorIgual(jugadora.edad, jugadoraAnswer.edad, "edad"),
+        altura: compararMayorMenorIgual(jugadora.altura, jugadoraAnswer.altura, "altura"),
+        equipo: compararIgualONo(jugadora.equipo, jugadoraAnswer.equipo, "equipo"),
+        pais: compararIgualONo(jugadora.pais, jugadoraAnswer.pais, "pais"),
+        pie: compararIgualONo(jugadora.pie, jugadoraAnswer.pie, "pie"),
+        posicion: compararIgualONo(jugadora.Posiciones[0].id, jugadoraAnswer.Posiciones[0].id, "posicion")
+    }
+
+    Object.assign(jugadoraAnswer, stats);
 
     displayRespuesta(jugadoraAnswer)
-    gestionarAciertos(nombreJugadora)
     if(nombreJugadora === jugadoraId){
         victory.play()
         updateRacha(3, 1, localStorage.getItem('Attr3'))
     }else{
         vidas--;
+        gestionarAciertos(nombreJugadora)
         vidasContainer.textContent = gettext('Vidas restantes: ') + vidas;
         if(vidas===0){
             //ponerBanderas()
@@ -237,6 +235,8 @@ async function verificar(){
             vidas: vidas,
             answer: null
         };
+
+        vidas = gameState.vidas;
 
         let jugadoras = gameState.jugadoras;
         vidasContainer.textContent = gettext("Vidas restantes: ") + gameState.vidas;

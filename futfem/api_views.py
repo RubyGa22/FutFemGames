@@ -829,24 +829,48 @@ def paisesall(request):
     
     return JsonResponse({"success": paises})
 
+import json
+import pycountry
+from django.http import JsonResponse
+from django.db.models import Q
+from .models import Pais
+
 def paisxnombre(request):
-    nombre = request.GET.get('nombre', '').strip()
+    nombre_query = request.GET.get('nombre', '').strip().lower()
 
-    if not nombre:
-        return JsonResponse(
-            {"error": "Falta el nombre del país"},
-            status=400
-        )
+    if not nombre_query:
+        return JsonResponse({"error": "Falta el nombre"}, status=400)
 
-    paises = Pais.objects.filter(nombre__icontains=nombre)
+    # 1. Intento rápido: Buscar en tu DB (Español o ISO)
+    paises_db = Pais.objects.filter(
+        Q(nombre__icontains=nombre_query) | 
+        Q(iso__iexact=nombre_query)
+    ).distinct()[:10]
 
+    # 2. Si no hay resultados o quieres ampliar, buscamos por otros idiomas usando pycountry
+    ids_encontrados = [p.id_pais for p in paises_db]
+    
+    # Buscamos el código ISO en la librería internacional
+    try:
+        # Esto busca en todos los nombres oficiales (inglés, francés, etc.) que pycountry conoce
+        search_results = pycountry.countries.search_fuzzy(nombre_query)
+        for country in search_results:
+            # Buscamos en nuestra DB el país que coincida con el ISO encontrado
+            p_extra = Pais.objects.filter(iso__iexact=country.alpha_2).first()
+            if p_extra and p_extra.id_pais not in ids_encontrados:
+                # Lo añadimos a la lista de objetos de Django
+                paises_db = list(paises_db) + [p_extra]
+                ids_encontrados.append(p_extra.id_pais)
+    except LookupError:
+        pass # No se encontraron coincidencias internacionales
+
+    # 3. Formatear la salida
     salida = []
-    for p in paises:
-
+    for p in paises_db[:10]: # Limitamos a los 10 mejores
         salida.append({
             "pais": p.id_pais,
-            "nombre": p.nombre,
-            "iso": p.iso
+            "nombre": p.nombre, # Siempre devolvemos tu nombre en español
+            "iso": p.iso.lower()
         })
 
     return JsonResponse(salida, safe=False)

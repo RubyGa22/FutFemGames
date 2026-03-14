@@ -143,7 +143,7 @@ msgstr "FutFem Wordle"
 #: .\minijuegos\templates\minijuegos\index.html:41
 #: .\usuarios\templates\ranking.html:33
 msgid "Futfem Mates"
-msgstr "FutFem Companyes"
+msgstr "FutFem Compis"
 
 #: .\minijuegos\templates\minijuegos\index.html:45
 msgid "Juegos Regulares"

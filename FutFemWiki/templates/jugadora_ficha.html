@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <title>{{ jugadora.Nombre }}</title>
+    <title>{{ jugadora.Nombre }} {{ jugadora.Apellidos }}</title>
     <link rel="icon" href="{% static 'img/logo.png' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,7 +40,7 @@
         }
     </style>
 </head>
-<body>
+<body {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
     
     {% include 'partials/header.html' %}
     <div id="jugadora-info">
@@ -48,14 +48,18 @@
         <div id="datos-jugadora">
             <h3>{{ jugadora.Nombre }} {{ jugadora.Apellidos }}</h3>
             <div class="grid">   
-                    <p>{% trans 'Nacimiento' %}: {{ jugadora.Nacimiento }}</p>
+                <div>
+                    <div style="display: flex; align-items: center;">
                     <div id="pais"></div>
-      
-                    <p>{% trans 'Altura' %}: {{ jugadora.altura }} cm</p>
-                    <p>{% trans 'Pie' %}: {{ jugadora.pie_habil }}</p>
-
                     <div id="posicion"></div>
+                    </div>
+                </div>
+                <div>
+                    <p>{{ jugadora.Nacimiento }}</p>
+                    <p>{{ jugadora.altura }} cm</p>
+                    <p>{% trans 'Pie' %}: {{ jugadora.pie_habil }}</p>      
                     <p>{% trans 'Value' %}: {{ jugadora.market_value }} €</p>
+                </div>
         </div>
         </div>
     </div>

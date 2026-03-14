@@ -156,8 +156,4 @@ async function finDelJuego() {
     };
 }
 
-
-
-
-
 initGame();

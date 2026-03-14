@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="{% static 'css/combo.css' %}">
     <link rel="stylesheet" href="{% static 'usuarios/css/perfil.css' %}?v={% now 'U' %}">
 </head>
-<body class="loading">
+<body class="loading" {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
     {% include 'partials/header.html' %}
     <div class="container-perfil">
         <input type="hidden" id="perfil-usuario-id" value="{{ usuario.id }}">
@@ -36,6 +36,7 @@
                 <div class="edit-mode" style="display: none;">
                     <input type="text" class="edit-input" value="{{ usuario.username }}">
                     <i class="bi bi-check-lg save-trigger text-success"></i>
+                    <i class="bi bi-x-lg cancel-trigger text-danger"></i>
                 </div>
             {% endif %}
         </div>
@@ -48,6 +49,7 @@
                 <div class="edit-mode" style="display: none;">
                     <input type="text" class="edit-input" value="{{ usuario.first_name }}">
                     <i class="bi bi-check-lg save-trigger text-success"></i>
+                    <i class="bi bi-x-lg cancel-trigger text-danger"></i>
                 </div>
             {% endif %}
         </div>
@@ -60,6 +62,7 @@
                 <div class="edit-mode" style="display: none;">
                     <input type="text" class="edit-input" value="{{ usuario.last_name }}">
                     <i class="bi bi-check-lg save-trigger text-success"></i>
+                    <i class="bi bi-x-lg cancel-trigger text-danger"></i>
                 </div>
             {% endif %}
         </div>
@@ -70,10 +73,25 @@
             {% if es_propio %}
                 <i class="bi bi-pencil ms-2 edit-trigger"></i>
                 <div class="edit-mode" style="display: none;">
-                    <input type="text" class="edit-input" id="jugadora-input" value="{{ jugadora_favorita.Apodo }}" data-id="{{ jugadora_favorita.id_jugadora }}">
+                    <input type="text" class="edit-input" id="jugadora-input" value="{{ jugadora_favorita.Apodo }}" data-id="{{ jugadora_favorita.id_jugadora }}" autocomplete="off">
                     <i class="bi bi-check-lg save-trigger text-success"></i>
-                    <div id="sugerencias-container"><ul id="sugerencias"></ul></div>
+                    <i class="bi bi-x-lg cancel-trigger text-danger"></i>
                 </div>
+                <div id="sugerencias-container"><ul id="sugerencias"></ul></div>
+            {% endif %}
+        </div>
+
+        <div class="field-container editable-group" data-field="equipo_favorito">
+            <h2>{% trans "Equipo favorito" %}:</h2>
+            <span class="display-value">{% if usuario.equipo_favorito %} <img src="/{{ usuario.equipo_favorito.escudo }}">{% else %}{% trans "Ninguno" %}{% endif %}</span>
+            {% if es_propio %}
+                <i class="bi bi-pencil ms-2 edit-trigger"></i>
+                <div class="edit-mode" style="display: none;">
+                    <input type="text" class="edit-input" id="equipo-input" value="{{ usuario.equipo_favorito.nombre }}" data-id="{{ equipo_favorito.id_equipo }}" autocomplete="off">
+                    <i class="bi bi-check-lg save-trigger text-success"></i>
+                    <i class="bi bi-x-lg cancel-trigger text-danger"></i>
+                </div>
+                <div id="sugerencias-container"><ul id="sugerencias-equipo"></ul></div>
             {% endif %}
         </div>
     </div>
@@ -98,6 +116,15 @@
 <script type="module" id="control-acceso" src="{% static 'usuarios/js/control-acceso.js' %}" data-allowed-roles="1,2"></script>
 <script src="{% url 'javascript-catalog' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
+<script type="module">
+    import { handleAutocompletePlayer } from "{% static 'futfem/js/jugadora.js' %}";
+    import { handleAutocompleteEquipo } from "{% static 'futfem/js/equipos.js' %}";
+    // La forma correcta de pasar parámetros en un listener
+    document.getElementById("equipo-input").addEventListener("input", (event) => {
+        handleAutocompleteEquipo(event, 'sugerencias-equipo');
+    });
+    document.getElementById("jugadora-input").addEventListener("input", handleAutocompletePlayer);
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 <script type="module" src="{% static 'usuarios/js/perfil.js' %}"></script>
 </body>
