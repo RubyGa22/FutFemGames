@@ -180,7 +180,7 @@ summary, details{
 }
 
 .jugadora-item.header-list p {
-    /*color: var(--color-texto);*/
+    color: var(--color-texto);
     text-transform: uppercase;
     font-weight: 800;
     letter-spacing: 1px;

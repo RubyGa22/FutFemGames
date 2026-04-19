@@ -940,6 +940,12 @@ def paisesall(request):
     
     return JsonResponse({"success": paises})
 
+import json
+import pycountry
+from django.http import JsonResponse
+from django.db.models import Q
+from .models import Pais
+
 def paisxnombre(request):
     nombre_query = request.GET.get('nombre', '').strip().lower()
 

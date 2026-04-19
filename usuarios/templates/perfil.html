@@ -113,6 +113,20 @@
                 {% endif %}
             </div>
         </div>
+
+        <div class="field-container editable-group" data-field="equipo_favorito">
+            <h2>{% trans "Equipo favorito" %}:</h2>
+            <span class="display-value">{% if usuario.equipo_favorito %} <img src="/{{ usuario.equipo_favorito.escudo }}">{% else %}{% trans "Ninguno" %}{% endif %}</span>
+            {% if es_propio %}
+                <i class="bi bi-pencil ms-2 edit-trigger"></i>
+                <div class="edit-mode" style="display: none;">
+                    <input type="text" class="edit-input" id="equipo-input" value="{{ usuario.equipo_favorito.nombre }}" data-id="{{ equipo_favorito.id_equipo }}" autocomplete="off">
+                    <i class="bi bi-check-lg save-trigger text-success"></i>
+                    <i class="bi bi-x-lg cancel-trigger text-danger"></i>
+                </div>
+                <div id="sugerencias-container"><ul id="sugerencias-equipo"></ul></div>
+            {% endif %}
+        </div>
     </div>
         <div class="right">
         <div id="rachas" class="glass">
