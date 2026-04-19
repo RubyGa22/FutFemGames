@@ -1,22 +1,66 @@
-body{
-    background-image: url("/static/img/fondo cesped.jpg.png");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-color: rgb(37, 0, 37); /* Color negro con transparencia */
-    background-blend-mode: color-dodge; /* Modo de mezcla */
+#amigos{
+    display: none;
+}
+#pag-perfil-container{
+    width: 100%;
+    height: calc(100vh - var(--header-height));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 .container-perfil{
     display: flex;
-    flex-direction: row;
-    height: 80vh;
-    width: 70%;
+    flex-direction: column;
+    /*height: 80vh;
+    width: 70%;*/
     align-items: center;
-    gap: 40px;
+    gap: 15px;
     padding: 80px;
+    padding-bottom: 20px;
+    padding-block: 40px;
+    background-image: none !important; /* Quitamos el fondo del padre */
+    background: var(--color-secundario);
+    border: none !important;
+    overflow-y: hidden;
+    max-width: 700px;
+    max-height: 90%;
+}
+
+.container-perfil::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 20%; /* Aquí controlas el alto exacto */
+    background-image: url("/static/img/estadio.jpg");
+    background-size: cover;
+    /* Mueve el fondo 50% (centro) + 14px hacia la derecha */
+    background-position: center calc(50% - 50px);
+    z-index: -1; /* Se va al fondo */
+    opacity: 0.8; /* Opcional: para que no distraiga tanto */
+    border-radius: 20px 20px 0 0;
+}
+.container-perfil#equipo-2::before{
+    background-image: url("/static/img/estadio-bunyol.jpg");
+    background-position: center calc(50% - 60px);
+}
+.container-perfil#equipo-11::before{
+    background-image: url("/static/img/estadio-paterna.jpg");
+}
+.container-perfil#equipo-27::before{
+    background-image: url("/static/img/estadio-vilareal.png");
+    background-position: center calc(50% - 40px);
+}
+.profile-img{
+    border-radius: 100%;
+    background: color-mix(in srgb, var(--color-secundario) 70%);
+    border: 2px solid var(--color-secundario) !important;
+    box-shadow: none;
 }
 .glass{
-    border: 0.25px solid rgba(227, 163, 249, 0.838);
-    
+    border: 0.25px solid var(--color-secundario);
 }
 
 .container-perfil #datos-personales{
@@ -25,7 +69,7 @@ body{
     align-items: center;
 }
 
-.text-success{
+.text-success, .text-danger{
     font-size: x-large;
     align-self: center;
 }
@@ -47,25 +91,170 @@ body{
     justify-content: center;
 }
 
+.container-perfil #datos-personales .row .field-container{
+    width: max-content;
+    padding-inline: 0;
+}
+
 .container-perfil>div{
     width: 100%;
-    height: 100%;
     cursor: default !important;
 }
 
 .container-perfil .right{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
     gap: 30px;
+    width: 100%;
 }
 
-.container-perfil .right div{
+.container-perfil .right>div{
     width: 100%;
     height: 100%;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     cursor: default !important;
+}
+
+.container-perfil .field-container img{
+    max-height: 50px;
+}
+
+/*****/
+
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-left: 20px;
+    padding-top: 10px;
+}
+
+.slider-controls {
+    display: flex;
+    gap: 8px;
+}
+
+/* Botones estilo Discord */
+.nav-btn {
+    background: #313338;
+    color: #dbdee1;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+
+.nav-btn:hover {
+    background: #4e5058;
+    color: #fff;
+}
+
+/* Viewport y Track */
+.streak-slider-viewport {
+    width: 100%;
+    overflow: hidden; /* Esconde lo que sobra */
+    padding: 5px 0; /* Para que las sombras no se corten */
+}
+
+.streak-grid {
+    display: flex; /* En línea */
+    gap: 12px;
+    will-change: transform; /* Optimización para GSAP */
+}
+
+/* Ajuste de la Card para el Slider */
+
+.discord-streak-card {
+    background: color-mix(in srgb, var(--color-secundario) 60%, #2b2d31 40%); /* El gris exacto de Discord */
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid transparent;
+    transition: background 0.2s, transform 0.2s;
+    position: relative;
+    width: max-content !important;
+    min-width: fit-content;
+    height: max-content !important;
+}
+
+.discord-streak-card:hover {
+    background: #35373c;
+    transform: translateY(-2px);
+}
+
+.card-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.game-mini-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.game-name {
+    color: #f2f3f5;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.streak-stats {
+    color: #b5bac1;
+    font-size: 12px;
+}
+
+/* El punto de "Online" pero usado para indicar racha activa */
+.status-dot {
+    position: absolute;
+    bottom: 10px;
+    left: 50px;
+    width: 14px !important;
+    height: 14px !important;
+    background: #23a55a; /* Verde Discord */
+    border: 3px solid #2b2d31;
+    border-radius: 50%;
+}
+
+.progress-container {
+    width: 100%;
+    height: 4px;
+    background: var(--color-secundario) !important;
+    border-radius: 2px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--color-primario);
+    border-radius: 2px;
+    box-shadow: 0 0 8px var(--color-primario);
+}
+
+
+
+
+@media (max-width: 1200px) {
+    .container-perfil{
+        padding-inline: 25px;
+    }
+}
+
+@media (max-width: 1030px) {
+    .container-perfil{
+        padding-inline: 0px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -86,26 +275,51 @@ body{
     .container-perfil{
         padding: 0;
         width: 100%;
-        gap: 5px;
+        gap: 0px;
+        height: max-content;
         flex-direction: column;
-        padding-inline: 5px;
+        padding: 5px;
+        max-width: 450px;
+    }
+    .container-perfil::before {
+        background-position: center calc(50% - 30px);
+    }
+    .container-perfil#equipo-2::before {
+        background-position: center calc(50% - 30px);
+    }
+    .container-perfil::before {
+        height: 20%; /* Aquí controlas el alto exacto */
     }
 
     .container-perfil #datos-personales{
         height: fit-content;
+        padding-top: 30px;
     }
 
     .container-perfil .right{
-        flex-direction: row;
+        flex-direction: column;
         width: 100%;
         gap: 15px;
     }
-    .container-perfil .right div{
-        width: 50%;
+
+    .slider-header {
+        margin-bottom: 0;
+    }
+    .container-perfil .right>div{
+        max-width: 100%;
         height: max-content;
     }
     
     .container-perfil .right div td:not([class]){
         font-size: xx-small;
+    }
+}
+
+@media (max-width: 500px) {
+    .container-perfil{
+        max-width: 95vw;
+    }
+    .container-perfil::before {
+        background-position: center calc(50% - 10px);
     }
 }

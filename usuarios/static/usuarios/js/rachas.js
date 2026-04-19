@@ -208,7 +208,9 @@ export async function obtenerUltimaRespuesta(juego) {
 export function displayRacha(racha, juego){
     const displayJuego = document.getElementById('racha-'+juego)
     if(racha === 0 || !racha){
-        displayJuego.style.display = 'none';
+        displayJuego.classList.remove('fire')
+        displayJuego.style.display = '100%';
+        displayJuego.textContent = '0';
     }else{
         displayJuego.style.display = '100%';
         displayJuego.textContent = racha;

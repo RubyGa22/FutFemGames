@@ -22,7 +22,6 @@
     rgba(217, 41, 255, 1), rgba(255, 10, 92, 1) );
 }
 body{
-    background-image: url("/static/img/fondo cesped.jpg.png");
     background-size: auto;
     background-repeat: repeat-y;
     background-color: rgba(37, 0, 37, 0.75); /* Color negro con transparencia */

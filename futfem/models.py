@@ -1,6 +1,18 @@
 from django.db import models
 
 # Create your models here.
+class Formacion(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombre = models.TextField()
+    descripcion = models.TextField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'formaciones'
+        managed = False  # Si la tabla ya existe y no quieres que Django la reescriba
+
+    def __str__(self):
+        return self.nombre
+
 class Pais(models.Model):
     id_pais = models.AutoField(primary_key=True)
     nombre = models.TextField()
@@ -18,7 +30,7 @@ class Liga(models.Model):
     id_liga = models.AutoField(primary_key=True)
     nombre = models.TextField()
     logo = models.TextField(null=True, blank=True)
-    pais = models.ForeignKey(Pais, on_delete=models.CASCADE, db_column='pais')  # Si tienes tabla de países, cámbiala luego a ForeignKey
+    pais = models.ForeignKey(Pais, on_delete=models.CASCADE, db_column='pais', db_index=True)  # Si tienes tabla de países, cámbiala luego a ForeignKey
 
     class Meta:
         db_table = 'ligas'
@@ -46,7 +58,19 @@ class Equipo(models.Model):
     def __str__(self):
         return self.nombre
 
-# models.py
+class EquipoFormacion(models.Model):
+    id = models.AutoField(primary_key=True)
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE, db_column='equipo')
+    formacion = models.ForeignKey(Formacion, on_delete=models.CASCADE, db_column='formacion')
+    temporada = models.CharField(max_length=10, db_column='temporada')
+    es_principal = models.BooleanField(default=False, db_column='es_principal')
+
+    class Meta:
+        db_table = 'equipo-formacion'
+        managed = False
+
+    def __str__(self):
+        return f"{self.equipo.nombre} - {self.formacion.nombre} ({self.temporada})"
 
 class EquipoTrofeo(models.Model):
     # Django creará el campo 'id' automático (AUTO_INCREMENT)
@@ -155,7 +179,6 @@ class Trofeo(models.Model):
 
     def __str__(self):
         return self.nombre
-
 
 class Trayectoria(models.Model):
     id = models.AutoField(primary_key=True)

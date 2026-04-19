@@ -11,6 +11,15 @@ body{
     text-align: center;
     width: 100%;
 }
+#game>.flip-container{
+    height: 120px !important;
+    max-height: 120px !important;
+}
+#game>.flip-container img{
+    height: 100% !important;
+    width: auto !important;
+    max-height: 120px !important;
+}
 #trayectoria-container {
     display: flex;
     flex-direction: column;
@@ -45,7 +54,7 @@ body{
 h1{
     text-align: center;
     margin-top: unset;
-    font-family: "Bauhaus 93", sans-serif;
+    font-family: var(--font-titulos);
 }
 .mystery{
     width: 150px;
@@ -61,7 +70,7 @@ h1{
 #foto-jug{
     margin-bottom: 1%;
 }
-button{
+#trayectoria-container button{
     width: 30%;
 }
 /* Añade esto a tu archivo CSS o dentro de una etiqueta <style> en el HTML */
@@ -141,10 +150,18 @@ p {
     display: flex;
     flex-direction: row;
     width: 100%;
-    justify-content: space-around;
+    justify-content: center;
 }
 #trayectoria .flip-container{
-    padding-top: 5px;
+    height: 100px !important;
+    width: 100px !important;
+}
+#trayectoria .flip-container img{
+    height: 75px !important;
+    width: 75px !important;
+}
+#trayectoria .flip-container p{
+    font-size: 14px;
 }
 /* Responsive: Ajustes para pantallas pequeñas */
 @media (max-width: 1350px) {
@@ -169,10 +186,6 @@ p {
     input {
         width: 90%;
         font-size: 14px;
-    }
-
-    button {
-        padding: 8px;
     }
 
     p {
@@ -214,9 +227,8 @@ p {
         font-size: 14px;
     }
 
-    button {
+    #trayectoria-container button {
         width: 30%;
-        padding: 8px;
     }
 
     p {
@@ -239,8 +251,9 @@ p {
     overflow-y: scroll;
     }
     #trayectoria {
-        max-width: 97%;
+        min-width: 320px;
         padding: 0.5rem 0.2rem;
+        padding-inline: 0;
         flex: 1 1 0;
         height: auto;
         /*display: grid;
@@ -250,12 +263,15 @@ p {
     }
     .trayectoria-row{
         width: 100%;
-        justify-content: space-around;
+        /*justify-content: space-around;*/
         height: fit-content;
     }
     .flip-container{
         max-width: 70px;
         min-height: 90px;
+    }
+    #trayectoria .flip-container p{
+        font-size: 10px;
     }
     #equipos div {
         margin: 15px 10px;
@@ -276,9 +292,8 @@ p {
         font-size: 14px;
     }
 
-    button {
+    #trayectoria-container button {
         width: 30%;
-        padding: 8px;
     }
     p {
         font-size: 11px;

@@ -1,5 +1,4 @@
 /*body{
-    /*background-image: url("../img/fondo cesped.jpg.png");
     background-size: cover;
     background-repeat: no-repeat;
     background-color: rgba(128, 0, 128, 0.5); /* Color negro con transparencia */
@@ -17,7 +16,6 @@
 
 .container-wordle h1{
     margin-top: 0;
-    font-family: "Bauhaus 93", sans-serif;
 }
 #board {
     display: grid;

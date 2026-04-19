@@ -22,7 +22,6 @@ def loading(request):
     # Lo pasa al template para que el JS lo use
     return render(request, 'minijuegos/carga.html', {'url_final': url_final})
 
-@login_required
 def nosotros(request):
     # Obtiene el parámetro ?url= que le pasas desde redirect.js
     # Lo pasa al template para que el JS lo use

@@ -1,12 +1,12 @@
 from webbrowser import get
-import json, random
+import json, random, pycountry
 from django.utils import timezone
 from django.http import JsonResponse
 from django.db import connection, IntegrityError
 from django.db.models import Q, CharField, Value
 from django.db.models.functions import Concat
 from datetime import date, datetime
-from .models import Jugadora, JugadoraPosicion, Posicion, Trayectoria, Equipo, Pais, Liga, Trofeo, JugadoraPais
+from .models import EquipoFormacion, Jugadora, JugadoraPosicion, Posicion, Trayectoria, Equipo, Pais, Liga, Trofeo, JugadoraPais
 from random import shuffle
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
@@ -195,6 +195,7 @@ def jugadoraxid(request):
 
 def jugadora_companeras(request):
     id_jugadora = request.GET.get('id_jugadora')
+    limite = int(request.GET.get('limite', 100))
     try:
         id_jugadora = int(id_jugadora)
     except (TypeError, ValueError):
@@ -209,27 +210,36 @@ def jugadora_companeras(request):
         SELECT 
             j2.jugadora as id_jug_comp,
             j2.equipo,
-            j2.fecha_inicio,
-            j2.fecha_fin,
-            j2.equipo_actual,
+            e.nombre as nombre_equipo,
+            e.escudo,
+            e.color,
+            j2.fecha_inicio as inicio_comp,
+            j2.fecha_fin as fin_comp,
             j_info.Nombre,
             j_info.Apellidos,
             j_info.imagen as foto_jugadora,
-            ROW_NUMBER() OVER (PARTITION BY j2.equipo ORDER BY j2.fecha_inicio DESC) as rn
+            -- Particionamos por equipo Y jugadora para que si coinciden en 
+            -- equipos diferentes, cada uno tenga su propio número de fila
+            ROW_NUMBER() OVER (
+                PARTITION BY j2.equipo, j2.jugadora 
+                ORDER BY j2.fecha_inicio DESC
+            ) as coincidence_id
         FROM trayectoria j1
-        JOIN trayectoria j2 ON j1.equipo = j2.equipo AND j1.jugadora != j2.jugadora
-        JOIN jugadoras j_info ON j2.jugadora = j_info.id_jugadora
+        INNER JOIN trayectoria j2 ON j1.equipo = j2.equipo AND j1.jugadora != j2.jugadora
+        INNER JOIN jugadoras j_info ON j2.jugadora = j_info.id_jugadora
+        INNER JOIN equipos e ON j2.equipo = e.id_equipo
         WHERE j1.jugadora = %s
+          -- Lógica de solapamiento de fechas
           AND j1.fecha_inicio <= COALESCE(j2.fecha_fin, CURDATE())
           AND COALESCE(j1.fecha_fin, CURDATE()) >= j2.fecha_inicio
     )
     SELECT * FROM companeras_data
-    ORDER BY rn ASC, id_jug_comp ASC
-    LIMIT 5
+    ORDER BY equipo ASC, Nombre ASC
+    LIMIT %s
     """
 
     with connection.cursor() as cursor:
-        cursor.execute(query, [id_jugadora])
+        cursor.execute(query, [id_jugadora, limite])
         columnas = [col[0] for col in cursor.description]
         results = [dict(zip(columnas, row)) for row in cursor.fetchall()]
 
@@ -238,7 +248,7 @@ def jugadora_companeras(request):
         n = r.get('Nombre', '')
         a = r.get('Apellidos', '')
         # Usamos tu lógica de primera palabra
-        r['Nombre_Completo'] = f"{n.split()[0] if n else ''} {a.split()[0] if a else ''}".strip()
+        r['Nombre_Completo'] = formatear_nombre_corto(n, a)
         
         # Manejo de imagen predeterminada si no hay en trayectoria ni en jugadora
         r['imagen'] = r['foto_jugadora'] or '/static/img/predeterm.jpg'
@@ -374,6 +384,8 @@ def jugadora_trayectoria(request):
         equipo = t.equipo
         jug = t.jugadora
 
+        e = Equipo.objects.get(id_equipo=equipo.id_equipo)
+
         escudo = None
         if equipo.escudo:
             escudo = equipo.escudo
@@ -395,6 +407,12 @@ def jugadora_trayectoria(request):
             'liga': equipo.liga.id_liga if equipo.liga else None,
             'nombre': equipo.nombre,
             'ImagenJugadora': imagen_jugadora,
+            "club": e.id_equipo,
+            "nombre": e.nombre,
+            "escudo": e.escudo,
+            "color": e.color,
+            "lat": e.latitud,
+            "long": e.longitud,
         })
 
     return JsonResponse(data, safe=False)
@@ -511,61 +529,134 @@ def jugadoras_por_equipo_y_temporada(request):
     if not equipo_id:
         return JsonResponse({"success": [], "error": "Falta el equipo"}, status=400)
 
-    # 1. Preparar el filtro de temporada
     query_filtro = ""
     params = [equipo_id]
 
     if temporada:
         try:
-            # Si temporada es "2024", buscamos jugadoras cuya estancia 
-            # se solape con cualquier momento de ese año (01-01 al 31-12)
             temporada_int = int(temporada)
             query_filtro = """
-                AND fecha_inicio <= %s 
-                AND (fecha_fin >= %s OR equipo_actual = 1)
+                AND tc.fecha_inicio <= %s 
+                AND (tc.fecha_fin >= %s OR tc.equipo_actual = 1)
             """
-            # Una jugadora estuvo en 2024 si empezó antes del fin de 2024 
-            # y terminó después del inicio de 2024
             params.extend([f"{temporada_int}-12-31", f"{temporada_int}-01-01"])
         except ValueError:
             return JsonResponse({"success": [], "error": "Temporada inválida"}, status=400)
 
-    # 2. Ejecutar SQL
     with connection.cursor() as cursor:
         cursor.execute(f"""
             SELECT 
-                j.*,
-                tc.fecha_inicio,
-                tc.fecha_fin,
-                tc.equipo_actual,
-                tc.años  -- Lo mantenemos por ahora como fallback
+                j.id_jugadora,          -- 0
+                j.Nombre,               -- 1
+                j.Apellidos,            -- 2
+                j.Apodo,                -- 3
+                j.Nacimiento,           -- 4
+                j.imagen,               -- 5
+                j.retiro,               -- 6
+                j.market_value,         -- 7
+                tc.fecha_inicio,        -- 8
+                tc.fecha_fin,           -- 9
+                tc.equipo_actual,       -- 10
+
+                -- Equipo
+                e.id_equipo,            -- 11
+                e.nombre,               -- 12
+                e.escudo,               -- 13
+                e.color,                -- 14
+
+                -- Nacionalidades
+                GROUP_CONCAT(DISTINCT jp.pais ORDER BY jp.es_primaria DESC) AS ids_paises, -- 16
+                GROUP_CONCAT(DISTINCT p.iso ORDER BY jp.es_primaria DESC) AS isos_paises,  -- 17
+
+                -- Posiciones
+                GROUP_CONCAT(DISTINCT pos.idPosicion ORDER BY jpos.es_primaria DESC) AS ids_posiciones, -- 18
+                GROUP_CONCAT(DISTINCT pos.abreviatura ORDER BY jpos.es_primaria DESC) AS abrev_posiciones, -- 19
+                GROUP_CONCAT(DISTINCT pos.nombre ORDER BY jpos.es_primaria DESC) AS nombres_posiciones -- 20
+
             FROM trayectoria tc
             JOIN jugadoras j ON j.id_jugadora = tc.jugadora
+            JOIN equipos e ON tc.equipo = e.id_equipo
+
+            LEFT JOIN `jugadora-pais` jp ON jp.jugadora = j.id_jugadora
+            LEFT JOIN `paises` p ON jp.pais = p.id_pais
+
+            LEFT JOIN `jugadora-posicion` jpos ON jpos.jugadora = j.id_jugadora
+            LEFT JOIN `posiciones` pos ON jpos.posicion = pos.idPosicion
+
             WHERE tc.equipo = %s
             {query_filtro}
+
+            GROUP BY j.id_jugadora, tc.fecha_inicio
             ORDER BY tc.fecha_inicio ASC
         """, params)
 
-        columnas = [col[0] for col in cursor.description]
         filas = cursor.fetchall()
 
-    # 3. Convertir a lista de diccionarios y formatear nombres
     resultado = []
+
     for fila in filas:
-        d = dict(zip(columnas, fila))
-        
-        # Aplicamos tu lógica de nombre corto aquí mismo
-        n = d.get('Nombre', '')
-        a = d.get('Apellidos', '')
-        nombre_prio = n.split()[0] if n else ""
-        apellido_prio = a.split()[0] if a else ""
-        d['Nombre_Completo'] = f"{nombre_prio} {apellido_prio}".strip()
-        
-        # Limpieza de fechas para JSON (evitar errores de objetos date no serializables)
-        if d['fecha_inicio']: d['fecha_inicio'] = str(d['fecha_inicio'])
-        if d['fecha_fin']: d['fecha_fin'] = str(d['fecha_fin'])
-        
-        resultado.append(d)
+        # Nacionalidades
+        lista_ids_paises = [int(x) for x in fila[15].split(',')] if fila[15] else []
+        lista_isos_paises = [x.lower() for x in fila[16].split(',')] if fila[16] else []
+
+        # Posiciones
+        lista_ids_posiciones = [int(x) for x in fila[17].split(',')] if fila[17] else []
+        lista_abrev_posiciones = fila[18].split(',') if fila[18] else []
+        lista_nombres_posiciones = fila[19].split(',') if fila[19] else []
+
+        posiciones_lista_obj = [
+            {
+                "id": lista_ids_posiciones[i],
+                "abreviatura": lista_abrev_posiciones[i] if i < len(lista_abrev_posiciones) else None,
+                "nombre": lista_nombres_posiciones[i] if i < len(lista_nombres_posiciones) else None,
+            }
+            for i in range(len(lista_ids_posiciones))
+        ]
+
+        # Equipo
+        equipo = {
+            "id": fila[11],
+            "nombre": fila[12],
+            "escudo": fila[13],
+            "color": fila[14],
+            "colorSecundario": fila[15],
+        }
+
+        # Nombre corto
+        n = fila[1] or ""
+        a = fila[2] or ""
+
+        resultado.append({
+            "id_jugadora": fila[0],
+            "nombre": fila[1],
+            "apellido": fila[2],
+            "apodo": fila[3],
+            "nombre_completo": formatear_nombre_corto(n,a),
+            "nacimiento": fila[4].strftime("%Y-%m-%d") if fila[4] else None,
+            "imagen": fila[5],
+            "retiro": fila[6],
+            "market_value": fila[7],
+
+            # 🔥 CLAVE (lo que elimina la otra API)
+            "equipo": equipo,
+            "PosicionesIds": lista_ids_posiciones,
+            "Posiciones": posiciones_lista_obj,
+            "TodasNacionalidades": lista_ids_paises,
+            "pais_iso": lista_isos_paises,
+            "pais_id": lista_ids_paises[0] if lista_ids_paises else None,
+
+            # lo que ya tenías
+            "trayectoria": {
+                "inicio": str(fila[8]) if fila[8] else None,
+                "fin": str(fila[9]) if fila[9] else None,
+                "actual": bool(fila[10])
+            },
+            "nacionalidades_ids": lista_ids_paises,
+            "nacionalidades_isos": lista_isos_paises,
+            "posiciones_ids": lista_ids_posiciones,
+            "posiciones_abrev": lista_abrev_posiciones,
+            "posicion": lista_abrev_posiciones[0] if lista_abrev_posiciones else "N/A"
+        })
 
     return JsonResponse({"success": resultado})
 
@@ -640,23 +731,43 @@ def api_random_player(request):
 #################################################################################################
 
 def equipoxid(request):
-    id = request.GET.get('id')
+    id_equipo = request.GET.get('id')
 
-    if not id:
-        return JsonResponse({"error": "Faltan parámetros o no se encontraron resultados."}, status=400)
+    if not id_equipo:
+        return JsonResponse({"error": "ID de equipo no proporcionado."}, status=400)
 
-    # Consulta
-    e = Equipo.objects.get(id_equipo=id)
+    try:
+        # 1. Obtenemos el equipo
+        e = Equipo.objects.get(id_equipo=id_equipo)
+        
+        # 2. Buscamos la formación (usamos select_related para traer los datos de un solo golpe)
+        # Priorizamos la que esté marcada como principal
+        ef = EquipoFormacion.objects.filter(equipo=e).select_related('formacion').order_by('-es_principal').first()
 
-    salida = {
+        # 3. Extraemos solo los DATOS, no el objeto completo
+        datos_formacion = None
+        if ef and ef.formacion:
+            datos_formacion = {
+                "id": ef.formacion.id,
+                "nombre": ef.formacion.nombre,
+                "temporada": ef.temporada
+            }
+
+        # 4. Construimos la salida
+        salida = {
             "club": e.id_equipo,
             "nombre": e.nombre,
             "escudo": e.escudo,
             "color": e.color,
             "lat": e.latitud,
-            "long": e.longitud
+            "long": e.longitud,
+            "formacion": datos_formacion  # Esto ahora es un dict, no un objeto
         }
-    return JsonResponse({"success": salida})
+        
+        return JsonResponse({"success": salida})
+
+    except Equipo.DoesNotExist:
+        return JsonResponse({"error": "El equipo no existe."}, status=404)
 
 def equiposxid(request):
     ids = request.GET.getlist('id[]')  # Recupera id[]=1&id[]=2&id[]=3
@@ -830,23 +941,41 @@ def paisesall(request):
     return JsonResponse({"success": paises})
 
 def paisxnombre(request):
-    nombre = request.GET.get('nombre', '').strip()
+    nombre_query = request.GET.get('nombre', '').strip().lower()
 
-    if not nombre:
-        return JsonResponse(
-            {"error": "Falta el nombre del país"},
-            status=400
-        )
+    if not nombre_query:
+        return JsonResponse({"error": "Falta el nombre"}, status=400)
 
-    paises = Pais.objects.filter(nombre__icontains=nombre)
+    # 1. Intento rápido: Buscar en tu DB (Español o ISO)
+    paises_db = Pais.objects.filter(
+        Q(nombre__icontains=nombre_query) | 
+        Q(iso__iexact=nombre_query)
+    ).distinct()[:10]
 
+    # 2. Si no hay resultados o quieres ampliar, buscamos por otros idiomas usando pycountry
+    ids_encontrados = [p.id_pais for p in paises_db]
+    
+    # Buscamos el código ISO en la librería internacional
+    try:
+        # Esto busca en todos los nombres oficiales (inglés, francés, etc.) que pycountry conoce
+        search_results = pycountry.countries.search_fuzzy(nombre_query)
+        for country in search_results:
+            # Buscamos en nuestra DB el país que coincida con el ISO encontrado
+            p_extra = Pais.objects.filter(iso__iexact=country.alpha_2).first()
+            if p_extra and p_extra.id_pais not in ids_encontrados:
+                # Lo añadimos a la lista de objetos de Django
+                paises_db = list(paises_db) + [p_extra]
+                ids_encontrados.append(p_extra.id_pais)
+    except LookupError:
+        pass # No se encontraron coincidencias internacionales
+
+    # 3. Formatear la salida
     salida = []
-    for p in paises:
-
+    for p in paises_db[:10]: # Limitamos a los 10 mejores
         salida.append({
             "pais": p.id_pais,
-            "nombre": p.nombre,
-            "iso": p.iso
+            "nombre": p.nombre, # Siempre devolvemos tu nombre en español
+            "iso": p.iso.lower()
         })
 
     return JsonResponse(salida, safe=False)

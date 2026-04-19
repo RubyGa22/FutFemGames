@@ -24,7 +24,7 @@
       "source": "openmaptiles",
       "source-layer": "water",
       "paint": {
-        "fill-color": "#ac00ac",
+        "fill-color": "#6e006e",
         "fill-opacity": 0.85
       }
     },
@@ -56,45 +56,15 @@
       "type": "line",
       "source": "openmaptiles",
       "source-layer": "boundary",
-      "filter": ["==", "admin_level", 2],
+      "filter": [
+        "all",
+        ["==", "admin_level", 2],
+        ["!=", "maritime", 1]
+      ],
       "paint": {
         "line-color": "#ac00ac",
         "line-width": 1.2,
         "line-opacity": 0.8
-      }
-    },
-
-    {
-      "id": "roads",
-      "type": "line",
-      "source": "openmaptiles",
-      "source-layer": "transportation",
-      "paint": {
-        "line-color": "#ff33ff",
-        "line-width": [
-          "interpolate",
-          ["linear"],
-          ["zoom"],
-          5, 0.2,
-          12, 2
-        ]
-      }
-    },
-
-    {
-      "id": "roads-outline",
-      "type": "line",
-      "source": "openmaptiles",
-      "source-layer": "transportation",
-      "paint": {
-        "line-color": "#330033",
-        "line-width": [
-          "interpolate",
-          ["linear"],
-          ["zoom"],
-          5, 0.5,
-          12, 3
-        ]
       }
     },
 
@@ -165,14 +135,38 @@
     },
 
     {
-      "id": "remove-ferry-routes",
+      "id": "roads",
       "type": "line",
       "source": "openmaptiles",
       "source-layer": "transportation",
-      "filter": ["==", "class", "ferry"],
+      "filter": ["!=", "class", "ferry"],
       "paint": {
-        "line-color": "rgba(0,0,0,0)",
-        "line-width": 0
+        "line-color": "#ff33ff",
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          5, 0.2,
+          12, 2
+        ]
+      }
+    },
+
+    {
+      "id": "roads-outline",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["!=", "class", "ferry"],
+      "paint": {
+        "line-color": "#330033",
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          5, 0.5,
+          12, 3
+        ]
       }
     },
 

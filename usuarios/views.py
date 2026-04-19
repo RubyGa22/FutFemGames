@@ -88,10 +88,15 @@ def solicitar_reset_password(request):
                     html_message=html_message,  # <--- ¡ESTO ES LO QUE ENVÍA EL DISEÑO!
                     fail_silently=False,
                 )
-                return render(request, 'password_enviado_exito.html', {'email': email_usuario})
+                # Reutilizamos el mismo HTML que ya tienes
+                return render(request, 'reset_password.html', {
+                    'mensaje_exito': _("¡Enviado! Revisa tu bandeja de entrada (y la carpeta de spam).")
+                })
             except Exception as e:
-                print(f"Error: {e}") # Para que veas el error en consola si falla
-                return render(request, 'reset_password.html', {'error': _("Error al enviar el correo.")})
+                print(f"Error real: {e}") # Mira esto en tu terminal
+                return render(request, 'reset_password.html', {
+                    'error': _("Error al enviar el correo. Por favor, inténtalo más tarde.")
+                })
         else:
             return render(request, 'reset_password.html', {'error': _("No encontramos ese email.")})
 
@@ -436,7 +441,7 @@ def actualizar_jugadora_favorita(request):
             return JsonResponse({'status': 'ok', 'message': 'Actualizado correctamente'})
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-        
+
 @csrf_exempt
 def actualizar_perfil(request):
     if request.method == 'PUT':
@@ -460,6 +465,12 @@ def actualizar_perfil(request):
             elif campo == 'jugadora_favorita':
                 j_id = data.get('jugadora_id')
                 usuario.jugadora_favorita_id = j_id
+                usuario.save()
+                return JsonResponse({'status': 'ok', 'reload': True})
+            
+            elif campo == 'equipo_favorito':
+                e_id = data.get('equipo_id')
+                usuario.equipo_favorito_id = e_id
                 usuario.save()
                 return JsonResponse({'status': 'ok', 'reload': True})
 

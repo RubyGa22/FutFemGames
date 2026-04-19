@@ -1,41 +1,30 @@
-import { fetchJugadoraTrayectoriaById, handleAutocompletePlayer } from "/static/futfem/js/jugadora.js";
-import { updateRacha, obtenerUltimaRespuesta } from "/static/usuarios/js/rachas.js";
-import { inicializarCounter, startCounter, stopCounter } from '../utils/counter.js'; 
-import { Ganaste, crearPopupInicialJuego } from "./funciones-comunes.js";
-import { victory, wrong } from "../sounds.js";
-
 // Variables de Juego
 let jugadoraId;
 let nombreCompleto;
 
 // Componentes html usados recurrentemente
-let popup;
-let resultText;
-let trayectoriaDiv;
-let myst;
-let jugadoraInput;
-let boton;
-let answer;
-// Añadir el evento de input al campo de texto
-const textoInput = document.getElementById("jugadoraInput");
-const btn = document.getElementById('botonVerificar');
-textoInput.addEventListener('input', debounce(handleAutocompletePlayer, 300)); // Debounce de 300ms
+let popup, resultText, trayectoriaDiv, myst, jugadoraInput, boton, answer, textoInput;
 
 // Función principal que controla el flujo de carga
 async function iniciar(dificultad) {
-
-    // Componentes html usados recurrentemente
+    const {obtenerUltimaRespuesta} = await import("/static/usuarios/js/rachas.js");
+    const {Ganaste} = await import("./funciones-comunes.js");
+    const {inicializarCounter, startCounter, stopCounter } = await import('../utils/counter.js');
+    const {handleAutocompletePlayer} = await import("/static/futfem/js/jugadora.js");
     popup = document.getElementById('popup-ex');
     resultText =  document.getElementById('result');
     trayectoriaDiv = document.getElementById('trayectoria');
     myst = document.getElementById('jugadora');
     jugadoraInput = document.getElementById('jugadoraInput');
     boton = document.getElementById('botonVerificar');
+    textoInput = document.getElementById("jugadoraInput");
+    textoInput.addEventListener('input', debounce(handleAutocompletePlayer, 300)); // Debounce de 300ms
+
     const ultima = await obtenerUltimaRespuesta(1);
     const name = localStorage.getItem('nombre');
     
-    if (btn) {
-        btn.addEventListener('click', checkAnswer); // Habilitar el botón al iniciar el juego
+    if (boton) {
+        boton.addEventListener('click', checkAnswer); // Habilitar el botón al iniciar el juego
     }
     
     if (popup) {
@@ -97,7 +86,8 @@ async function play() {
     jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
     const res = localStorage.getItem('res1');
     const texto = gettext('Adivina la Jugadora de Fútbol es un juego de trivia donde debes identificar a una futbolista según los equipos en los que ha jugado. Usa las pistas, demuestra tu conocimiento y compite para ver quién acierta más.');
-    const imagen = '/static/img/trayectoria.jpg';
+    const imagen = '/static/img/trayectoria.webp';
+    const {crearPopupInicialJuego} = await import("./funciones-comunes.js");
     if(res !== jugadoraId || !res){
         /*if(lastAnswer !== res || !lastAnswer){
             updateRacha(1, 0, 'loss'+jugadoraId);
@@ -110,6 +100,7 @@ async function play() {
 }
 
 export async function loadJugadoraById(id, ganaste) {
+    const { fetchJugadoraTrayectoriaById } = await import("/static/futfem/js/jugadora.js");
     const data = await fetchJugadoraTrayectoriaById(id);
     if (data.length > 0) {
         displayTrayectoria(data, ganaste);
@@ -186,6 +177,7 @@ function displayTrayectoria(data, acertaste) {
                 jugadoraImg.src = item.imagen;
                 jugadoraImg.alt = 'Imagen de la Jugadora';
                 jugadoraImg.className = 'glass';
+                jugadoraImg.style.borderColor = item.color;
                 back.appendChild(jugadoraImg);
 
                 const anyos = document.createElement('p');
@@ -199,6 +191,7 @@ function displayTrayectoria(data, acertaste) {
                 jugadoraImg.src = data[0].ImagenJugadora;
                 jugadoraImg.alt = 'Imagen de la Jugadora';
                 jugadoraImg.className = 'glass';
+                jugadoraImg.style.borderColor = item.color;
                 back.appendChild(jugadoraImg);
 
                 const anyos = document.createElement('p');
@@ -218,6 +211,10 @@ function displayTrayectoria(data, acertaste) {
 async function checkAnswer() {
     const nombreCompleto = jugadoraInput.value.trim();
     const idJugadora = jugadoraInput.getAttribute('data-id');
+    const {wrong, victory} = await import("../sounds.js");
+    const {updateRacha} = await import("/static/usuarios/js/rachas.js");
+    const {Ganaste} = await import("./funciones-comunes.js");
+    const {stopCounter} = await import('../utils/counter.js');
 
     if (!idJugadora) {
         console.warn('No se encontró data-id en el input.');
@@ -246,6 +243,7 @@ async function checkAnswer() {
 async function trayectoriaPerder() {
     // Bloquear el botón y el input
     const jugadora = await sacarJugadora(jugadoraId);
+    const {updateRacha} = await import("/static/usuarios/js/rachas.js");
 
     boton.disabled = true;
     jugadoraInput.disabled = true;

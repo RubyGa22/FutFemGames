@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
     <link rel="stylesheet" href="{% static 'usuarios/css/ranking.css' %}">
 </head>
-<body>
+<body {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
     {% include 'partials/header.html' %}
 
     <div class="container-ranking mt-5">

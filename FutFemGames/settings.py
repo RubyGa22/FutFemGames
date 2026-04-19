@@ -11,18 +11,41 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import os
+import os, mimetypes
+mimetypes.add_type("application/javascript", ".js", True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Carpeta donde Django buscará archivos subidos
 MEDIA_ROOT = BASE_DIR / 'futfem' / 'media'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# 2. Donde Compressor guardará sus archivos generados (normalmente lo mismo que STATIC_ROOT)
+COMPRESS_ROOT = STATIC_ROOT
 
 # URL pública para acceder a esos archivos
 MEDIA_URL = '/media/'
+STATIC_URL = '/static/'
+COMPRESS_URL = STATIC_URL # Esto le dice al compresor que use la misma ruta
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# Cache de larga duración (1 año) para archivos que no cambian
+WHITENOISE_MAX_AGE = 31536000 
+WHITENOISE_IMMUTABLE_FILE_SUPPORT = True
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_MANIFEST_STRICT = False # Evita errores si falta algún archivo
+WHITENOISE_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Esto asegura que si cambias el archivo, Django le cambie el nombre (hash)
+# para que el navegador descargue la versión nueva.
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-tylyd1o(l$na1k@hd!vw!6e767zw$$v5b_02p$$wbuv+f9wk7p'
@@ -31,7 +54,17 @@ SECRET_KEY = 'django-insecure-tylyd1o(l$na1k@hd!vw!6e767zw$$v5b_02p$$wbuv+f9wk7p
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "localhost",
+]
 
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': False,
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True, # Fuerza a que se muestre siempre en DEBUG
+    'RESULTS_CACHE_SIZE': 100,  # Aumenta el historial de resultados
+    'RENDER_PANELS': True,
+}
 
 # Application definition
 
@@ -41,8 +74,11 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'django_browser_reload',
+    "debug_toolbar",
+    'compressor',
     'minijuegos',
     'futfem',
     'FutFemWiki',
@@ -51,15 +87,27 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'FutFemGames.middleware.CustomWhiteNoiseMiddleware',
     'django_browser_reload.middleware.BrowserReloadMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware', 
     'django.middleware.common.CommonMiddleware',       # <--- SUBE AQUÍ
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder', # <--- Obligatorio
+)
+
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = False 
 
 ROOT_URLCONF = 'FutFemGames.urls'
 

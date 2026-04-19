@@ -1,5 +1,4 @@
 // static/js/api/jugadoras.js
-import { fetchEquipoPalmaresByTemporadas } from "./equipos.js";
 let min = 1;
 let max = 476;
 
@@ -111,9 +110,9 @@ try {
  * @param {number|string} id
  * @returns {Promise<Array>}
  */
-export async function fetchJugadoraCompanyerasById(id) {
+export async function fetchJugadoraCompanyerasById(id, limite) {
     try {
-        const response = await fetch(`../api/jugadora_companyeras?id_jugadora=${id}`);
+        const response = await fetch(`/api/jugadora_companyeras?id_jugadora=${id}&limite=${limite}`);
         
         if (!response.ok) {
             throw new Error(`Error en la solicitud: ${response.statusText}`);
@@ -275,18 +274,26 @@ function fetchJugadoraTrofeosIndividualesById(id) {
  * @param {*} id 
  * @return {Promise<{equipo: Array, individual: Array}>}
  */
-export async function fetchJugadoraPalmaresById(id) {
+// Ahora recibe 'trayectoria' como segundo argumento
+export async function fetchJugadoraPalmaresById(id, trayectoria) {
     console.log('Fetching palmares for jugadora ID:', id);
-    const trayectoria = await fetchJugadoraTrayectoriaById(id);
-    const palmaresIndividual = await fetchJugadoraTrofeosIndividualesById(id);
-    let palmaresEquipo = [];
-    for(const etapa of trayectoria){
-        // Extraemos solo el año (primeros 4 caracteres YYYY)
+    
+    // ELIMINADO: const trayectoria = await fetchJugadoraTrayectoriaById(id); <-- Esto sobraba
+    
+    const palmaresIndividualPromise = fetchJugadoraTrofeosIndividualesById(id);
+    const { fetchEquipoPalmaresByTemporadas } = await import("./equipos.js"); // Importar la función necesaria para el palmarés de equipo
+
+    const promesasPalmaresEquipo = trayectoria.map(etapa => {
         const anioInicio = etapa.fecha_inicio.substring(0, 4);
         const anioFin = etapa.fecha_fin ? etapa.fecha_fin.substring(0, 4) : 'act';
-        const palmares = await fetchEquipoPalmaresByTemporadas(etapa.equipo, `${anioInicio}-${anioFin}`);
-        palmaresEquipo.push(palmares);
-    }
+        return fetchEquipoPalmaresByTemporadas(etapa.equipo, `${anioInicio}-${anioFin}`);
+    });
+
+    const [palmaresIndividual, palmaresEquipo] = await Promise.all([
+        palmaresIndividualPromise,
+        Promise.all(promesasPalmaresEquipo)
+    ]);
+
     return { 
         equipo: palmaresEquipo,
         individual: palmaresIndividual

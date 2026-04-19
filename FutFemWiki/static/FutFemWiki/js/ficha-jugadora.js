@@ -1,7 +1,9 @@
-import {calcularEdad, fetchJugadoraTrayectoriaById, fetchJugadoraPalmaresById, cargarJugadoraDatos} from '/static/futfem/js/jugadora.js'; 
+import {calcularEdad, fetchJugadoraTrayectoriaById, fetchJugadoraPalmaresById, cargarJugadoraDatos, fetchJugadoraCompanyerasById} from '/static/futfem/js/jugadora.js'; 
 import {fetchEquipoById} from '/static/futfem/js/equipos.js';    
 
-let trayectorias, palmares, jugadora;
+let trayectorias, palmares, jugadora, companyeras;
+// Variable global o superior para guardar las compañeras
+let todasLasCompanyeras = [];
 const edad = document.getElementById('edad');
 const mostrador = document.getElementById('mostrador-tarjetas');
 const pais = document.getElementById('pais');
@@ -11,17 +13,20 @@ const palmaresIndiv = document.getElementById('palmares-individual');
 const contenedorPais = document.getElementById('pais');
 
 export async function cargarFichaJugadora(id_jugadora) {
-    [jugadora, trayectorias, palmares] = await Promise.all([
+    [jugadora, trayectorias] = await Promise.all([
         cargarJugadoraDatos(id_jugadora),
-        fetchJugadoraTrayectoriaById(id_jugadora),
-        fetchJugadoraPalmaresById(id_jugadora)
-    ]);    
+        fetchJugadoraTrayectoriaById(id_jugadora)
+    ]);   
+    // 2. Cargamos lo secundario sin bloquear el primer render
+    const companyeras = fetchJugadoraCompanyerasById(id_jugadora, 1000);
+    palmares = fetchJugadoraPalmaresById(id_jugadora, trayectorias);
 
     // Variables globales (o pasadas por parámetro) para usar en cargarTrayectorias
     window.trayectorias = trayectorias;
     window.palmares = palmares;
+    window.companyeras = companyeras;
 
-    edad.textContent = jugadora.Nacimiento + '(' + calcularEdad(jugadora.Nacimiento) + ')';
+    //edad.textContent = jugadora.Nacimiento + '(' + calcularEdad(jugadora.Nacimiento) + ')';
 
     jugadora.Posiciones.forEach(pos => {
         const abrev = pos.abreviatura || pos.nombre.substring(0, 3).toUpperCase();
@@ -62,7 +67,7 @@ export async function cargarFichaJugadora(id_jugadora) {
         });
     }
     if (!palmares.individual) {palmares.individual = [];}
-    palmaresIndiv.innerHTML = `
+    /*palmaresIndiv.innerHTML = `
         ${
             palmares.individual.length
             ? palmares.individual.map(t => `
@@ -70,31 +75,64 @@ export async function cargarFichaJugadora(id_jugadora) {
             `).join('')
             : `<p class="sin-trofeos">Sin trofeos individuales</p>`
         }
-    `;
-
+    `;*/
+    window.todasLasCompanyeras = await companyeras;
     await cargarTrayectorias(jugadora, trayectorias, palmares);
+    
+
+    // 3. INICIALIZAR SWIPER (Fuera del bucle)
+    new Swiper(".mySwiper", {
+        effect: "coverflow",
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: "auto",
+        coverflowEffect: {
+            rotate: 0,
+            stretch: 0,
+            depth: 200,
+            modifier: 1,
+            slideShadows: false, // Desactivar si tus tarjetas ya tienen sombras
+        },
+        spaceBetween: 30,
+        loop: false,
+        pagination: {
+            el: ".swiper-pagination",
+            clickable: true
+        },
+        on: {
+            init: function () {
+                // Al cargar por primera vez, pillamos el equipo del primer slide
+                const initialId = this.slides[this.activeIndex].getAttribute('data-equipo-id');
+                cargarCompanyeras(initialId);
+            },
+            slideChange: function () {
+                // Al cambiar, pillamos el ID del slide que ha quedado activo
+                const activeId = this.slides[this.activeIndex].getAttribute('data-equipo-id');
+                cargarCompanyeras(activeId);
+            }
+        }
+    });
 
 }
 
-     // Asegúrate de tener Swiper importado o cargado en el HTML
-async function cargarTrayectorias(jugadora, trayectorias, palmares) {
-    console.log('Cargando trayectorias para:', jugadora);
+// Asegúrate de tener Swiper importado o cargado en el HTML
+async function cargarTrayectorias(jugadora, trayectorias, palmaresPromise) {
     const mostrador = document.getElementById('mostrador-tarjetas');
+    const fragment = document.createDocumentFragment();
     mostrador.innerHTML = ''; // Limpiar
 
-    // 1. PETICIONES EN PARALELO: Pedimos todos los equipos a la vez
-    const equiposData = await Promise.all(
-        trayectorias.map(t => fetchEquipoById(t.equipo))
-    );
+    const palmares = await palmaresPromise;
 
     trayectorias.forEach((trayectoria, index) => {
-        const equipo = equiposData[index];
-
-        info.style.background = equipo.color;
-        
+        console.log(`Procesando trayectoria ${index + 1}/${trayectorias.length}:`, trayectoria);
+        info.style.background = `linear-gradient(to top, color-mix(in srgb, transparent 30%, transparent), color-mix(in srgb, ${trayectoria.color} 100%, transparent 30%))`;
+        info.style.border = `1px solid ${trayectoria.color}`
         // 1. Crear el Slide de Swiper
         const swiperSlide = document.createElement('div');
         swiperSlide.classList.add('swiper-slide');
+
+        const equipoId = trayectoria.equipo.id || trayectoria.equipo;
+        swiperSlide.setAttribute('data-equipo-id', equipoId);
 
         // 2. Crear el Wrapper de la Tarjeta (para el flip)
         const tarjetaWrapper = document.createElement('div');
@@ -111,23 +149,23 @@ async function cargarTrayectorias(jugadora, trayectorias, palmares) {
         back.classList.add('tarjeta-back', 'glass');
 
         // Lógica de colores y contenido...
-        const imgSrc = trayectoria.imagen ? `/${trayectoria.imagen}` : `/${jugadora.imagen}`;
+        const imgSrc = trayectoria.imagen ? `/${trayectoria.imagen}` : '/static/img/predeterm.jpg';
         const iso = jugadora.pais_iso && jugadora.pais_iso.length > 0 ? jugadora.pais_iso[0] : 'xx';
         const trofeosEquipo = palmares.equipo[index].success || [];
         const trofeosAgrupados = agruparTrofeos(trofeosEquipo);
         
         front.innerHTML = `
-            <img class="imagen-jugadora" src="${imgSrc}">
+            <img class="imagen-jugadora" src="${imgSrc}" alt="${jugadora.nombre_completo} - ${trayectoria.equipo.nombre}" width="300" height="400" style="width: 100%; height: auto; object-fit: cover;" fetchpriority="high" loading="eager">
             <p class="nombre">${jugadora.nombre_completo}</p>
             <div class="detalles">
                 <div class="equipo-pais">
                     <p>${gettext(jugadora.Posiciones[0].abreviatura)}</p>
-                    <img src="/${equipo.escudo}">
+                    <img src="/${trayectoria.escudo}" alt="${trayectoria.equipo.nombre}" title="${trayectoria.equipo.nombre}">
                     <span class="fi fi-${iso}" style="font-size: xx-large;"></span>
                 </div>
                 <p>${trayectoria.fecha_inicio ? (trayectoria.fecha_inicio.substring(0, 4) + (trayectoria.fecha_fin ? ' - ' + trayectoria.fecha_fin.substring(0, 4) : ' - Act.')) : null}</p>            </div>
         `;
-        if(equipo.club === 83){
+        if(trayectoria.equipo.club === 83){
             info.querySelector('img').classList.add('vintage');
             front.querySelector('.imagen-jugadora').classList.add('vintage');
         }
@@ -148,7 +186,7 @@ async function cargarTrayectorias(jugadora, trayectorias, palmares) {
         const detalles = front.querySelector('.detalles');
         const nombre = front.querySelector('.nombre');
         if (detalles && nombre) {
-            const gradiente = `linear-gradient(to right, ${equipo.color}, transparent)`;
+            const gradiente = `linear-gradient(to right, ${trayectoria.color}, transparent)`;
             detalles.style.background = gradiente;
             nombre.style.background = gradiente;
         }
@@ -160,34 +198,55 @@ async function cargarTrayectorias(jugadora, trayectorias, palmares) {
         
         // El wrapper de flip va dentro del slide de swiper
         swiperSlide.appendChild(tarjetaWrapper);
-        mostrador.appendChild(swiperSlide);
+        fragment.appendChild(swiperSlide);
         
         // Evento Click para el Flip
         tarjetaWrapper.addEventListener('click', () => {
             tarjetaInner.classList.toggle('flipped');
         });
     });
+    mostrador.appendChild(fragment);
+}
 
-    // 3. INICIALIZAR SWIPER (Fuera del bucle)
-    new Swiper(".mySwiper", {
-        effect: "coverflow",
-        grabCursor: true,
-        centeredSlides: true,
-        slidesPerView: "auto",
-        coverflowEffect: {
-            rotate: 0,
-            stretch: 0,
-            depth: 200,
-            modifier: 1,
-            slideShadows: false, // Desactivar si tus tarjetas ya tienen sombras
-        },
-        spaceBetween: 30,
-        loop: false,
-        pagination: {
-            el: ".swiper-pagination",
-            clickable: true
-        }
+async function cargarCompanyeras(equipoId) {
+    const contenedor = document.getElementById('companyeras-container');
+    contenedor.innerHTML = '';
+    // Validación de seguridad: si aún no hay datos, no ejecutamos el filtro
+    if (!window.todasLasCompanyeras || !Array.isArray(window.todasLasCompanyeras)) {
+        console.warn("Las compañeras aún no se han cargado.");
+        return;
+    }
+    // Filtrar las compañeras que coincidan con el equipo del slide activo
+    // Asegúrate de comparar el ID como número o string según tu BD
+    const filtradas = window.todasLasCompanyeras.filter(c => String(c.equipo) === String(equipoId));
+    filtradas.forEach(compañera => {
+        const slugNombre = (compañera.Nombre_Completo || compañera.nombre).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, ''); // Limpiamos caracteres especiales para el slug
+        const card = document.createElement('div');
+        card.classList.add('companyera-card', 'glass');
+        const imgSrc = compañera.imagen ? `${compañera.imagen}` : 'static/img/predeterm.jpg';
+        card.innerHTML = `
+            <img src="/${imgSrc}" alt="${compañera.Nombre_Completo}" width="100" height="130" style="width: 100%; height: auto; object-fit: cover;" loading="lazy">
+            <p>${compañera.Nombre_Completo}</p>
+        `;
+        card.style.borderColor = compañera.color || '#ccc';
+        card.style.background = `linear-gradient(to bottom, 
+        color-mix(in srgb, ${compañera.color} 30%, transparent), 
+        color-mix(in srgb, ${compañera.color} 50%, transparent))`;
+        // Evento click para redirigir a la ficha de la compañera
+        card.addEventListener('click', () => {
+            window.location.href = `/jugadora/${compañera.id_jug_comp}/${slugNombre}/`;
+        });
+        contenedor.appendChild(card);
     });
+    // Si no hay compañeras, crear tarjeta de "Sin compañeras"
+    if (filtradas.length === 0) {
+        const card = document.createElement('div');
+        card.classList.add('companyera-card', 'glass', 'sin-companyeras');
+        card.innerHTML = `
+            <p>Sin compañeras en este equipo</p>
+        `;
+        contenedor.appendChild(card);
+    }
 }
 
 // Agrupar trofeos por ID y juntar temporadas

@@ -8,12 +8,13 @@ export function inicializarMapaEquipos() {
     if (map) {
         markersGroup.forEach(m => m.marker.remove());
         markersGroup = []; 
-        return
+        return map;
     };
 
     map = new maplibregl.Map({
         container: 'mapa-equipos',
         style: '/static/FutFemWiki/mapstyles/style-morado.json', // luego lo cambiamos por tu estilo
+        projection: 'globe',
         center: [-3.7, 40.4],
         zoom: 6,
         minZoom: 6,
@@ -32,10 +33,12 @@ export function inicializarMapaEquipos() {
         bloqueado = false;
     });
 
+    map.on("zoomend", () => {
+        generarHeatmap();
+    });
+
     map.on("zoom", () => {
         const zoom = map.getZoom();
-
-        generarHeatmap();
 
         markersGroup.forEach(m => {
             const el = m.el;
@@ -136,6 +139,7 @@ export function inicializarMapaEquipos() {
 
     });
     map.addControl(new CapaControl(), "top-right");
+    return map;
 }
 
 
@@ -255,6 +259,7 @@ function rotarSuave(time) {
 
 
 function mostrarTooltipEquipo(id, nombre, lngLat) {
+    const slugNombre = nombre.toLowerCase().replace(/\s+/g, '-');
     const popup = new maplibregl.Popup({
         closeButton: true,
         offset: 25
@@ -275,7 +280,7 @@ function mostrarTooltipEquipo(id, nombre, lngLat) {
         document
           .getElementById('ver-equipo')
           .addEventListener('click', () => {
-              window.location.href = `/wiki/equipo/${id}/`;
+              window.location.href = `/equipo/${id}/${slugNombre}/`;
           });
     });
 

@@ -1,78 +1,148 @@
 {% load static %}
 {% load i18n %}
+{% load l10n %}
+{% load compress %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aprende sobre {{ equipo.nombre }}, su historia, jugadoras destacadas, palmarés y ubicación en el mapa.">
     <title>{{ equipo.nombre }}</title>
     <link rel="icon" href="/{{ equipo.escudo }}">
+    {% if jugadora.imagen %}
+    <link rel="preload" as="image" href="/{{ jugadora.imagen }}" fetchpriority="high">
+    {% endif %}
+    <link rel="preload" as="image" href="/static/img/Football_pitch.webp" fetchpriority="high">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" media="print" onload="this.media='all'">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@100..900&family=Oswald:wght@200..700&family=Plus+Jakarta+Sans:wght@200..800&family=Russo+One&display=swap" 
+      media="print" onload="this.media='all'">
+    
+    <link rel="modulepreload" href="/static/FutFemWiki/js/ficha-equipo.js">
+    <link rel="modulepreload" href="/static/futfem/js/equipos.js" as="script">
+    <link rel="preload" href="/api/equipoxid?id={{equipo.id_equipo}}" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="/static/js/animations/header.js" as="script">
+
+    {% compress css inline %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
-    <link rel="stylesheet" href="{% static 'css/combo.css' %}">
     <link rel="stylesheet" href="{% static 'FutFemWiki/css/wiki.css' %}">
-    <link rel="stylesheet" href="{% static 'FutFemWiki/css/ficha-equipo.css' %}?v={% now 'U' %}">
+    <link rel="stylesheet" href="{% static 'css/XI.css' %}">
+    <link rel="stylesheet" href="{% static 'FutFemWiki/css/ficha-equipo.css' %}">
+    {% endcompress %}
+
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css">
+    </noscript>
+    
 </head>
-<body>
+<body {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
     {% include 'partials/header.html' %}
     <div id="equipo-container">
-
-    <div class="row">
-
-    <div class="left">
-        <div id="tabla-trofeos" class="tabla-jugadoras">
-            <div id="cabecera-tabla" class="cabecera-tabla">
-                <h3>{% trans "Palmarés" %}</h3>
-                <a id="ver-trofeos" href="#">{% trans "Ver Más" %}</a>
-            </div>
-                <div id="palmares" class="container-jugadoras"></div>
+        <div id="selector">
+            <a href="#info">Información</a><a href="#plantilla">Plantilla</a><a href="">Historicas</a>
         </div>
-    </div>
-    <div>
-        <h1>{{ equipo.nombre }}</h1>
+        <div id="info">
+            <div class="left" style="min-height: 450px; height: 100%;">
+                <section id="jugadoras-actuales">
+                    <div id="tabla-jugadoras-actuales" class="tabla-jugadoras" style="height: 100%; width: 95%; min-height: 300px;">
+                        <div id="cabecera-tabla" class="cabecera-tabla">
+                            <h3>{% trans "Plantilla" %}</h3>
+                            <a id="ver-jugadoras-actuales" href="#">{% trans "Ver Más" %}</a>
+                        </div>
+                        <div id="jugadoras-actuales">
+                            <div id="campo-destacadas">
+                            {% include 'partials/football_field.html' %}
+                            </div>
+                            <div id="jugadoras-actuales-container" class="container-jugadoras"></div>
+                        </div>
 
-        <img src="/{{ equipo.escudo }}" alt="{{ equipo.nombre }}">
-    </div>
-    <div class="right">
-        <div id="mapa-equipos" style="width: 100%; height: 100%; display: block;"></div>
-    </div>
-    </div>
-    <div class="down">
-    <section id="jugadoras-actuales">
-        <div id="tabla-jugadoras-actuales" class="tabla-jugadoras">
-            <div id="cabecera-tabla" class="cabecera-tabla">
-                <h3>{% trans "Plantilla" %}</h3>
-                <a id="ver-jugadoras-actuales" href="#">{% trans "Ver Más" %}</a>
-            </div>
-            <div id="jugadoras-actuales-container" class="container-jugadoras"></div>
-        </div>
-    </section>
-    <section id="jugadoras-alltime">
-        <div id="tabla-jugadoras" class="tabla-jugadoras">
-            <div id="cabecera-tabla-alltime" class="cabecera-tabla">
-                <h3>{% trans "All Time" %}</h3>
-                <a id="ver-jugadoras-all-time" href="#">{% trans "Ver Más" %}</a>
-            </div>
-            <div id="jugadoras-container" class="container-jugadoras"></div>
-        </div>
-    </section>
-    </div>
+                    </div>
+                </section>
+                <section id="jugadoras-destacadas">
+                    <div id="tabla-jugadoras-destacadas" class="tabla-jugadoras">
+                        <div id="cabecera-tabla" class="cabecera-tabla">
+                            <h3>{% trans "Destacadas" %}</h3>
+                        </div>
+                        <div id="jugadoras-destacadas-container" class="container-jugadoras"></div>
 
-</div>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="{% url 'javascript-catalog' %}"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/maplibre-gl@5.18.0/dist/maplibre-gl.js"></script>
-<script type="module" src="{% static 'FutFemWiki/mapstyles/CapaControl.js' %}"></script>
-<script type="module" src="{% static 'FutFemWiki/js/mapa.js' %}"></script>
-<script type="module" src="{% static 'FutFemWiki/js/ficha-equipo.js' %}"></script>
+                    </div>
+                </section>
+            </div>
+            <div class="resto" style="height: 100%;">
+            <div class="row">
+                <div>
+                    <div id="tabla-info" class="tabla-jugadoras">
+                        <div id="cabecera-tabla" class="cabecera-tabla">
+                            <h3>{% trans "Club" %}</h3>
+                        </div>
+                        <div id="info" class="container-jugadoras">
+                            <div id="escudo-container">
+                                <img src="/{{ equipo.escudo }}" id="escudo" alt="{{ equipo.nombre }}" fetchpriority="high">
+                            </div>
+                            <div id="datos-equipo">
+                                <h3>{{ equipo.nombre }}</h3>
+                                <div>
+                                <img src="/{{ equipo.liga.logo }}" id="liga-item" alt="{{ equipo.liga.nombre }}">
+                                <span class="fi fi-{{ equipo.liga.pais.iso.lower }}" id="pais"></span>
+                                </div>
+                                <a href="https://www.google.com/maps/search/?api=1&query={{ equipo.latitud|unlocalize }},{{ equipo.longitud|unlocalize }}" target="_blank" rel="noopener noreferrer" class="btn-mapa"><i class="bi bi-geo-alt-fill"></i> Google Maps
+                                </a>
+                                <!--<p>{{ equipo.latitud }}</p>
+                                <p>{{ equipo.longitud }}</p>-->
+                            </div>
+                        </div>
+                    </div>
+                <div id="tabla-trofeos" class="tabla-jugadoras">
+                    <div id="cabecera-tabla" class="cabecera-tabla">
+                        <h3>{% trans "Palmarés" %}</h3>
+                        <a id="ver-trofeos" href="#">{% trans "Ver Más" %}</a>
+                    </div>
+                    <div id="palmares" class="container-jugadoras"></div>
+                </div>
+                </div>
+
+            <div class="right" style="display: none;">
+                <div id="tabla-map" class="tabla-jugadoras">
+                    <div id="cabecera-tabla" class="cabecera-tabla">
+                        <h3>{% trans "Mapa" %}</h3>
+                        <a id="ver-map" href="#">{% trans "Ver Más" %}</a>
+                    </div>
+                    <div id="mapa-equipos" class="container-jugadoras" style="width: 100%; height: 400px; display: block;"></div>
+                </div>
+            </div>
+            </div>
+            <div class="down">
+                <section id="jugadoras-alltime">
+                    <div id="tabla-jugadoras" class="tabla-jugadoras">
+                        <div id="cabecera-tabla-alltime" class="cabecera-tabla">
+                            <h3>{% trans "All Time" %}</h3>
+                            <a id="ver-jugadoras-all-time" href="#">{% trans "Ver Más" %}</a>
+                        </div>
+                        <div id="jugadoras-container" class="container-jugadoras"></div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    
+
+
+        </div>
+        <div id="plantilla"></div>
+    </div>
+<script src="{% static 'js/animations/header.js' %}" defer></script>
+<!--<script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>-->
+<script src="{% url 'javascript-catalog' %}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous" defer></script>
+<!--script src="https://unpkg.com/maplibre-gl@5.18.0/dist/maplibre-gl.js" defer></script-->
 <script>
     function actualizarHeader() {
         const headerEscudo = document.querySelector('.navbar-brand1 img');
@@ -153,6 +223,7 @@
     activarPopup('tabla-jugadoras-actuales', 'ver-jugadoras-actuales');
     activarPopup('tabla-jugadoras', 'ver-jugadoras-all-time');
     activarPopup('tabla-trofeos', 'ver-trofeos');
+    activarPopup('tabla-map', 'ver-map');
 
 
 
@@ -160,40 +231,82 @@
 </script>
 <script type="module">
     import { crearFichaJugadorasActuales, crearFichaJugadorasDeSiempre, displayPalmares } from '{% static "FutFemWiki/js/ficha-equipo.js" %}';
-    import { inicializarMapaEquipos, añadirEquipoMapa, centrarMapaEnEquipos, map, actualizarMarkersZoom } from '{% static "FutFemWiki/js/mapa.js" %}';
     import { fetchEquipoById } from '{% static "futfem/js/equipos.js" %}';
+
     const color = '{{equipo.color}}';
-    const [equipos, palmares] = await Promise.all([fetchEquipoById('{{equipo.id_equipo}}'), displayPalmares('{{equipo.id_equipo}}')]);
-    displayEquipoMapa(equipos);
-    export function displayEquipoMapa(equipo) {
-        console.log(equipo)
-        inicializarMapaEquipos();
+    const idEquipo = '{{equipo.id_equipo}}';
 
-        // Solo añadimos el equipo si tiene latitud y longitud
-            map.on("load", async () => {
-            if (equipo.lat != null && equipo.long != null) {
-
-                añadirEquipoMapa(
-                    equipo.id,
-                    equipo.nombre,
-                    parseFloat(equipo.lat),
-                    parseFloat(equipo.long),
-                    '/' + equipo.escudo,
-                    equipo.color
-                );
-            }
-
-
-        actualizarMarkersZoom();
-        centrarMapaEnEquipos([equipo.id]);
-
-    });
-    }
-
+    // 1. Carga inmediata de datos de texto y jugadoras (Pesa poco)
     actualizarHeader();
+    crearFichaJugadorasActuales(idEquipo, color);
+    crearFichaJugadorasDeSiempre(idEquipo, color);
 
-    crearFichaJugadorasActuales("{{ equipo.id_equipo }}", color);
-    crearFichaJugadorasDeSiempre("{{ equipo.id_equipo }}", color);
+    async function cargarDatosPrincipales() {
+        // Ejecutamos las peticiones de datos en paralelo
+        const [equipoData] = await Promise.all([
+            fetchEquipoById(idEquipo),
+            displayPalmares(idEquipo)
+        ]);
+
+        if (equipoData) {
+            // 2. CARGA BAJO DEMANDA (Lazy Import)
+            // Solo descargamos la lógica del campo de fútbol cuando tenemos los datos
+            const { crearAlineacion } = await import('{% static "js/football_field.js" %}');
+            crearAlineacion(equipoData.formacion.nombre);
+
+            // 3. MAPA: Activamos el disparador por interacción
+            //prepararDisparadorMapa(equipoData);
+        }
+    }
+    cargarDatosPrincipales();
+
+    // 2. LA MAGIA: Solo cargar el mapa si el usuario llega a él
+    /*function observarMapa(equipo) {
+        const mapaContenedor = document.getElementById('mapa-equipos');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(async (entry) => {
+                if (entry.isIntersecting) {
+                    console.log("Cargando recursos del mapa...");
+                    await cargarRecursosMapa(equipo);
+                    observer.disconnect(); // Dejar de observar una vez cargado
+                }
+            });
+        }, { rootMargin: '200px' }); // Empieza a cargar 200px antes de llegar
+
+        observer.observe(mapaContenedor);
+    }*/
+
+    /*async function cargarRecursosMapa(equipo) {
+        // 1. CSS
+        if (!document.getElementById('maplibre-css')) {
+            const link = document.createElement('link');
+            link.id = 'maplibre-css';
+            link.rel = 'stylesheet';
+            link.href = 'https://unpkg.com/maplibre-gl@5.18.0/dist/maplibre-gl.css';
+            document.head.appendChild(link);
+        }
+
+        // 2. JS de la librería
+        await import('https://unpkg.com/maplibre-gl@5.18.0/dist/maplibre-gl.js');
+        
+        // 3. Importar TU JS con un parámetro para evitar caché (?v=2)
+        const mapaModulo = await import('{% static "FutFemWiki/js/mapa.js" %}?v=2');
+        
+        // 4. Obtener la instancia de forma segura
+        const instanciaMapa = mapaModulo.inicializarMapaEquipos();
+
+        if (instanciaMapa) {
+            instanciaMapa.on("load", () => {
+                console.log("Mapa cargado con éxito");
+                mapaModulo.añadirEquipoMapa(equipo.id, equipo.nombre, equipo.lat, equipo.long, '/' + equipo.escudo, equipo.color);
+                mapaModulo.actualizarMarkersZoom();
+                mapaModulo.centrarMapaEnEquipos();
+            });
+        } else {
+            console.error("No se pudo obtener la instancia del mapa");
+        }
+    }*/
 </script>
 </body>
 </html>

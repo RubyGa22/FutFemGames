@@ -45,6 +45,10 @@ export async function inicializarWiki(arg) {
 
     const inputPaises = document.getElementsByClassName('input-pais');
 
+    const sectionWiki = document.getElementById('wiki-equipos');
+
+    const cabecera = document.getElementById('cabecera-wiki-equipos');
+
     const inputPosiciones = document.getElementById('input-posicion');
 
     const cabeceraLigas = document.getElementById('cabecera-equipo');
@@ -69,13 +73,15 @@ export async function inicializarWiki(arg) {
             displayJugadoras(jugadorasOriginal);
         });
     }else if(arg === 'equipos'){
+        sectionWiki.classList.add('equipos');
+        cabecera.classList.add('equipos');
         cabeceraJugadoras.classList.remove('active');
         cabeceraLigas.classList.add('active');
         await ligasxpais(1).then(ligas => {
             displayLigas(ligas.success);
         });
-         await equiposxliga(1).then(equipos => {
-        displayEquipos(equipos.success);
+        await equiposxliga(1).then(equipos => {
+            displayEquipos(equipos.success);
         });
         console.log(ligasContainer.firstChild)
         ligasContainer.firstChild.classList.add('selected');
@@ -101,7 +107,7 @@ export async function inicializarWiki(arg) {
     });
 
         inputPaises[0].addEventListener('input', async (event) => {
-            handleAutocompletePais(event, 'sugerencias-pais1');
+            handleAutocompletePais(event, 'sugerencias-pais1', ligasxpais);
         });
         inputPaises[1].addEventListener('input', async (event) => {
             handleAutocompletePais(event, 'sugerencias-pais2');
@@ -209,6 +215,7 @@ function renderJugadorasPage(page = 1) {
 
     jugadoras.forEach((jugadora, index) => {
         const nombreCompleto = jugadora.nombre_completo || 'Desconocida';
+        const slugNombre = nombreCompleto.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, ''); // Limpiamos caracteres especiales para el slug
         const div = document.createElement('div');
         div.classList.add('jugadora-item');
         div.classList.add('glass');
@@ -225,7 +232,9 @@ function renderJugadorasPage(page = 1) {
         div1.appendChild(img)
 
         const imgClub = document.createElement('img');
-        imgClub.src = '/' + jugadora.equipo.escudo;
+        const foto = "/"+jugadora.equipo.escudo;
+        const fotoMini = foto.replace('/clubes/', '/clubes/mini/');
+        imgClub.src = fotoMini;
         imgClub.className = 'equipo-imagen';
         imgClub.alt = jugadora.equipo.nombre;
 
@@ -289,14 +298,16 @@ function renderJugadorasPage(page = 1) {
         div.style.background = `
             linear-gradient(
                 to bottom,
-                color-mix(in srgb, ${colorPrimario} 30%, transparent),
-                color-mix(in srgb, ${colorSecundario} 30%, transparent)
+                color-mix(in srgb, ${colorPrimario} 70%, transparent),
+                color-mix(in srgb, ${colorSecundario} 70%, transparent)
             )
         `;
         }
 
+        div.style.border = `1px solid color-mix(in srgb, ${colorPrimario} 50%, transparent)`;
+
         pNombre.addEventListener('click', () => {
-            window.location.href = `/wiki/jugadora/${jugadora.id_jugadora}/`;
+            window.location.href = `/jugadora/${jugadora.id_jugadora}/${slugNombre}/`;
         });
         div.appendChild(div1);
         div.appendChild(pNacimiento);
@@ -387,11 +398,13 @@ function displayLigas(data) {
 
     data.forEach((liga, index) => {
         const ligaElement = document.createElement('div');
+        const foto = "/"+liga.logo;
+        const fotoMini = foto.replace('/ligas/', '/ligas/mini/');
         ligaElement.classList.add('liga-item');
         ligaElement.classList.add('glass');
         ligaElement.id = liga.liga;
         ligaElement.innerHTML = `
-            <img src="/${liga.logo}" alt="${liga.nombre} Logo" class="liga-logo">
+            <img src="${fotoMini}" alt="${liga.nombre} Logo" class="liga-logo">
             <div class="liga-info">
             <h3>${liga.nombre}</h3>
             <p>2025/2026</p>
@@ -406,8 +419,8 @@ function displayLigas(data) {
                 ligaElement.style.background = `
                     linear-gradient(
                         to bottom,
-                        color-mix(in srgb, ${rgbToRgba(colors[0], 0.5)} 50%, transparent),
-                        color-mix(in srgb, ${rgbToRgba(colors[1], 0.5)} 100%, transparent)
+                        color-mix(in srgb, ${rgbToRgba(colors[0], 1)} 50%, transparent),
+                        color-mix(in srgb, ${rgbToRgba(colors[1], 1)} 100%, transparent)
                     )
                 `;
                 ligaElement.style.borderColor = rgbToRgba(colors[2], 0.7);
@@ -421,10 +434,14 @@ function displayLigas(data) {
         ligaElement.addEventListener('click', async () => {
             seleccionarLiga(ligaElement);
             const equipos = await equiposxliga(liga.liga);
-            displayEquiposMapa(equipos.success)
+            /*displayEquiposMapa(equipos.success)*/
             displayEquipos(equipos.success);
         });
         container.appendChild(ligaElement);
+
+        if(index===0){
+            ligaElement.click();
+        }
 
 
         // Retraso progresivo para efecto fade
@@ -454,10 +471,13 @@ export function displayEquipos(equipos, container) {
         return;
     }
     equipos.forEach((equipo, index) => {
+        const equipoSlug = equipo.nombre.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
         const equipoElement = document.createElement('div');
+        const foto = "/"+equipo.escudo;
+        const fotoMini = foto.replace('/clubes/', '/clubes/mini/');
         equipoElement.className = 'equipo-item';
         equipoElement.innerHTML = `
-            <img src="/${equipo.escudo}" alt="${equipo.nombre} Escudo" class="equipo-escudo">
+            <img src="${fotoMini}" alt="${equipo.nombre} Escudo" class="equipo-escudo">
             <div class="equipo-info">
             <h4>${equipo.nombre}</h4>  
             </div>
@@ -469,8 +489,8 @@ export function displayEquipos(equipos, container) {
         equipoElement.style.background = `
             linear-gradient(
                 to bottom,
-                color-mix(in srgb, ${colorPrimario} 30%, transparent),
-                color-mix(in srgb, ${colorSecundario} 30%, transparent)
+                color-mix(in srgb, ${colorPrimario} 100%, transparent 20%),
+                color-mix(in srgb, ${colorSecundario} 100%, transparent)
             )
         `;
         equipoElement.style.setProperty('--equipo-shadow-color', colorPrimario);
@@ -478,7 +498,7 @@ export function displayEquipos(equipos, container) {
         container.appendChild(equipoElement);
 
         equipoElement.addEventListener('click', () => {
-            window.location.href = `/wiki/equipo/${equipo.id}/`;
+            window.location.href = `/equipo/${equipo.id}/${equipoSlug}/`;
         });
 
         // Retraso progresivo para efecto fade

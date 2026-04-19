@@ -34,6 +34,7 @@ async function renderPlayer(container, data, hideValue) {
     const img = container.querySelector('img');
     container.querySelector('h3').textContent = data.nombre;
     img.src = data.imagen;
+    img.alt = data.nombre;
 
     const p = container.querySelector('p');
     p.textContent = hideValue ? '' : data.market_value.toLocaleString() + " €";
@@ -155,9 +156,5 @@ async function finDelJuego() {
         window.location.href = '/'; // O la URL de salida que prefieras
     };
 }
-
-
-
-
 
 initGame();

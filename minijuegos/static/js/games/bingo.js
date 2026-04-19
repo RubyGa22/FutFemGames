@@ -1,8 +1,5 @@
-import { fetchJugadoraNacionalidadById, fetchJugadoraTrayectoriaById, fetchJugadoraPalmaresById } from "/static/futfem/js/jugadora.js";
-import { updateRacha, obtenerUltimaRespuesta } from '/static/usuarios/js/rachas.js';
-import { inicializarCounter, startCounter, stopCounter } from '../utils/counter.js'; 
 import { victory, wrong, correct } from "../sounds.js";
-import { ponerBanderas, ponerLigas, ponerClubes, ponerTrofeos, ponerEdades, crearPopupInicialJuego, Ganaste, calcularEdad } from "./funciones-comunes.js";
+import { Ganaste, calcularEdad } from "./funciones-comunes.js";
 
 let idres, currentPlayerData, paises, equipos, ligas, trofeos, lastPlayer, jugadora;;
 
@@ -10,6 +7,7 @@ let idres, currentPlayerData, paises, equipos, ligas, trofeos, lastPlayer, jugad
 async function iniciar(dificultad) {
     const popup = document.getElementById('popup-ex'); // Selecciona el primer elemento con la clase 'popup-ex'
     const btn = document.getElementsByClassName('skip-button')[0];
+    const {ponerBanderas, ponerLigas, ponerClubes, ponerTrofeos, ponerEdades} = await import('./funciones-comunes.js');
     lastPlayer = localStorage.getItem('last-player-bingo');
 
     if (btn) {
@@ -19,6 +17,8 @@ async function iniciar(dificultad) {
         popup.style.display = 'none'; // Cambia el estilo para ocultarlo
     }
 
+    const {obtenerUltimaRespuesta, updateRacha} = await import('/static/usuarios/js/rachas.js');
+    window.updateRacha = updateRacha; // Hacer updateRacha global para poder usarlo en Ganaste()
     const ultima = await obtenerUltimaRespuesta(6);
     let ultimaArray = JSON.parse(ultima);
     let usuarioAnswer = null;   // ← AQUÍ sí
@@ -40,6 +40,9 @@ async function iniciar(dificultad) {
         skipPlayer(paises, equipos, ligas, trofeos);
     }
     // Definir los segundos según la dificultad
+    const { inicializarCounter, startCounter, stopCounter } = await import('../utils/counter.js'); 
+    window.stopCounter = stopCounter; // Hacer stopCounter global para poder usarlo en Ganaste()
+
     let segundos = inicializarCounter(180000000000000000000000000000000000000000000000000000000000, 120 , 60, 'bingo', dificultad);
 
     // Se ejecutan todas a la vez. El tiempo total es lo que tarde la más lenta.
@@ -102,7 +105,8 @@ async function play() {
     idres = paises.map(String).concat(equipos.map(String), ligas.map(String), trofeos.map(String)).join('');
     const res = localStorage.getItem('res6');
     const texto = gettext('¡Pon a prueba tu memoria en "Futfem Bingo"! En este juego recibirás jugadoras al azar y deberás colocarlas en las casillas de país, equipo o liga que coincidan con su trayectoria. Cada jugadora tiene varias características, y tu objetivo es encajarla correctamente en el tablero. Gana quien logre completar su tarjeta como en un bingo tradicional, ¡pero con fútbol femenino!');
-    const imagen = '/static/img/Bingo.png';
+    const imagen = '/static/img/Bingo.webp';
+    const {crearPopupInicialJuego} = await import('./funciones-comunes.js');
     if(res !== idres || !res){
         localStorage.removeItem('Attr6');
         localStorage.removeItem('last-player-bingo');
@@ -114,147 +118,83 @@ async function play() {
 
 function handleCellClick(cell, jugador) {
     const cellId = cell.id;
-    const paisJugadora = jugador.pais;
-    const trayectoria = jugador.trayectoria; // Array de nombres de equipos
-    const trofeos = jugador.trofeos; // Array de trofeos
-    let celdasLlenas = false;
-    // Obtener la imagen dentro de la celda clicada
-    const img = cell.querySelector('img');
-    if (!img) {
+        const img = cell.querySelector('img');
+    
+        if (!img) {
         console.log("No hay imagen en esta celda.");
         return false;
     }
 
-    const imgClass = img.className; // Obtener la clase de la imagen
-
+    const imgClass = img.className;
+    const lowerClass = imgClass.toLowerCase();
     let hasMatch = false;
 
-    // Verificar si es un país o un club según el atributo alt de la imagen
-    if (img.className.toLowerCase().includes("pais")) {
-        if (imgClass === `pais${paisJugadora.Pais}`) { // Compara con el campo de país del jugador
-            //console.log("¡Coincidencia de país encontrada!");
+    // 1. VERIFICACIÓN DE PAÍS
+    if (lowerClass.includes("pais") && jugador.pais) {
+        if (imgClass === `pais${jugador.pais.Pais}`) {
             hasMatch = true;
-        } else {
-            console.log("No hay coincidencia de país.");
         }
     }
-    if (img.className.toLowerCase().includes("liga")) {
-        if (Array.isArray(jugador.liga)) { // Verificar que trayectoria sea un array
-            const ligaMatch = jugador.liga.some(liga => `liga${liga}` === imgClass);
 
-            if (ligaMatch) {
-                console.log("¡Coincidencia de liga encontrada!");
-                hasMatch = true;
-            } else {
-                console.log("No hay coincidencia de liga.");
-            }
-        } else {
-            console.log("La trayectoria no es un array o está vacía.");
+    // 2. VERIFICACIÓN DE LIGA
+    if (lowerClass.includes("liga") && Array.isArray(jugador.liga)) {
+        hasMatch = jugador.liga.some(liga => `liga${liga}` === imgClass);
+    }
+
+    // 3. VERIFICACIÓN DE CLUB (Trayectoria)
+    if (lowerClass.includes("club") && Array.isArray(jugador.trayectoria)) {
+        hasMatch = jugador.trayectoria.some(club => `club${club}` === imgClass);
+    }
+
+    // 4. VERIFICACIÓN DE TROFEOS (Corregido)
+    if (lowerClass.includes("trofeo") && jugador.trofeos) {
+        let trofeoMatch = false;
+        
+        if (img.id === 'jugadora' && Array.isArray(jugador.trofeos.individual)) {
+            // Trofeos Individuales (Balón de Oro, MVP, etc.)
+            trofeoMatch = jugador.trofeos.individual.some(t => `trofeo${t.id}` === imgClass);
+        } else if (img.id === 'clubes' && Array.isArray(jugador.trofeos.equipo)) {
+            // Trofeos de Equipo (Champions, Liga, etc.)
+            // Aplanamos los arrays de 'success' para buscar el ID
+            const idsEquipo = jugador.trofeos.equipo.flatMap(item => item.success || []);
+            trofeoMatch = idsEquipo.some(idTrofeo => `trofeo${idTrofeo}` === imgClass);
+        }
+        
+        if (trofeoMatch) hasMatch = true;
+    }
+
+    // 5. VERIFICACIÓN DE EDAD (Más limpio)
+    if (lowerClass.includes("edad")) {
+        const edad = jugador.edad;
+        // Buscamos la clase específica que define la regla
+        const claseRegla = Array.from(img.classList).find(cls => 
+            cls.startsWith('EdadMenor') || cls.startsWith('EdadMayor') || cls.startsWith('EdadIgual')
+        );
+
+        if (claseRegla) {
+            const valorRegla = parseInt(claseRegla.replace(/\D/g, ''), 10); // Extrae solo los números
+            if (claseRegla.startsWith('EdadMenor')) hasMatch = (edad < valorRegla);
+            else if (claseRegla.startsWith('EdadMayor')) hasMatch = (edad > valorRegla);
+            else if (claseRegla.startsWith('EdadIgual')) hasMatch = (edad === valorRegla);
         }
     }
-    if (img.className.toLowerCase().includes("club")) {
-        if (Array.isArray(trayectoria)) { // Verificar que trayectoria sea un array
-            const clubMatch = trayectoria.some(club => `club${club}` === imgClass);
-
-            if (clubMatch) {
-                console.log("¡Coincidencia de club encontrada!");
-                hasMatch = true;
-            } else {
-                console.log("No hay coincidencia de club.");
-            }
-        } else {
-            console.log("La trayectoria no es un array o está vacía.");
-        }
-    }
-    if (img.className.toLowerCase().includes("trofeo")) {
-        if (Array.isArray(trofeos.equipo && trofeos.equipo)) { // Verificar que trayectoria sea un array
-            let trofeoMatch = false;
-            let trofeosIndividuales = [];
-            let trofeosEquipo = [];
-
-            if(trofeos.individual){
-                trofeos.individual.forEach(item => {
-                    trofeosIndividuales.push(item);
-                    
-                });
-            }
-            
-            if(trofeos.equipo){
-                trofeos.equipo.forEach(item => {
-                    if (Array.isArray(item.success)) {
-                        trofeosEquipo.push(...item.success);
-                    }
-                });
-            }
-
-            if(img.id === 'jugadora'){
-                trofeoMatch = trofeosIndividuales.some(trofeo => `trofeo${trofeo.id}` === imgClass);
-            } else if(img.id === 'clubes'){
-                trofeoMatch = trofeosEquipo.some(trofeo => `trofeo${trofeo.id}` === imgClass);
-            }
-            if (trofeoMatch) {
-                console.log("¡Coincidencia de trofeo encontrada!");
-                hasMatch = true;
-            } else {
-                console.log("No hay coincidencia de trofeo.");
-            }
-        } else {
-            console.log("La trayectoria no es un array o está vacía.");
-        }
-    }
-    if (img.className.toLowerCase().includes("edad")) {
-        // Verificar si la clase contiene 'EdadMenor'
-        const claseEdadMenor = Array.from(img.classList).find(cls => cls.startsWith('EdadMenor'));
-        const claseEdadMayor = Array.from(img.classList).find(cls => cls.startsWith('EdadMayor'));
-        const claseEdad = Array.from(img.classList).find(cls => cls.startsWith('EdadIgual'));
-        if (claseEdadMenor) {
-            // Extraer el número después de 'EdadMenor'
-            const edadLimite = parseInt(claseEdadMenor.replace('EdadMenor', ''), 10);
-
-            if (jugador.edad < edadLimite) {
-                console.log(`¡Coincidencia de edad menor de ${edadLimite}!`);
-                hasMatch = true;
-            } else {
-                console.log(`No hay coincidencia de edad menor de ${edadLimite}.`);
-            }
-        }
-        if (claseEdadMayor) {
-            // Extraer el número después de 'EdadMayor'
-            const edadLimite = parseInt(claseEdadMayor.replace('EdadMayor', ''), 10);
-
-            if (jugador.edad > edadLimite) {
-                console.log(`¡Coincidencia de edad mayor de ${edadLimite}!`);
-                hasMatch = true;
-            } else {
-                console.log(`No hay coincidencia de edad mayor de ${edadLimite}.`);
-            }
-        }
-        // Si no es 'EdadMenor', verificar las otras clases de edad
-        if (claseEdad) {
-            // Extraer el número después de 'EdadMenor'
-            const edadLimite = parseInt(claseEdad.replace('EdadIgual', ''), 10);
-
-            if (jugador.edad === edadLimite) {
-                console.log(`¡Coincidencia de edad igual a ${edadLimite}!`);
-                hasMatch = true;
-            } else {
-                console.log(`No hay coincidencia de edad igual a ${edadLimite}.`);
-            }
-        }
-
-    }
-    if(hasMatch){
-        bloquearCeldaEstilo(cell, jugador.foto); // Usar la imagen correcta
+    // --- LÓGICA DE ACIERTO ---
+    if (hasMatch) {
+        bloquearCeldaEstilo(cell, jugador.foto);
         gestionarAciertos(cellId, jugador.foto);
-        correct.play();
-        celdasLlenas = comprobarFotosEnCeldas();
+        if (typeof correct !== 'undefined') correct.play();
+        
+        // Verificar si se ha completado el tablero
+        if (comprobarFotosEnCeldas()) {
+            window.stopCounter('bingo');
+            if (typeof victory !== 'undefined') victory.play();
+            window.updateRacha(6, 1, localStorage.getItem('Attr6'));
+            Ganaste('bingo');
+        }
+    } else {
+        if (typeof wrong !== 'undefined') wrong.play();
     }
-    if(celdasLlenas){
-        stopCounter('bingo');
-        victory.play();
-        updateRacha(6, 1, localStorage.getItem('Attr6'));
-        Ganaste('bingo');
-    }
+
     return hasMatch;
 }
 
@@ -333,6 +273,8 @@ async function mostrarJugadora(jugadora, paises, clubes, ligas, trofeos) {
 
 
     const edad = calcularEdad(jugadora.Nacimiento);
+    const { fetchJugadoraNacionalidadById, fetchJugadoraTrayectoriaById, fetchJugadoraPalmaresById } = await import("/static/futfem/js/jugadora.js");
+
     // En lugar de 3 awaits secuenciales, haz esto:
     const [pais, equipos, palmares] = await Promise.all([
         fetchJugadoraNacionalidadById(jugadora.id),
@@ -457,6 +399,7 @@ function gestionarAciertos(celda, foto) {
 
 async function colocarAciertos() {
     let grid = localStorage.getItem('Attr6');
+    const {stopCounter} = await import('../utils/counter.js');
 
     // Asegurarse de que retrievedGrid es un array
     let retrievedGrid = grid ? JSON.parse(grid) : [];
@@ -494,6 +437,6 @@ async function bingoPerder() {
     // Guardar de nuevo 
     localStorage.setItem('Attr6', JSON.stringify(retrievedGrid));
     if(localStorage.length>0){
-        await updateRacha(6, 0, localStorage.getItem('Attr6'));
+        await window.updateRacha(6, 0, localStorage.getItem('Attr6'));
     }
 }

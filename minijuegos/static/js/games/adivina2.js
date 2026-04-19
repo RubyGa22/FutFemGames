@@ -4,7 +4,7 @@ import { Ganaste, crearPopupInicialJuego } from "./funciones-comunes.js";
 import { victory } from "../sounds.js";
 
 const texto = 'Guess Player" es un juego de trivia en el que los jugadores deben adivinar el nombre de una jugadora de fútbol basándose en los equipos en los que ha jugado a lo largo de su carrera. El juego presenta una serie de pistas sobre los clubes y selecciones nacionales en los que la jugadora ha jugado, y el objetivo es identificar correctamente a la jugadora lo más rápido posible. A medida que avanzas, las pistas se hacen más desafiantes y los jugadores deben demostrar su conocimiento sobre el fútbol femenino y sus estrellas. ¡Pon a prueba tus conocimientos y compite para ver quién adivina más jugadoras correctamente!';
-const imagen = '/static/img/ComingSoon.png';
+const imagen = '/static/img/ComingSoon.webp';
 const btn = document.getElementById('botonVerificar');
 const div = document.getElementById('game-results');
 const vidasContainer = document.getElementById('vidas');
@@ -33,7 +33,7 @@ async function iniciar(dificultad) {
     localStorage.setItem('res3', jugadora);
     vidasContainer.textContent = gettext('Vidas restantes: ') + vidas;
 
-     if(ultimaObj.answer === jugadoraId){
+    if(ultimaObj.answer === jugadoraId){
         console.log('Se ha guardado la respuesta'); 
         localStorage.setItem('Attr3', ultima);
     }
@@ -97,27 +97,25 @@ async function verificar(){
     if (!nombreJugadora) return;
 
     const jugadoraAnswer = await obtenerJugadora(nombreJugadora)
-    const edad = compararMayorMenorIgual(jugadora.edad, jugadoraAnswer.edad, "edad")
-    const altura = compararMayorMenorIgual(jugadora.altura, jugadoraAnswer.altura, "altura");
-    const equipo = compararIgualONo(jugadora.equipo, jugadoraAnswer.equipo, "equipo");
-    const pais = compararIgualONo(jugadora.pais, jugadoraAnswer.pais, "pais");
-    const pie = compararIgualONo(jugadora.pie, jugadoraAnswer.pie, "pie");
-    const posicion = compararIgualONo(jugadora.Posiciones[0].id, jugadoraAnswer.Posiciones[0].id, "posicion");
-    jugadoraAnswer.pie = pie
-    jugadoraAnswer.edad = edad
-    jugadoraAnswer.altura = altura
-    jugadoraAnswer.equipo = equipo
-    jugadoraAnswer.pais = pais
-    jugadoraAnswer.posicion = posicion
-    
+
+    const stats = {
+        edad: compararMayorMenorIgual(jugadora.edad, jugadoraAnswer.edad, "edad"),
+        altura: compararMayorMenorIgual(jugadora.altura, jugadoraAnswer.altura, "altura"),
+        equipo: compararIgualONo(jugadora.equipo, jugadoraAnswer.equipo, "equipo"),
+        pais: compararIgualONo(jugadora.pais, jugadoraAnswer.pais, "pais"),
+        pie: compararIgualONo(jugadora.pie, jugadoraAnswer.pie, "pie"),
+        posicion: compararIgualONo(jugadora.Posiciones[0].id, jugadoraAnswer.Posiciones[0].id, "posicion")
+    }
+
+    Object.assign(jugadoraAnswer, stats);
 
     displayRespuesta(jugadoraAnswer)
-    gestionarAciertos(nombreJugadora)
     if(nombreJugadora === jugadoraId){
         victory.play()
         updateRacha(3, 1, localStorage.getItem('Attr3'))
     }else{
         vidas--;
+        gestionarAciertos(nombreJugadora)
         vidasContainer.textContent = gettext('Vidas restantes: ') + vidas;
         if(vidas===0){
             //ponerBanderas()
@@ -237,6 +235,8 @@ async function verificar(){
             vidas: vidas,
             answer: null
         };
+
+        vidas = gameState.vidas;
 
         let jugadoras = gameState.jugadoras;
         vidasContainer.textContent = gettext("Vidas restantes: ") + gameState.vidas;

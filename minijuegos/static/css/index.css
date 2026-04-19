@@ -1,23 +1,28 @@
 .col-md-4{
-    max-width: 20%;
+    max-width: max-content;
+    display: grid;
+    grid-template-areas: "stack"; /* Definimos una única zona de apilado */
+    align-items: center;
+    justify-items: center;
+    position: relative; /* Opcional, solo para contener z-index */
 }
 body {
-    position: relative;
     height: 100vh;
     /* ... tus otros estilos ... */
     overflow: hidden !important;
     background: none; /* Quitamos el fondo de aquí */
     min-height: 100vh;
     max-height: 100vh;
+    background: none !important;
 }
 body::before {
     content: "";
     position: fixed;
     inset: 0;
     z-index: -1;
-    background-image: url("../img/estadio.jpg") !important;
+    /*background-image: url("../img/estadio.jpg") !important;
     background-color: rgba(48, 0, 48, 0.5) !important; /* Color negro con transparencia */
-    background-blend-mode: luminosity !important; /* Modo de mezcla */
+    /*background-blend-mode: luminosity !important; /* Modo de mezcla */
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -44,12 +49,12 @@ body::before {
 section{
     width: 100%;
     /*height: 100%;*/
-    /*overflow-y: auto;*/
+    overflow-y: auto;
 }
 section .container {
     height: 100%;
     position: relative;
-    margin-top: 1rem !important;
+    margin-top: 0rem !important;
 }
 
 section::-webkit-scrollbar{
@@ -62,23 +67,31 @@ section::-webkit-scrollbar{
     align-items: center;
 }
 
+#regular-games .row .col-md-4:nth-child(1), #regular-games .row .col-md-4:nth-child(3){
+    opacity: 0;
+    visibility: hidden;
+}
+
 /* Estilos principales para .game-button */
 .game-button {
     --start: 0;
-    border-radius: 10px; /* Bordes redondeados */
+    border-radius: 15px; /* Bordes redondeados */
     text-align: center; /* Centrar el contenido dentro del botón */
     /*padding: 10px; /* Espaciado interior */
-    background-color: var(--color-secundario); /* Color de fondo primario */
+    background: color-mix(in srgb, var(--color-primario) 50%, transparent 50%); /* Color de fondo primario */
     color: white; /* Color del texto */
     margin-bottom: 20px; /* Espaciado inferior entre botones */
     transition: transform 0.2s; /* Suavizar el efecto de transformación */
-    /*border: 0.5px solid var(--color-primario);*/
-    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);
+    /*border: 1px solid var(--color-secundario);*/
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
     position: relative;
     transition: border-color 0.5s ease-in-out;
-    backdrop-filter: blur(20px);
+    /*backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);*/
     pointer-events: auto;
+    min-width: 98px;
     overflow: hidden;
+    border: 1px solid var(--color-primario);
 }
 .game-button {
     transform-style: preserve-3d;
@@ -123,6 +136,7 @@ section::-webkit-scrollbar{
 }
 .glow {
   pointer-events: none;
+  display: none;
   position: absolute;
   width: 100%;
   height: 100%;
@@ -159,20 +173,53 @@ section::-webkit-scrollbar{
   transition: 1s ease;
 }
 
-.game-button:hover > .glow::before {
-  opacity: 1;
+.game-button:hover {
+    transform: scale(1.05);
+    transition: transform 0.4s ease;
 }
 
-.game-button:hover::before {
-  opacity: 0.6;
+.game-button:hover > .glow::before {
+    opacity: 1;
+    display: none;
 }
 
 .game-button img {
-    max-width: 100%; /* La imagen ocupa el ancho total disponible */
+    max-width: 150px; /* La imagen ocupa el ancho total disponible */
+    aspect-ratio: 1 / 1; 
+    min-height: 98px; /* Asegura que la imagen tenga al menos 100px de alto */
+    min-width: 98px; /* Asegura que la imagen tenga al menos 100px de ancho */
+    height: 150px; /* Establece una altura fija para las imágenes */
+    width: auto; /* Ajusta el ancho automáticamente para mantener la proporción */
     height: auto; /* Mantener la proporción de la imagen */
     border-radius: 10px 10px 0 0; /* Bordes redondeados en las imágenes */
     object-fit: cover;
-    transition: transform 0.4s ease, opacity 0.4s ease; transform-origin: center center;
+    transition: transform 0.4s ease, opacity 0.4s ease; 
+    transform-origin: center center;
+}
+
+.game-button#boton-wordle img{
+    object-fit: contain;
+}
+
+/* Imagen base: siempre está ahí */
+.base-img {
+    z-index: 1;
+}
+
+/* Imagen hover: se coloca encima y desaparece de entrada */
+/*.hover-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2; 
+    opacity: 0; /* Invisible por defecto */
+/*}
+
+/* --- EFECTO HOVER --- */
+
+/* 2. Opcional: Zoom a ambas para dar dinamismo */
+.game-button:hover .game-img {
+    transform: scale(1.05);
 }
 
 .game-button button {
@@ -181,22 +228,66 @@ section::-webkit-scrollbar{
     display: none; /* El botón se muestra como un bloque */
     border: none;
 }
-.game-button h4 {
-    margin-top: 10px; /* Espaciado superior para el título */
+
+.game-button #game-title-container{
+    background: color-mix(in srgb, var(--color-primario) 100%, transparent 0%); /* Color de fondo primario */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 15px 15px 0 0;
+}
+
+/*.game-button #game-title-container>div{
+    height: 30px;
+    justify-content: space-between !important;
+    /*background: color-mix(in srgb, var(--color-primario) 100%, transparent 0%);*/
+    /*border-bottom: 5px solid var(--color-primario);}*/
+
+.game-button #game-title-container>div::before{
+    content: "";
+    position: fixed;
+    background: #ff0000;
+    background: linear-gradient(
+        to bottom,
+        #ff0000,#fdcf58
+    );
+}
+
+/*.game-button #game-title-container .forma{
+    
+    background: color-mix(in srgb, var(--color-primario) 100%, transparent 0%);
+    width: -webkit-fill-available;
+    border-radius: 0 15px 0 0;
+    z-index: 2;
+    width: 60%;
+}
+
+.game-button #game-title-container div>.forma:nth-child(1){
+    border-radius: 15px 0 0 0;
+}*/
+
+
+.game-button h2 {
+    padding-block: 10px; /* Espaciado superior para el título */
     font-size: 20px; /* Tamaño de fuente predeterminado */
     font-weight: bold; /* Título en negrita */
+    margin-bottom: 0 !important; /* Eliminar el margen inferior */
+    height: 100%; /* El título ocupa el espacio restante debajo de la imagen */
+    width: 100% !important;
+    /*font-family: 'Oswald', sans-serif !important; /* Fuente personalizada para el título */
+    background: color-mix(in srgb, var(--color-primario) 100%, transparent 0%); /* Color de fondo primario */
 }
 
 .game-button:hover {
-    transform: scale(1.05); /* Aumenta ligeramente el tamaño al pasar el ratón */
     color: var(--color-texto); /* Cambiar el color del texto en hover */
-    background: var(--color-primario); /* Cambiar el fondo en hover */
+    /*background: var(--color-primario); /* Cambiar el fondo en hover */
+    background: color-mix(in srgb, var(--color-primario) 30%, transparent 70%); /* Color de fondo primario */
     transition: scale 0.5s, background-color 0.2s, color 0.2s; /* Suavizar las transiciones */
 }
 
 
 @media (max-width: 1200px) {
-    .game-button h4{
+    .game-button h2{
         font-size: medium;
     }
 }
@@ -208,8 +299,16 @@ section::-webkit-scrollbar{
         flex-direction: column;
         align-items: center;
     }
-    .game-button h4 {
+    .game-button{
+        min-width: 150px;
+        max-height: 214px;
+    }
+    .game-button h2 {
         font-size: 1.0rem; /* Ajustar el tamaño de la fuente en pantallas medianas */
+    }
+    .game-button img{
+        max-height: 177px;
+
     }
     .game-button {
         max-width: 100%; /* Botones ocupan todo el ancho en pantallas medianas */
@@ -225,10 +324,14 @@ section::-webkit-scrollbar{
 /* Media queries para pantallas de menos de 768px */
 @media (max-width: 768px) {
     section{
-        overflow-y: hidden;
+        min-height: 75vh;
+    }
+    section h1{
+        font-size: 1.5rem;
     }
     section .container{
         padding-inline: unset;
+        min-height: 70vh;
     }
     .row{
         margin-inline: 0px;
@@ -237,15 +340,25 @@ section::-webkit-scrollbar{
         display: none; /* Ocultar los botones en pantallas pequeñas */;
     }
     .game-button {
-        max-width: 100%; /* Botones ocupan todo el ancho en pantallas pequeñas */
+        max-width: 100% !important; /* Botones ocupan todo el ancho en pantallas pequeñas */
+        min-width: 85px;
+        max-width: 152px;
+        max-height: 100%;
+    }
+    .game-button img {
+        max-width: 100px; /* La imagen ocupa el ancho total disponible */
+        min-height: 45px; /* Asegura que la imagen tenga al menos 100px de alto */
+        min-width: 45px; /* Asegura que la imagen tenga al menos 100px de ancho */
+        height: 100px; /* Establece una altura fija para las imágenes */
+        width: stretch; /* Ajusta el ancho automáticamente para mantener la proporción */
     }
     .col-md-3 {
         max-width: 50%; /* Dos columnas por fila en pantallas pequeñas */
     }
     .col-md-4{
-        max-width: 30%;
+        max-width: max-content
     }
-    .game-button h4 {
+    .game-button h2 {
         font-size: 10px; /* Reducir el tamaño de la fuente en pantallas pequeñas */
         width: max-content;
         justify-self: center;

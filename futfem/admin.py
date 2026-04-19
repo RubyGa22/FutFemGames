@@ -167,6 +167,7 @@ class JugadoraAdmin(admin.ModelAdmin):
 class EquipoAdmin(admin.ModelAdmin):
     list_display = ('ver_escudo', 'nombre', 'ver_logo_liga', 'ver_color', 'latitud', 'longitud')
     list_filter = ('liga',)
+    ordering = ('nombre',)
     search_fields = ('nombre',)
     autocomplete_fields = ['equipo_sucesor']
     inlines = [EquipoTrofeoInline]

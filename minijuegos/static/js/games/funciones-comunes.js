@@ -1,15 +1,10 @@
-import { fetchJugadoraById } from '/static/futfem/js/jugadora.js'
-import { fetchPaisesById } from '/static/futfem/js/pais.js';
-import { fetchLigasById } from '/static/futfem/js/ligas.js';
-import { fetchEquiposById } from '/static/futfem/js/equipos.js';
-import { fetchTrofeosById } from '/static/futfem/js/trofeos.js';
-import { cambiarImagenConFlip } from "/static/js/animations/generales.js";
 //----------------------------------------------------------------------------------
 //---------------Funciones para colocar banderas, clubes, edades--------------------
 //----------------------------------------------------------------------------------
 //------------------Poner Banderas--------------------------------------------------
 export async function ponerBanderas(ids, posiciones) {
 
+    const { fetchPaisesById } = await import("/static/futfem/js/pais.js");
     const data = await fetchPaisesById(ids)
 
     data.forEach((pais, index) => {
@@ -47,6 +42,7 @@ export async function ponerBanderas(ids, posiciones) {
 //--------------------Poner Clubes--------------------------------------------------
 export async function ponerClubes(ids, posiciones) {
 
+    const { fetchEquiposById } = await import("/static/futfem/js/equipos.js");
     const data = await fetchEquiposById(ids);
     data.forEach((club, index) => {
         const th = document.getElementById(posiciones[index]);
@@ -72,10 +68,12 @@ export async function ponerClubes(ids, posiciones) {
             th.style.background = `
                 linear-gradient(
                     to bottom,
-                    color-mix(in srgb, ${colorPrimario} 50%, transparent),
-                    color-mix(in srgb, ${colorSecundario} 50%, transparent)
+                    color-mix(in srgb, ${colorPrimario} 20%, transparent),
+                    color-mix(in srgb, ${colorPrimario} 20%, transparent)
                 )
                 `;
+            
+            th.style.border = `1px solid color-mix(in srgb, ${colorPrimario} 50%, transparent)`;
 
             // Añadir imagen y texto al elemento th
             th.appendChild(img);
@@ -88,6 +86,7 @@ export async function ponerClubes(ids, posiciones) {
 //--------------------Poner Ligas---------------------------------------------------
 export async function ponerLigas(ids, posiciones) {
 
+    const { fetchLigasById } = await import("/static/futfem/js/ligas.js");
     const data = await fetchLigasById(ids);
     data.forEach((liga, index) => {
         const th = document.getElementById(posiciones[index]);
@@ -117,6 +116,7 @@ export async function ponerLigas(ids, posiciones) {
 //--------------------Poner Trofeos--------------------------------------------------
 export async function ponerTrofeos(ids, posiciones) {
 
+    const { fetchTrofeosById } = await import("/static/futfem/js/trofeos.js");
     const data = await fetchTrofeosById(ids);
     data.forEach((trofeo, index) => {
         const th = document.getElementById(posiciones[index]);
@@ -172,16 +172,18 @@ export function ponerEdades(id1, id2, rutaImagen1, rutaImagen2) {
 //---------------Funciones para verificar banderas, clubes, edades------------------
 //----------------------------------------------------------------------------------
 async function sacarJugadora(id) {
+    const { fetchJugadoraById } = await import("/static/futfem/js/jugadora.js");
     const data = await fetchJugadoraById(id)
     return data;
 }
 
-export function Ganaste(modo) {
+export async function Ganaste(modo) {
     const input = document.querySelectorAll('input');
-    const button = document.querySelector('button');
+    const button = document.getElementById('botonVerificar');
     const result = document.getElementById('resultado');
     const reloj = document.getElementById('reloj');
     const vidas = document.getElementById('vidas');
+    const { cambiarImagenConFlip } = await import("/static/js/animations/generales.js");
     if(button){
         button.disabled=true;
         button.style.pointerEvents = 'none';
@@ -206,9 +208,9 @@ export function Ganaste(modo) {
         localStorage.setItem('Attr1', jugadora_id);
         cambiarImagenConFlip();
     }else if(modo==='compañeras'){
-        const div = document.getElementById('compañeras');
-        const jugadora_id = div.getAttribute('Attr8');
-        localStorage.setItem('Attr8', jugadora_id);
+        const button = document.getElementById('botonVerificar');
+        result.textContent = gettext('¡Has Ganado!');
+        button.disabled = true;
         cambiarImagenConFlip();
     }else if(modo === 'Guess Player'){
         const button = document.querySelector('button');
@@ -257,6 +259,8 @@ export function crearPopupInicialJuego(titulo, explicacion, imagen, tipo, inicia
     const imagenDiv = document.createElement('div');
     const imagenElemento = document.createElement('img');
     imagenElemento.src = imagen;
+    imagenElemento.alt = titulo;
+    imagenElemento.fetchPriority = 'high'; // Prioridad alta para cargar la imagen rápidamente
     imagenDiv.appendChild(imagenElemento);
 
     // Crear el contenedor de la explicación con el título y el texto
@@ -298,19 +302,25 @@ export function crearPopupInicialJuego(titulo, explicacion, imagen, tipo, inicia
 
     // Crear los botones de dificultad
     const botonSinTiempo = document.createElement('button');
-    botonSinTiempo.innerHTML = '<i class="bi bi-infinity"></i>';
+    botonSinTiempo.title = gettext('infinite');
+    botonSinTiempo.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-infinity" viewBox="0 0 16 16">
+  <path d="M5.68 5.792 7.345 7.75 5.681 9.708a2.75 2.75 0 1 1 0-3.916ZM8 6.978 6.416 5.113l-.014-.015a3.75 3.75 0 1 0 0 5.304l.014-.015L8 8.522l1.584 1.865.014.015a3.75 3.75 0 1 0 0-5.304l-.014.015zm.656.772 1.663-1.958a2.75 2.75 0 1 1 0 3.916z"/>
+</svg>`;
     botonSinTiempo.addEventListener('click', () => iniciarCallback('infinito'));  // Usamos una función de flecha para pasar el parámetro 'facil'
     
     const botonFacil = document.createElement('button');
     botonFacil.textContent = gettext('Fácil');
+    botonFacil.title = 'easy';
     botonFacil.addEventListener('click', () => iniciarCallback('facil'));  // Usamos una función de flecha para pasar el parámetro 'facil'
 
     const botonMedio = document.createElement('button');
     botonMedio.textContent = gettext('Medio');
+    botonMedio.title = 'medium';
     botonMedio.addEventListener('click', () => iniciarCallback('medio'));  // Usamos una función de flecha para pasar el parámetro 'normal'
     
     const botonDificil = document.createElement('button');
     botonDificil.textContent = gettext('Difícil');
+    botonDificil.title = 'hard';
     botonDificil.addEventListener('click', () => iniciarCallback('dificil'));  // Usamos una función de flecha para pasar el parámetro 'dificil'
 
     // Añadir los botones al contenedor de dificultad

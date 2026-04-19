@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load compress %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
@@ -7,21 +8,35 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>Perfil de {{ usuario.username }}</title>
     <link rel="icon" href="{% static 'img/logo.png' %}">
+    <link rel="preload" as="image" href="/static/img/Football_pitch.webp" fetchpriority="high">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" 
+      media="print" onload="this.media='all'">
+
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    </noscript>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />    
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
-    <link rel="stylesheet" href="{% static 'css/combo.css' %}">
-    <link rel="stylesheet" href="{% static 'usuarios/css/perfil.css' %}?v={% now 'U' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />  
+    {% compress css inline%}  
+        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+        <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+        <link rel="stylesheet" href="{% static 'css/combo.css' %}">
+        <link rel="stylesheet" href="{% static 'usuarios/css/perfil.css' %}">
+    {% endcompress %}
 </head>
-<body class="loading">
+<body class="loading" {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
     {% include 'partials/header.html' %}
-    <div class="container-perfil">
+    <div id="pag-perfil-container">
+    <div class="container-perfil glass" id="equipo-{{ usuario.equipo_favorito.id_equipo }}">
         <input type="hidden" id="perfil-usuario-id" value="{{ usuario.id }}">
 
-    <div id="datos-personales" class="glass">
+    <div id="datos-personales">
         <img src="{% if jugadora_favorita %}/{{ jugadora_favorita.imagen }}{% else %}{% static 'img/default-avatar.png' %}{% endif %}" class="glass profile-img" alt="Avatar" style="width:150px; height:auto; padding-inline: unset;">
         <div class="field-container editable-group" data-field="username" id="username-container">
             <h1 class="d-inline display-value">{{ usuario.username }}</h1>
@@ -36,45 +51,67 @@
                 <div class="edit-mode" style="display: none;">
                     <input type="text" class="edit-input" value="{{ usuario.username }}">
                     <i class="bi bi-check-lg save-trigger text-success"></i>
+                    <i class="bi bi-x-lg cancel-trigger text-danger"></i>
                 </div>
             {% endif %}
         </div>
 
+        <div class="row" style="gap: 5px;">
         <div class="field-container editable-group" data-field="first_name">
-            <span>{% trans "Nombre" %}:</span>
+            <!--<span>{% trans "Nombre" %}:</span>-->
             <span class="display-value">{{ usuario.first_name|default:"---" }}</span>
             {% if es_propio %}
                 <i class="bi bi-pencil ms-2 edit-trigger"></i>
                 <div class="edit-mode" style="display: none;">
                     <input type="text" class="edit-input" value="{{ usuario.first_name }}">
                     <i class="bi bi-check-lg save-trigger text-success"></i>
+                    <i class="bi bi-x-lg cancel-trigger text-danger"></i>
                 </div>
             {% endif %}
         </div>
 
         <div class="field-container editable-group" data-field="last_name">
-            <span>{% trans "Apellidos" %}:</span>
+            <!--<span>{% trans "Apellidos" %}:</span>-->
             <span class="display-value">{{ usuario.last_name|default:"---" }}</span>
             {% if es_propio %}
                 <i class="bi bi-pencil ms-2 edit-trigger"></i>
                 <div class="edit-mode" style="display: none;">
                     <input type="text" class="edit-input" value="{{ usuario.last_name }}">
                     <i class="bi bi-check-lg save-trigger text-success"></i>
+                    <i class="bi bi-x-lg cancel-trigger text-danger"></i>
                 </div>
             {% endif %}
         </div>
-
-        <div class="field-container editable-group" data-field="jugadora_favorita">
-            <h2>{% trans "Jugadora favorita" %}:</h2>
-            <span class="display-value">{% if jugadora_favorita %}{{ jugadora_favorita.Apodo }}{% else %}{% trans "Ninguna" %}{% endif %}</span>
-            {% if es_propio %}
-                <i class="bi bi-pencil ms-2 edit-trigger"></i>
-                <div class="edit-mode" style="display: none;">
-                    <input type="text" class="edit-input" id="jugadora-input" value="{{ jugadora_favorita.Apodo }}" data-id="{{ jugadora_favorita.id_jugadora }}">
-                    <i class="bi bi-check-lg save-trigger text-success"></i>
+        </div>
+        <div class="row">
+            <div class="field-container editable-group" data-field="equipo_favorito">
+                
+                <span class="display-value" style="order: 2;">{% if usuario.equipo_favorito %} <img src="/{{ usuario.equipo_favorito.escudo }}">{% else %}{% trans "Ninguno" %}{% endif %}</span>
+                {% if es_propio %}
+                    <!--<h2 style="order: 1;">{% trans "Equipo favorito" %}:</h2>-->
+                    <i class="bi bi-pencil ms-2 edit-trigger"></i>
+                    <div class="edit-mode" style="display: none;">
+                        <input type="text" class="edit-input" id="equipo-input" value="{{ usuario.equipo_favorito.nombre }}" data-id="{{ equipo_favorito.id_equipo }}" autocomplete="off">
+                        <i class="bi bi-check-lg save-trigger text-success"></i>
+                        <i class="bi bi-x-lg cancel-trigger text-danger"></i>
+                    </div>
+                    <div id="sugerencias-container"><ul id="sugerencias-equipo"></ul></div>
+                {% endif %}
+            </div>
+            <div class="field-container editable-group" data-field="jugadora_favorita">
+                
+                {% if es_propio %}
+                <h2>{% trans "Jugadora favorita" %}:</h2>
+                <span class="display-value">{% if jugadora_favorita %}{{ jugadora_favorita.Apodo }}{% else %}{% trans "Ninguna" %}{% endif %}</span>
+                    <i class="bi bi-pencil ms-2 edit-trigger"></i>
+                    <div class="edit-mode" style="display: none;">
+                        <input type="text" class="edit-input" id="jugadora-input" value="{{ jugadora_favorita.Apodo }}" data-id="{{ jugadora_favorita.id_jugadora }}" autocomplete="off">
+                        <i class="bi bi-check-lg save-trigger text-success"></i>
+                        <i class="bi bi-x-lg cancel-trigger text-danger"></i>
+                    </div>
                     <div id="sugerencias-container"><ul id="sugerencias"></ul></div>
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
         </div>
     </div>
         <div class="right">
@@ -91,13 +128,24 @@
         </div>
         <div id="amigos" class="glass">
             <!-- <h3>Amigos conectados</h3> -->
-             <h3>Próximamente</h3>
+            <h2>Proximamente</h2>
         </div>
         </div>
+    </div>
     </div>
 <script type="module" id="control-acceso" src="{% static 'usuarios/js/control-acceso.js' %}" data-allowed-roles="1,2"></script>
 <script src="{% url 'javascript-catalog' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
+<script type="module">
+    import { handleAutocompletePlayer } from "{% static 'futfem/js/jugadora.js' %}";
+    import { handleAutocompleteEquipo } from "{% static 'futfem/js/equipos.js' %}";
+    // La forma correcta de pasar parámetros en un listener
+    document.getElementById("equipo-input").addEventListener("input", (event) => {
+        handleAutocompleteEquipo(event, 'sugerencias-equipo');
+    });
+    document.getElementById("jugadora-input").addEventListener("input", handleAutocompletePlayer);
+</script>
+<script src="{% static 'js/animations/header.js' %}" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 <script type="module" src="{% static 'usuarios/js/perfil.js' %}"></script>
 </body>

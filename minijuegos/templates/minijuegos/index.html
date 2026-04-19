@@ -1,32 +1,59 @@
 {% load static %}
 {% load i18n %}
+{% load compress %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#480048">
-    <meta name="description" content="FutFemGames es una plataforma de minijuegos inspirados en el fútbol femenino. Disfruta de juegos como Futfem Career, Futfem Grid, Futfem Bingo y más. ¡Juega ahora y demuestra tu pasión por el fútbol femenino!">
+    <meta name="description" content="FutFemGames es una plataforma de minijuegos inspirados en el fútbol femenino. Disfruta de juegos como Futfem Career, Futfem Grid, Futfem Bingo y más.">
     <title>FutFemGames</title>
+    
     <link rel="icon" href="{% static 'img/logo.png' %}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
+
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Montserrat:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Montserrat:wght@400;700&display=swap" media="print" onload="this.media='all'">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" media="print" onload="this.media='all'">
+
+    <link rel="modulepreload" href="{% static 'usuarios/js/rachas.js' %}">
+    <link rel="preload" href="{% static 'js/animations/header.js' %}" as="script">
+
+    {% compress css inline %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <link rel="stylesheet" href="{% static 'css/index.css' %}">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
     <link rel="stylesheet" href="{% static 'css/glow-border.css' %}">
+    {% endcompress %}
+
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css">
+    </noscript>
 </head>
-<body>
-    <div id="bg-dynamic"></div>
+<body {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
 {% include 'partials/header.html' %}
 <section class="juegos">
+<h1>
+    {% with id=usuario_sesion.equipo_favorito.id_equipo user=usuario_sesion.username %}
+        {% if id == 2 %}
+            ¡Matxo {{ user }}!
+        {% elif id == 11 %}
+            ¡Amunt, {{ user }}!
+        {% elif id == 27 %}
+            ¡Endavant, {{ user }}!
+        {% else %}
+            ¡Hola, {{ user }}!
+        {% endif %}
+    {% endwith %}
+</h1>
 <div class="container mt-5 sibling-fade">
     <div class="row sibling-fade d-flex justify-content-center">
-        {% include 'partials/game_card.html' with racha_id="racha-1" destino_js="career" imagen="img/trayectoria.png" titulo=_("Futfem Career") %}
-        {% include 'partials/game_card.html' with racha_id="racha-4" destino_js="grid" imagen="img/grid1.png" titulo=_("Futfem Grid") %}
-        {% include 'partials/game_card.html' with racha_id="racha-6" destino_js="bingo" imagen="img/Bingo.png" titulo=_("Futfem Bingo") %}
+        {% include 'partials/game_card.html' with racha_id="racha-1" destino_js="career" imagen="img/grid-logo.webp" titulo=_("Futfem Career") %}
+        {% include 'partials/game_card.html' with racha_id="racha-4" destino_js="grid" imagen="img/grid-logo.webp" imagen_hover="img/grid1.webp" titulo=_("Futfem Grid") %}
+        {% include 'partials/game_card.html' with racha_id="racha-6" destino_js="bingo" imagen="img/bingo-logo.webp" imagen_hover="img/Bingo.webp" titulo=_("Futfem Bingo") %}
         <div class="col-md-4" style="display: none;">
             <div class="game-button glow" onclick="redireccionarA('XI_Clubs')">
                 <img src="{% static 'img/ComingSoon.png' %}" alt="Game 3">
@@ -36,28 +63,28 @@
         </div>
     </div>
     <div class="row sibling-fade d-flex justify-content-center">
-        {% include 'partials/game_card.html' with racha_id="racha-2" destino_js="wordle" imagen="img/wordle.png" titulo=_("Futfem Wordle") %}
-        {% include 'partials/game_card.html' with racha_id="racha-3" destino_js="guess" imagen="img/ComingSoon.png" titulo=_("Futfem Guess") %}
-        {% include 'partials/game_card.html' with racha_id="racha-5" destino_js="mates" imagen="img/ComingSoon.png" titulo=_("Futfem Mates") %}        
+        {% include 'partials/game_card.html' with racha_id="racha-2" destino_js="wordle" imagen="img/wordle-logo.webp" imagen_hover="img/wordle.webp" titulo=_("Futfem Wordle") %}
+        {% include 'partials/game_card.html' with racha_id="racha-3" destino_js="guess" imagen="img/bingo-logo.webp" titulo=_("Futfem Guess") %}
+        {% include 'partials/game_card.html' with racha_id="racha-5" destino_js="mates" imagen="img/bingo-logo.webp" titulo=_("Futfem Mates") %}        
     </div>
 
     <div id="regular-games">
         <h2>{% trans "Juegos Regulares" %}</h2>
 
         <div class="row sibling-fade d-flex justify-content-center">
-            {% include 'partials/game_card.html' with racha_id="racha-7" destino_js="higher_lower" imagen="img/higher_lower.png" titulo=_("Higher or Lower") %}
+            {% include 'partials/game_card.html' with racha_id="racha-tbd" destino_js="tbd" imagen="img/higher_lower.webp" titulo=_("Higher or Lower") %}
+            {% include 'partials/game_card.html' with racha_id="racha-7" destino_js="higher_lower" imagen="img/higher_lower1.webp" titulo=_("Higher or Lower") %}
+            {% include 'partials/game_card.html' with racha_id="racha-tdb1" destino_js="tbd" imagen="img/higher_lower.webp" titulo=_("Higher or Lower") %}
         </div>
 
     </div>
 </div>
 </section>
-<script src="{% static 'js/redireccion.js' %}"></script>
-<script type="module" src="{% static 'js/games/funciones-comunes.js' %}"></script>
-<script type="module" src="{% static 'usuarios/js/rachas.js' %}"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script src="{% static 'js/redireccion.js' %}" defer></script>
+<script src="{% static 'js/animations/header.js' %}" defer></script>
+<script type="module" src="{% static 'usuarios/js/rachas.js' %}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous" defer></script>
 <script type="module">
     import { obtenerRacha, displayRacha } from '{% static "usuarios/js/rachas.js" %}';
 
