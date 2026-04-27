@@ -1,11 +1,11 @@
 {% load static %}
 {% load i18n %}
-<header class="navbar">
+<header class="navbar" role="banner">
   <div class="container">
 
     <!-- Logo de vSports -->
     <div id="header-izquierda"> 
-          <a href="{% url 'index' %}" class="navbar-brand1"><img src="{% static 'img/logo.webp' %}" alt="logo futfem" fetchpriority="high" height="75" width="75"></a>
+          <a href="/#juegos" class="navbar-brand1"><img src="{% static 'img/logo.webp' %}" alt="logo futfem" fetchpriority="high" height="75" width="75"></a>
       <!--<nav id="main-nav">
         <ul>
           <li><a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">{% trans "Inicio" %}</a></li>
@@ -39,7 +39,7 @@
       </nav>-->
     </div>
     <!-- Barra de navegación -->
-    <a href="{% url 'index' %}" class="navbar-brand"><img src="{% static 'img/logo_1.webp' %}" alt="logo futfem" fetchpriority="high" style="height: 40px; width: 80px;"></a>
+    <!--<a href="{% url 'index' %}" class="navbar-brand"><img src="{% static 'img/logo_1.webp' %}" alt="logo futfem" fetchpriority="high" style="height: 40px; width: 80px;"></a>-->
         <!-- Menú desplegable -->
     <div class="dropdown-menu1">
         <!--<div class="header-images">

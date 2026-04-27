@@ -1,10 +1,18 @@
 {
   "version": 8,
   "name": "FIFA Purple Dark",
+  "projection": {
+            "type": "globe"
+        },
   "sources": {
     "openmaptiles": {
       "type": "vector",
       "url": "https://api.maptiler.com/tiles/v3/tiles.json?key=LYmhz1BKy6QniXWrxK2S"
+    },
+    "satellite_maptiler": {
+      "type": "raster",
+      "url": "https://api.maptiler.com/tiles/satellite-v2/tiles.json?key=LYmhz1BKy6QniXWrxK2S",
+      "tileSize": 256
     }
   },
   "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=LYmhz1BKy6QniXWrxK2S",
@@ -19,13 +27,13 @@
     },
 
     {
-      "id": "water",
-      "type": "fill",
-      "source": "openmaptiles",
-      "source-layer": "water",
+      "id": "satellite-layer",
+      "type": "raster",
+      "source": "satellite_maptiler",
       "paint": {
-        "fill-color": "#6e006e",
-        "fill-opacity": 0.85
+        "raster-saturation": -0.5,
+        "raster-contrast": 0.2,
+        "raster-opacity": 0.8
       }
     },
 

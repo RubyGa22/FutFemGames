@@ -8,6 +8,10 @@ body, html {
     overflow: hidden; 
 }
 
+header{
+    background: var(--color-secundario);
+}
+
 #mapa-container {
     width: 100vw;
     /* Restamos la altura estimada del header para evitar el scroll */

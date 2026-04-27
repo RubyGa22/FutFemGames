@@ -12,8 +12,8 @@ body{
     width: 100%;
 }
 #game>.flip-container{
-    height: 120px !important;
-    max-height: 120px !important;
+    height: 120px;
+    max-height: 120px;
 }
 #game>.flip-container img{
     height: 100% !important;
@@ -243,12 +243,15 @@ p {
     #game{
         width: 97%;
     }
+    #game>.flip-container img{
+        max-height: 75px !important;
+    }
     #foto-jug{
         height: 100px !important;
     }
     #sugerencias{
-    max-height: 130px;
-    overflow-y: scroll;
+        max-height: 130px;
+        overflow-y: scroll;
     }
     #trayectoria {
         min-width: 320px;
@@ -261,6 +264,7 @@ p {
         gap: 0 0; /* Espacio entre los elementos, ajusta según tu preferencia */
         justify-items: center;
     }
+    
     .trayectoria-row{
         width: 100%;
         /*justify-content: space-around;*/

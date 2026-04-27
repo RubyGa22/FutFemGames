@@ -1,21 +1,28 @@
 // static/js/api/jugadoras.js
 let min = 1;
 let max = 476;
+let debounceTimer;
 
 /**
  * Obtener jugadoras al escribir en un input
  * @param {event}
  * @returns {}
  */
-export async function handleAutocompletePlayer(event) {
+export async function handleAutocompletePlayer(event){
     const input = event.target;
     const texto = input.value.trim();
     const suggestionsList = document.getElementById("sugerencias");
 
-    // Limpiar sugerencias previas
-    suggestionsList.innerHTML = '';
+    // Limpiamos el temporizador previo cada vez que se pulsa una tecla
+    clearTimeout(debounceTimer);
 
-    if (texto.length > 2) { // Solo si hay más de 2 caracteres
+    // Si el texto es corto, vaciamos la lista y salimos
+    if (texto.length <= 2) {
+        suggestionsList.innerHTML = '';
+        return;
+    }
+
+    debounceTimer = setTimeout(async () => {
         const url = `/api/jugadoraxnombre?nombre=${encodeURIComponent(texto)}`;
 
         try {
@@ -58,7 +65,7 @@ export async function handleAutocompletePlayer(event) {
         } catch (error) {
             console.error('Error al buscar la jugadora:', error);
         }
-    }
+    });
 }
 /**
  * Obtener nacionalidad de una jugadora por ID

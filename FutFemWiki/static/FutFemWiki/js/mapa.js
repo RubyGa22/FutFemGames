@@ -1,5 +1,3 @@
-import {CapaControl} from '../mapstyles/capaControl.js';
-
 export let map = null;
 let markersGroup = [];
 let bloqueado = false;
@@ -15,11 +13,9 @@ export function inicializarMapaEquipos() {
         container: 'mapa-equipos',
         style: '/static/FutFemWiki/mapstyles/style-morado.json', // luego lo cambiamos por tu estilo
         projection: 'globe',
-        center: [-3.7, 40.4],
-        zoom: 6,
-        minZoom: 6,
-        bearing: -20,
-        pitch: 45,
+        center: [7, 40],
+        zoom: 5,
+        minZoom: 4.5,
         antialias: true
     });
 
@@ -83,13 +79,13 @@ export function inicializarMapaEquipos() {
         map.addSource("satellite", {
             type: "raster",
             tiles: [
-                "https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=LYmhz1BKy6QniXWrxK2S"
+                "https://api.maptiler.com/tiles/satellite-v2/tiles.json?key=LYmhz1BKy6QniXWrxK2S"
             ],
             tileSize: 256,
             attribution: "© MapTiler © OpenStreetMap contributors"
         });
 
-        map.addLayer({
+        /*map.addLayer({
             id: "satellite-layer",
             type: "raster",
             source: "satellite",
@@ -98,7 +94,7 @@ export function inicializarMapaEquipos() {
             }
         });
 
-        map.moveLayer("satellite-layer");
+        map.moveLayer("satellite-layer");*/
 
         map.addLayer({
             id: "3d-buildings",
@@ -138,7 +134,9 @@ export function inicializarMapaEquipos() {
         });
 
     });
-    map.addControl(new CapaControl(), "top-right");
+    //const { capaControl } = import("../mapstyles/capaControl.js");
+
+    //map.addControl(new CapaControl(), "top-right");
     return map;
 }
 
@@ -153,13 +151,15 @@ export function añadirEquipoMapa(id, nombre, lat, lng, escudoUrl, color) {
         return;
     }
 
+    const fotoUrl = escudoUrl.replace('/clubes/', '/clubes/mini/');
+
     const el = document.createElement('div');
     el.className = 'marker-escudo';
     el.innerHTML = `
         <div class="marker-wrapper" id="marker-${id}">
             <!--<div class="marker-pin"></div>-->
             <div class="marker-punto"></div>
-            <img src="${escudoUrl}" class="marker-escudo-img" />
+            <img src="${fotoUrl}" class="marker-escudo-img" />
         </div>
     `;
 

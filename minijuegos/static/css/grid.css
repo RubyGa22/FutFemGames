@@ -67,11 +67,11 @@ th[id*="Equipo"] {
 }
 
 
-img {
+/*img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-}
+}*/
 #c11 img {
     display: block;
 }

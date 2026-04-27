@@ -87,6 +87,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'FutFemGames.middleware.CustomWhiteNoiseMiddleware',
     'django_browser_reload.middleware.BrowserReloadMiddleware',
@@ -105,6 +106,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'compressor.finders.CompressorFinder', # <--- Obligatorio
 )
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = False 

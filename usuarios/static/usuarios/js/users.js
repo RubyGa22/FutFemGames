@@ -1,3 +1,6 @@
+// Variable global para controlar el tiempo de espera
+let debounceTimer;
+
 export async function updateJugadoraPerfil(id_jugadora) {
     const inputField = document.getElementById('jugadora-input');
     const nuevoNombre = inputField.value.trim();
@@ -108,10 +111,16 @@ export async function handleAutocompleteUser(event) {
     const texto = input.value.trim();
     const suggestionsList = document.getElementById("sugerencias");
 
-    // Limpiar sugerencias previas
-    suggestionsList.innerHTML = '';
+    // Limpiamos el temporizador previo cada vez que se pulsa una tecla
+    clearTimeout(debounceTimer);
 
-    if (texto.length > 2) { // Solo si hay más de 2 caracteres
+    // Si el texto es corto, vaciamos la lista y salimos
+    if (texto.length <= 2) {
+        suggestionsList.innerHTML = '';
+        return;
+    }
+
+    debounceTimer = setTimeout(async () => {
         const url = `/accounts/usuarioxnombre?nombre=${encodeURIComponent(texto)}`;
 
         try {
@@ -180,6 +189,10 @@ export async function handleAutocompleteUser(event) {
                         input.value = usuario;
                         input.setAttribute('data-id', id);
                         suggestionsList.innerHTML = '';  // Limpiar las sugerencias
+                        // 1. Guardamos en el historial que el buscador estaba activo antes de irnos
+                        // Esto no cambia la URL, solo añade metadatos al historial local
+                        history.replaceState({ searchOpen: true }, "");
+                        window.location.href = `/accounts/perfil/${usuario}`;
                         /*document.getElementById("jugadora_id").value = id_jugadora;
                         loadPlayerById(id_jugadora);  // Cargar los detalles de la jugadora*/
                     });
@@ -190,5 +203,5 @@ export async function handleAutocompleteUser(event) {
         } catch (error) {
             console.error('Error al buscar la jugadora:', error);
         }
-    }
+    });
 }

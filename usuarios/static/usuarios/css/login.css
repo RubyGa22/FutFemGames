@@ -1,8 +1,4 @@
 body{
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-color: rgba(37, 0, 37, 0.65); /* Color negro con transparencia */
-    background-blend-mode: color-dodge; /* Modo de mezcla */
     min-height: 100vh;
 }
 

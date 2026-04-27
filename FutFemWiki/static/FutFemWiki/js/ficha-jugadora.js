@@ -149,7 +149,7 @@ async function cargarTrayectorias(jugadora, trayectorias, palmaresPromise) {
         back.classList.add('tarjeta-back', 'glass');
 
         // Lógica de colores y contenido...
-        const imgSrc = trayectoria.imagen ? `/${trayectoria.imagen}` : '/static/img/predeterm.jpg';
+        const imgSrc = trayectoria.imagen ? `/${trayectoria.imagen}` : '/'+jugadora.imagen;
         const iso = jugadora.pais_iso && jugadora.pais_iso.length > 0 ? jugadora.pais_iso[0] : 'xx';
         const trofeosEquipo = palmares.equipo[index].success || [];
         const trofeosAgrupados = agruparTrofeos(trofeosEquipo);
@@ -165,7 +165,7 @@ async function cargarTrayectorias(jugadora, trayectorias, palmaresPromise) {
                 </div>
                 <p>${trayectoria.fecha_inicio ? (trayectoria.fecha_inicio.substring(0, 4) + (trayectoria.fecha_fin ? ' - ' + trayectoria.fecha_fin.substring(0, 4) : ' - Act.')) : null}</p>            </div>
         `;
-        if(trayectoria.equipo.club === 83){
+        if(trayectoria.club === 83){
             info.querySelector('img').classList.add('vintage');
             front.querySelector('.imagen-jugadora').classList.add('vintage');
         }

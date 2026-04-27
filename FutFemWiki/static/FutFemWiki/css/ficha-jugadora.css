@@ -1,6 +1,6 @@
 
 body::before{
-    background-color: color-mix(in srgb, var(--color-secundario) 100%, transparent 20%) !important;
+    /*background-color: color-mix(in srgb, var(--color-secundario) 100%, transparent 20%) !important;*/
     background-blend-mode: normal !important;
 }
 #ficha-jugadora-container{
@@ -67,16 +67,24 @@ body::before{
     height: 100%;
 }
 
+#companyeras{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
 #companyeras-container{
     display: flex;
     flex-direction: row;
     gap: 10px;
-    max-width: 80vw;
-    overflow-x: auto;
+    max-width: 90vw;
+    overflow-x: auto !important;
 }
 
 #companyeras-container::-webkit-scrollbar {
     height: 8px; /* Altura de la barra de desplazamiento horizontal */
+    display: block;
 }
 
 #companyeras-container div{
@@ -172,7 +180,7 @@ span.swiper-pagination-bullet-active{
         height: 50vh;
     }
     .swiper{
-        max-height: 100%;
+        max-height: 300px;
     }
     /*.swiper #mostrador-tarjetas{
         max-height: 30vh;
@@ -189,7 +197,7 @@ span.swiper-pagination-bullet-active{
     }
 
     .swiper #mostrador-tarjetas .swiper-slide{
-        max-height: max-content;
+        max-height: 250px;
     }
     .swiper #mostrador-tarjetas .swiper-slide .tarjeta-wrapper{
         /*min-height: 250px;*/

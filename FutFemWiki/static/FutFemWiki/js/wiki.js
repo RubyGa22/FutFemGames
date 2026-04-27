@@ -4,7 +4,6 @@ import { equiposxliga, handleAutocompleteEquipo, fetchEquipoById } from '/static
 import { fetchAllJugadoras, formatearValorMercado } from '/static/futfem/js/jugadora.js';
 import { calcularEdad } from '/static/js/games/funciones-comunes.js';
 import { getDominantColors, rgbToRgba } from '/static/js/utils/color.thief.js';
-import { inicializarMapaEquipos, añadirEquipoMapa, centrarMapaEnEquipos, map } from './mapa.js';
 
 let jugadorasOriginal;
 let currentPage = 1;
@@ -508,7 +507,7 @@ export function displayEquipos(equipos, container) {
     });
 }
 
-export function displayEquiposMapa(equipos) {
+/*export function displayEquiposMapa(equipos) {
     inicializarMapaEquipos();
 
     // Guardamos los equipos para añadirlos cuando el mapa esté listo
@@ -535,4 +534,4 @@ export function displayEquiposMapa(equipos) {
         });
     });
 
-}
+}*/

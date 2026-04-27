@@ -84,92 +84,149 @@ export async function crearFichaJugadorasDeSiempre(equipo, color) {
 
 function displayJugadoras(id, jugadoras, color, actuales) {
     const container = document.getElementById(id);
-    // 1. Agrupamos las jugadoras por su ID
+    if (!container) return;
+
+    // 1. Agrupamos las jugadoras por su ID (Mantenemos tu lógica de trayectoria)
     const jugadorasAgrupadas = [];
     const mapaJugadoras = {};
 
     jugadoras.forEach(j => {
         const anyoInicio = j.trayectoria.inicio ? j.trayectoria.inicio.toString().split('-')[0] : '????';
-
-        // Si fecha_fin existe y no es 'act', sacamos el año; si no, ponemos 'act'
         const anyoFin = (j.trayectoria.fin && j.trayectoria.fin !== 'act') ? j.trayectoria.fin.toString().split('-')[0] : 'act';
         const fechaTexto = `${anyoInicio} - ${anyoFin}`;
         
         if (!mapaJugadoras[j.id_jugadora]) {
-            // Si es la primera vez que vemos a esta jugadora, la añadimos al mapa
             mapaJugadoras[j.id_jugadora] = {
                 ...j,
-                etapas: [fechaTexto] // Creamos un array para guardar sus etapas
+                etapas: [fechaTexto]
             };
             jugadorasAgrupadas.push(mapaJugadoras[j.id_jugadora]);
         } else {
-            // Si ya existe, solo añadimos la nueva etapa a su array
             mapaJugadoras[j.id_jugadora].etapas.push(fechaTexto);
         }
     });
 
-    const fragment = document.createDocumentFragment();
-
+    // Ordenar por fecha de inicio
     jugadorasAgrupadas.sort((a, b) => {
-        // ordeenar por fecha de inicio de la primera etapa (la más antigua)
         const fechaA = a.trayectoria.inicio ? new Date(a.trayectoria.inicio) : new Date(0);
         const fechaB = b.trayectoria.inicio ? new Date(b.trayectoria.inicio) : new Date(0);
         return fechaA - fechaB;
     });
 
+    const fragment = document.createDocumentFragment();
+
     jugadorasAgrupadas.forEach((jugadora, index) => {
         const nombreCompleto = jugadora.nombre_completo || 'Desconocida';
-        const slugNombre = nombreCompleto.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, ''); // Limpiamos caracteres especiales para el slug
-        // 1. Contenedor principal (El que se mueve y hace el fade-in)
+        const slugNombre = nombreCompleto.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+
+        // --- CONSTRUCCIÓN DE LA TARJETA (Estilo Actuales) ---
+        
         const wrapper = document.createElement('div');
-        wrapper.className = 'jugadora-wrapper'; 
-        
-        // 2. La Tarjeta (Solo la parte visual con la imagen)
-        const card = document.createElement('div');
-        card.className = 'jugadora-item glass';
-        card.id = jugadora.id_jugadora;
-        
-        // Aplicamos el fondo a la tarjeta, no al wrapper
-        card.style.backgroundImage = `
-            linear-gradient(
-                to bottom,
-                color-mix(in srgb, ${color} 30%, transparent),
-                transparent
-            ),
-            url('/${jugadora.imagen || 'static/img/predeterm.jpg'}')
-        `;
+        wrapper.className = 'jugadora-wrapper';
 
-        card.innerHTML = `
-            <div class="jugadora-info">
-                <h3>${jugadora.nombre_completo}</h3>
-            </div>
-        `;
+        const div = document.createElement('div');
+        div.classList.add('jugadora-item', 'glass');
+        if(jugadora.equipo.id === 83) div.classList.add('icono')
 
-        // 3. Las Etapas (Fuera de la tarjeta)
-        const etapasDiv = document.createElement('div');
-        etapasDiv.className = 'jugadora-etapas-outside';
-        etapasDiv.textContent = jugadora.etapas.join(', '); //salto de linea entre etapas
-        etapasDiv.style.fontSize = '0.7em';
-        etapasDiv.style.textWrap = 'nowrap';
-        etapasDiv.style.overflow = 'hidden';
+        const div1 = document.createElement('div');
+        div1.className = 'jugadora-div1';
 
-        // Ensamblaje
-        wrapper.appendChild(card);
-        wrapper.appendChild(etapasDiv);
-        
-        // Evento de click en la tarjeta (o en el wrapper si prefieres)
-        card.addEventListener("click", () => {
-            location.href = `/jugadora/${jugadora.id_jugadora}/${slugNombre}/`;
+        // Imagen de perfil
+        const img = document.createElement('img');
+        img.src = jugadora.imagen ? '/' + jugadora.imagen : '/static/img/predeterm.jpg';
+        img.width = 70;
+        img.height = 70;
+        img.className = 'jugadora-imagen';
+        img.loading = 'lazy';
+        img.alt = nombreCompleto;
+        div1.appendChild(img);
+
+        const div1_2 = document.createElement('div');
+        div1_2.className = 'jugadora-div1_2';
+
+        // Nombre
+        const pNombre = document.createElement('p');
+        pNombre.className = 'jugadora-nombre';
+        pNombre.textContent = nombreCompleto;
+        pNombre.style.background = jugadora.equipo?.color || color;
+        div1_2.appendChild(pNombre);
+
+        // Contenedor de iconos y posición
+        const divBanderaYPosicion = document.createElement('div');
+        divBanderaYPosicion.className = 'jugadora-banderas-posicion';
+
+        const divBanderas = document.createElement('div');
+        divBanderas.className = 'jugadora-banderas';
+
+        // Bandera (Nacionalidad)
+        if (jugadora.nacionalidades_isos && jugadora.nacionalidades_isos.length > 0) {
+            const iso = jugadora.nacionalidades_isos[0];
+            const icon = document.createElement('span');
+            icon.className = `fi fi-${iso.toLowerCase()}`;
+            divBanderas.appendChild(icon);
+        }
+        const imgLiga = document.createElement('img');
+        // Logo Liga
+        if (jugadora.equipo?.liga_logo) {
+            imgLiga.src = "/" + jugadora.equipo.liga_logo;
+        }else if(jugadora.equipo.id === 83){ imgLiga.src = "/" + jugadora.equipo.escudo;}      
+
+        divBanderas.appendChild(imgLiga);
+  
+
+        // Escudo Club
+        if (jugadora.equipo?.escudo) {
+            const imgClub = document.createElement('img');
+            imgClub.src = '/' + jugadora.equipo.escudo;
+            imgClub.className = 'equipo-imagen';
+            divBanderas.appendChild(imgClub);
+        }
+
+        // Posiciones
+        const pPosicion = document.createElement('div');
+        pPosicion.className = 'jugadora-posicion';
+        (jugadora.posiciones_abrev || []).forEach(pos => {
+            const span = document.createElement('span');
+            span.textContent = pos; // Aquí puedes usar gettext(pos) si es necesario
+            span.className = 'pos-' + pos;
+            pPosicion.appendChild(span);
         });
 
-        card.style.backgroundSize = 'cover';
-        card.style.backgroundPosition = 'center';
-        card.style.backgroundRepeat = 'no-repeat';
+        divBanderaYPosicion.appendChild(divBanderas);
+        divBanderaYPosicion.appendChild(pPosicion);
+        div1_2.appendChild(divBanderaYPosicion);
+        div1.appendChild(div1_2);
+        div.appendChild(div1);
 
+        // Fondo dinámico
+        const colPrimario = jugadora.equipo?.color || color || 'var(--color-primario)';
+        div.style.background = `
+            linear-gradient(
+                to bottom,
+                color-mix(in srgb, ${colPrimario} 30%, transparent),
+                transparent
+            )
+        `;
+        div.style.border = '1px solid '+colPrimario
+
+        // Click para ir al perfil
+        div.addEventListener('click', () => {
+            window.location.href = `/jugadora/${jugadora.id_jugadora}/${slugNombre}/`;
+        });
+
+        // --- INFO DE ETAPAS (Fuera de la tarjeta, tal como pediste) ---
+        const etapasDiv = document.createElement('div');
+        etapasDiv.className = 'jugadora-etapas-outside';
+        etapasDiv.textContent = jugadora.etapas.join(', ');
+        etapasDiv.style.fontSize = '0.7em';
+        etapasDiv.style.textAlign = 'center';
+        etapasDiv.style.marginTop = '5px';
+
+        wrapper.appendChild(div);
+        wrapper.appendChild(etapasDiv);
         fragment.appendChild(wrapper);
-        
 
-        // Efecto fade-in en el wrapper
+        // Efecto fade-in
         setTimeout(() => {
             wrapper.classList.add('visible');
         }, index * 100);
@@ -275,10 +332,12 @@ async function displayJugadorasActuales(id, jugadoras, color){
             const div = document.createElement('div');
             div.classList.add('jugadora-item');
             div.classList.add('glass');
+            if(jugadora.equipo.id === 83) div.classList.add('icono')
 
             const div1 = document.createElement('div');
             const div1_2 = document.createElement('div');
             div1.className = 'jugadora-div1';
+            div1_2.className = 'jugadora-div1_2';
 
             const img = document.createElement('img');
             img.src = jugadora.imagen ? '/' + jugadora.imagen : '/static/img/predeterm.jpg';
@@ -297,11 +356,19 @@ async function displayJugadorasActuales(id, jugadoras, color){
             const pNombre = document.createElement('p');
             pNombre.className = 'jugadora-nombre';
             pNombre.textContent = nombreCompleto; 
+            pNombre.style.background = jugadora.equipo.color;
             div1_2.appendChild(pNombre);
 
             const pValor = document.createElement('p');
             pValor.className = 'jugadora-valor';
             pValor.textContent = formatearValorMercado(jugadora.market_value) || 'N/A';
+            pValor.style.textWrap = 'nowrap';
+
+            const imgLiga = document.createElement('img');
+            // Logo Liga
+            if (jugadora.equipo?.liga_logo) {
+                imgLiga.src = "/" + jugadora.equipo.liga_logo;
+            }else if(jugadora.equipo.id === 83){ imgLiga.src = "/" + jugadora.equipo.escudo;}      
 
             const divBanderaYPosicion = document.createElement('div');
             divBanderaYPosicion.className = 'jugadora-banderas-posicion';
@@ -312,20 +379,23 @@ async function displayJugadorasActuales(id, jugadoras, color){
 
             // Recorremos la lista de ISOs para crear los iconos
             // Usamos (jugadora.nacionalidades_isos || []) para asegurar que SIEMPRE haya un array, aunque sea vacío
-            (jugadora.nacionalidades_isos || []).forEach((iso, index) => {
+            /*(jugadora.nacionalidades_isos || []).forEach((iso, index) => {
                 if (!iso) return; // Salta si la ISO es null o vacía
 
                 const icon = document.createElement('span');
-                icon.className = `fi fi-${iso.toLowerCase()}`; // Forzamos minúsculas por si acaso
-                
-                // ... resto de tu lógica de estilos (index > 0, etc.)
-                
+                icon.className = `fi fi-${iso.toLowerCase()}`; // Forzamos minúsculas por si acaso                
                 icon.title = `País ID: ${jugadora.nacionalidades_ids?.[index] || '?'}`;
                 divBanderas.appendChild(icon);
-            });
+            });*/
+
+            const iso = jugadora.nacionalidades_isos[0];
+            const icon = document.createElement('span');
+            icon.className = `fi fi-${iso.toLowerCase()}`; // Forzamos minúsculas por si acaso                
+            icon.title = `País ID: ${jugadora.nacionalidades_ids?.[0] || '?'}`;
+            divBanderas.appendChild(icon);
 
             const pNacimiento = document.createElement('p');
-            pNacimiento.textContent = calcularEdad(jugadora.nacimiento);
+            pNacimiento.textContent = calcularEdad(jugadora.nacimiento)+' años';
 
             const pPosicion = document.createElement('div');
             pPosicion.className = 'jugadora-posicion';
@@ -352,15 +422,17 @@ async function displayJugadorasActuales(id, jugadoras, color){
                     color-mix(in srgb, ${colorSecundario} 30%, transparent)
                 )
             `;
+            div.style.border = '1px solid '+colorPrimario
             }
 
             pNombre.addEventListener('click', () => {
                 window.location.href = `/jugadora/${jugadora.id_jugadora}/${slugNombre}/`;
             });
             div.appendChild(div1);
-            div.appendChild(pNacimiento);
-            div.appendChild(imgClub);
-            div.appendChild(pValor);
+            divBanderas.appendChild(imgLiga);
+            divBanderas.appendChild(imgClub);
+            //div.appendChild(pNacimiento);
+            //div.appendChild(pValor);
             container.appendChild(div);
 
             // Retraso progresivo para efecto fade

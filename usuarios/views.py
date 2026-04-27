@@ -187,7 +187,7 @@ def registro_view(request):
                 'error': 'El usuario ya existe'
             })
 
-        return redirect('/api/login/')
+        return redirect('/accounts/login/')
 
     return render(request, 'registro.html')
 

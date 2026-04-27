@@ -44,37 +44,11 @@
 </head>
 <body {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
     {% include 'partials/header.html' %}
-    <div id="equipo-container">
+    <div id="equipo-container" class="{% if equipo.id_equipo == 83 %}icono-pagina{% endif %}">
         <div id="selector">
-            <a href="#info">Información</a><a href="#plantilla">Plantilla</a><a href="">Historicas</a>
+            <a href="#info" class="active">Información</a><a href="#plantilla">Plantilla</a><a href="#historicas">Historicas</a>
         </div>
-        <div id="info">
-            <div class="left" style="min-height: 450px; height: 100%;">
-                <section id="jugadoras-actuales">
-                    <div id="tabla-jugadoras-actuales" class="tabla-jugadoras" style="height: 100%; width: 95%; min-height: 300px;">
-                        <div id="cabecera-tabla" class="cabecera-tabla">
-                            <h3>{% trans "Plantilla" %}</h3>
-                            <a id="ver-jugadoras-actuales" href="#">{% trans "Ver Más" %}</a>
-                        </div>
-                        <div id="jugadoras-actuales">
-                            <div id="campo-destacadas">
-                            {% include 'partials/football_field.html' %}
-                            </div>
-                            <div id="jugadoras-actuales-container" class="container-jugadoras"></div>
-                        </div>
-
-                    </div>
-                </section>
-                <section id="jugadoras-destacadas">
-                    <div id="tabla-jugadoras-destacadas" class="tabla-jugadoras">
-                        <div id="cabecera-tabla" class="cabecera-tabla">
-                            <h3>{% trans "Destacadas" %}</h3>
-                        </div>
-                        <div id="jugadoras-destacadas-container" class="container-jugadoras"></div>
-
-                    </div>
-                </section>
-            </div>
+        <div id="info" class="tab-content active">
             <div class="resto" style="height: 100%;">
             <div class="row">
                 <div>
@@ -118,7 +92,18 @@
                 </div>
             </div>
             </div>
-            <div class="down">
+
+            <section id="jugadoras-destacadas">
+                <div id="tabla-jugadoras-destacadas" class="tabla-jugadoras">
+                    <div id="cabecera-tabla" class="cabecera-tabla">
+                        <h3>{% trans "Destacadas" %}</h3>
+                    </div>
+                    <div id="jugadoras-destacadas-container" class="container-jugadoras"></div>
+
+                </div>
+            </section>
+
+            <!--<div class="down">
                 <section id="jugadoras-alltime">
                     <div id="tabla-jugadoras" class="tabla-jugadoras">
                         <div id="cabecera-tabla-alltime" class="cabecera-tabla">
@@ -128,13 +113,34 @@
                         <div id="jugadoras-container" class="container-jugadoras"></div>
                     </div>
                 </section>
+            </div>-->
             </div>
-        </div>
+            <div class="left" style="min-height: 450px; height: 100%;">
+                <section id="jugadoras-actuales">
+                    <div id="tabla-jugadoras-actuales" class="tabla-jugadoras" style="height: 100%; width: 95%; min-height: 300px;">
+                        <div id="cabecera-tabla" class="cabecera-tabla">
+                            <h3>{% trans "Plantilla" %}</h3>
+                            <!--<a id="ver-jugadoras-actuales" href="#">{% trans "Ver Más" %}</a>-->
+                        </div>
+                        <div id="jugadoras-actuales">
+                            <div id="campo-destacadas">
+                            {% include 'partials/football_field.html' %}
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
     
 
 
         </div>
-        <div id="plantilla"></div>
+        <div id="plantilla" class="tab-content">  
+            <div id="jugadoras-actuales-container" class="container-jugadoras"></div>
+        </div>
+        <div id="historicas" class="tab-content">
+            <div id="jugadoras-container" class="container-jugadoras"></div>
+        </div>
     </div>
 <script src="{% static 'js/animations/header.js' %}" defer></script>
 <!--<script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>-->
@@ -143,7 +149,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous" defer></script>
 <!--script src="https://unpkg.com/maplibre-gl@5.18.0/dist/maplibre-gl.js" defer></script-->
-<script>
+<script defer>
     function actualizarHeader() {
         const headerEscudo = document.querySelector('.navbar-brand1 img');
 
@@ -220,11 +226,47 @@
     }
 
     // Inicialización
-    activarPopup('tabla-jugadoras-actuales', 'ver-jugadoras-actuales');
+    /*activarPopup('tabla-jugadoras-actuales', 'ver-jugadoras-actuales');
     activarPopup('tabla-jugadoras', 'ver-jugadoras-all-time');
-    activarPopup('tabla-trofeos', 'ver-trofeos');
-    activarPopup('tabla-map', 'ver-map');
+    activarPopup('tabla-trofeos', 'ver-trofeos');*/
+    //activarPopup('tabla-map', 'ver-map');
+    
+    document.addEventListener('DOMContentLoaded', () => {
+    const links = document.querySelectorAll('#selector a');
 
+    links.forEach(link => {
+        link.addEventListener('click', function(e) {
+            const targetId = this.getAttribute('href');
+
+            // 1. Validar si el href es un ID válido (empieza por #)
+            if (!targetId || !targetId.startsWith('#') || targetId.length < 2) {
+                // Si es el link de "Historicas" (vacío), no hacemos nada o redirigimos
+                return; 
+            }
+
+            e.preventDefault();
+
+            // 2. Limpiar clase 'active' de TODOS los enlaces
+            links.forEach(a => a.classList.remove('active'));
+
+            // 3. Limpiar clase 'active' de los DIVS
+            // IMPORTANTE: Aquí buscamos los divs por ID directamente 
+            // o les añadimos una clase común para no fallar.
+            document.querySelectorAll('#info, #plantilla, #historicas').forEach(div => {
+                div.classList.remove('active');
+            });
+
+            // 4. Añadir clase 'active' al enlace clicado
+            this.classList.add('active');
+
+            // 5. Añadir clase 'active' al div correspondiente
+            const targetDiv = document.querySelector(targetId);
+            if (targetDiv) {
+                targetDiv.classList.add('active');
+            }
+        });
+    });
+});
 
 
 
@@ -234,7 +276,7 @@
     import { fetchEquipoById } from '{% static "futfem/js/equipos.js" %}';
 
     const color = '{{equipo.color}}';
-    const idEquipo = '{{equipo.id_equipo}}';
+    const idEquipo = '{{equipo.id_equipo}}';    
 
     // 1. Carga inmediata de datos de texto y jugadoras (Pesa poco)
     actualizarHeader();
@@ -258,7 +300,10 @@
             //prepararDisparadorMapa(equipoData);
         }
     }
-    cargarDatosPrincipales();
+    window.addEventListener('pageshow', (event) => {
+        // Reiniciamos la lógica
+        cargarDatosPrincipales();
+    });
 
     // 2. LA MAGIA: Solo cargar el mapa si el usuario llega a él
     /*function observarMapa(equipo) {

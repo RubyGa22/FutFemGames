@@ -10,7 +10,7 @@ const div = document.getElementById('game-results');
 const vidasContainer = document.getElementById('vidas');
 const input = document.getElementById('jugadoraInput');
 // Añadir el evento de input al campo de texto
-input.addEventListener('input', debounce(handleAutocompletePlayer, 300)); // Debounce de 300ms
+input.addEventListener('input', handleAutocompletePlayer); // Debounce de 300ms
 
 let jugadora;
 let answer;

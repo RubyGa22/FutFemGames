@@ -1,18 +1,28 @@
+#container-index{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding-block: 2.5%;
+    max-width: 1320px;
+}
 .col-md-4{
     max-width: max-content;
     display: grid;
     grid-template-areas: "stack"; /* Definimos una única zona de apilado */
+    padding-inline: 0;
+    max-width: fit-content !important;
     align-items: center;
     justify-items: center;
     position: relative; /* Opcional, solo para contener z-index */
 }
 body {
-    height: 100vh;
+    height: 100dvh;
     /* ... tus otros estilos ... */
     overflow: hidden !important;
     background: none; /* Quitamos el fondo de aquí */
-    min-height: 100vh;
-    max-height: 100vh;
+    min-height: 100dvh;
+    max-height: 100dvh;
     background: none !important;
 }
 body::before {
@@ -43,22 +53,164 @@ body::before {
   will-change: filter, transform;
 
   transition: none;
-  max-height: 100vh;
+  max-height: 100dvh;
+}
+
+#selector{
+    display: flex;
+    flex-direction: row;
+    background: var(--color-secundario);
+    width: max-content;
+}
+
+/*------------------MODAL------------------*/
+/* El contenedor que ocupa toda la pantalla */
+.search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 0, 20, 0.85); /* Tinte morado oscuro */
+    backdrop-filter: blur(15px);      /* Efecto cristal */
+    z-index: 10000;
+    display: none; /* Oculto por defecto */
+    justify-content: center;
+    align-items: flex-start; /* Empezar desde arriba */
+    padding-top: 10vh;
+    animation: fadeInModal 0.3s ease-out;
+}
+
+.search-overlay .container{
+    flex-direction: column;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; transform: scale(1.05); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.search-modal-content {
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    color: white;
+}
+
+.close-overlay {
+    position: absolute;
+    top: -50px;
+    right: 0;
+    height: fit-content;
+    width: fit-content;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2.5rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.close-overlay:hover { /*transform: rotate(90deg);*/ color: var(--color-primario); background: transparent; box-shadow: none; }
+
+.modal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+}
+
+/* Estilo para el input dentro del modal */
+#usuarioInput {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 1.2rem;
+    border-radius: 12px;
+    border: 2px solid var(--color-primario);
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    outline: none;
+    box-shadow: 0 0 15px color-mix(in srgb, var(--color-primario) 30%, transparent 70%);
+}
+
+#usuarioInput:focus {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 25px color-mix(in srgb, var(--color-primario) 40%, transparent 60%);
+}
+
+#selector a{
+    text-decoration: none;
+    padding: 5px;
+    color: var(--color-detalles);
+    font-size: large;
+}
+
+
+
+#selector a.active, #selector a:hover{
+    text-decoration: none;
+    background: var(--color-primario);
+    color: var(--color-detalles) !important;
 }
 
 section{
     width: 100%;
     /*height: 100%;*/
-    overflow-y: auto;
+    overflow-y: hidden;
+    margin-top: 20px;
+    padding-inline: 10px;
+}
+/* Oculta las secciones por defecto */
+.content-section {
+    display: none;
+}
+
+/* Clase para mostrar la sección activa */
+.content-section.active {
+    display: block; /* o flex, grid, etc. */
+}
+section{
+    height: 100%;
 }
 section .container {
-    height: 100%;
     position: relative;
     margin-top: 0rem !important;
+    width: 100%;
+    max-width: 100%;
+    align-items: center;
 }
 
 section::-webkit-scrollbar{
     display: none;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#daily-games, #regular-games {
+    animation: fadeIn 0.4s ease-out forwards;
+    width: 100%;
+}
+
+/* Estilo para el botón de volver */
+.btn-volver {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid #ac00ac;
+    padding: 8px 20px;
+    margin-top: 20px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: 0.3s;
+    position: absolute;
+    top: 0;
+}
+
+.btn-volver:hover {
+    background: #ac00ac;
 }
 
 #regular-games{
@@ -72,6 +224,143 @@ section::-webkit-scrollbar{
     visibility: hidden;
 }
 
+section#juegos .container{
+    justify-content: flex-start;
+}
+
+section#juegos .container #daily-games{
+    max-height: 50dvh;
+    width: 100%;
+}
+
+section .container{
+    height: 95%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+#menu-seleccion{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+section .container.mt-5{
+    flex-direction: column;
+}
+
+section .container .column{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 50%;
+    height: 100%;
+}
+
+section .container .web-button{
+    background: color-mix(in srgb, var(--color-secundario) 100%, transparent 10%);
+    color: var(--color-detalles);
+    height: 100%;
+    width: 100%;
+    display: flex;
+    text-decoration: none;
+    flex-direction: row;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 5px 15px color-mix(in srgb, black 30%, transparent 70%);
+}
+
+/* El patrón estilo FIFA en la esquina */
+section .container .web-button::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    
+    /* Dimensiones: 50% de ancho y 50% de alto */
+    width: 50%;
+    height: 50%;
+    
+    /* Variables del patrón */
+    --s: 56px; 
+    --c1: var(--color-primario);
+    --c2: transparent;
+
+    /* Aplicamos tu gradiente */
+    background: 
+        linear-gradient(atan(-.5), var(--c1) 33%, var(--c2) 33.5% 66.5%, var(--c1) 67%) 
+        0 0 / var(--s) var(--s);
+    
+    /* Corte diagonal para que parezca más "diseño de interfaz" */
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+    
+    /* Opacidad opcional para que no tape el texto si es muy oscuro */
+    opacity: 0.6;
+    pointer-events: none; /* Para que no interfiera con los clics */
+}
+
+section .container .web-button:hover:after{
+    --c1: var(--color-secundario);
+}
+
+section .container .web-button:hover{
+    background: var(--color-primario);
+    color: var(--color-texto);
+    transform: scale(1.01);
+    cursor: pointer;
+}
+
+section .container .web-button:focus{
+    background: var(--color-primario);
+    transform: scale(1.01);
+}
+
+section .container .web-button img, section .container .web-button svg  {
+    /* 4. Saca la imagen del flujo para que no empuje al texto */
+    position: absolute; 
+    
+    /* 5. Ubicación (ejemplo: abajo a la derecha) */
+    right: 0;
+    bottom: 0;
+    
+    /* 6. Ajusta el tamaño según necesites */
+    height: 90%; 
+    width: auto;
+    
+    /* 7. Opcional: Si quieres que se vea un poco transparente o decorativa */
+    z-index: 1; 
+    pointer-events: none; /* Para que el clic pase a través de la imagen al botón */
+}
+
+section .container .web-button.type-2 img, section .container .web-button.type-2 svg{
+    left: unset;
+    right: 0;
+    height: 100%;
+    width: 50%;
+    object-fit: cover;
+    transform: none;
+}
+
+section .container .web-button svg{
+    height: 70%;
+    bottom: 20px;
+    right: 20px;
+    /*left: 50%;
+    transform: translateX(-50%);*/
+}
+
+section .container .web-button .web-button-text{
+    margin: 20px;
+}
+
+section .container .web-button .web-button-text{
+    max-width: 50%;
+}
+
 /* Estilos principales para .game-button */
 .game-button {
     --start: 0;
@@ -80,10 +369,10 @@ section::-webkit-scrollbar{
     /*padding: 10px; /* Espaciado interior */
     background: color-mix(in srgb, var(--color-primario) 50%, transparent 50%); /* Color de fondo primario */
     color: white; /* Color del texto */
-    margin-bottom: 20px; /* Espaciado inferior entre botones */
+    margin-bottom: 5px; /* Espaciado inferior entre botones */
     transition: transform 0.2s; /* Suavizar el efecto de transformación */
     /*border: 1px solid var(--color-secundario);*/
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    /*box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);*/
     position: relative;
     transition: border-color 0.5s ease-in-out;
     /*backdrop-filter: blur(6px);
@@ -132,7 +421,9 @@ section::-webkit-scrollbar{
     padding: 0 !important;
     transform-style: preserve-3d; 
     backface-visibility: hidden;
-    pointer-events: none
+    gap: 10px;
+    pointer-events: none;
+    justify-content: center;
 }
 .glow {
   pointer-events: none;
@@ -184,7 +475,8 @@ section::-webkit-scrollbar{
 }
 
 .game-button img {
-    max-width: 150px; /* La imagen ocupa el ancho total disponible */
+    max-width: 110px; /* La imagen ocupa el ancho total disponible */
+    max-height: 110px;
     aspect-ratio: 1 / 1; 
     min-height: 98px; /* Asegura que la imagen tenga al menos 100px de alto */
     min-width: 98px; /* Asegura que la imagen tenga al menos 100px de ancho */
@@ -272,6 +564,7 @@ section::-webkit-scrollbar{
     font-size: 20px; /* Tamaño de fuente predeterminado */
     font-weight: bold; /* Título en negrita */
     margin-bottom: 0 !important; /* Eliminar el margen inferior */
+    text-wrap: nowrap;
     height: 100%; /* El título ocupa el espacio restante debajo de la imagen */
     width: 100% !important;
     /*font-family: 'Oswald', sans-serif !important; /* Fuente personalizada para el título */
@@ -299,6 +592,10 @@ section::-webkit-scrollbar{
         flex-direction: column;
         align-items: center;
     }
+    section .container .web-button img{
+        left: 50%;
+        transform: translateX(-50%);
+    }
     .game-button{
         min-width: 150px;
         max-height: 214px;
@@ -316,28 +613,63 @@ section::-webkit-scrollbar{
     .col-md-3 {
         max-width: 33.33%; /* Tres columnas por fila en pantallas medianas */
     }
-    .col-md-4{
-        max-width: 30%;
-    }
 }
 
 /* Media queries para pantallas de menos de 768px */
 @media (max-width: 768px) {
+    .col-md-4{
+        max-width: 85px !important;
+        padding-inline: 0 !important;
+    }
+    #selector{
+        order: 2;
+    }
+    #container-index{
+        display: flex;
+        max-width: 500px;
+        padding-bottom: 0;
+    }
     section{
-        min-height: 75vh;
+        min-height: 75dvh;
+        height: max-content;
+        margin-top: 0;
     }
     section h1{
         font-size: 1.5rem;
     }
+    #menu-seleccion{
+        flex-direction: column;
+    }
     section .container{
         padding-inline: unset;
-        min-height: 70vh;
+        min-height: 70dvh;
+    }
+    section .container{
+        flex-direction: column;
+    }
+    section .container .column{
+        width: 100%;
+        min-height: 50%;
     }
     .row{
-        margin-inline: 0px;
+        gap: 3px;
     }
     .game-button button {
         display: none; /* Ocultar los botones en pantallas pequeñas */;
+    }
+    section .container .web-button{
+        height: 100%;
+        width: 100%;
+    }
+    section .container .web-button img{
+        right: 0;
+        left: unset;
+        transform: none;
+    }
+    section .container .web-button svg{
+        right: 10px;
+        left: unset;
+        transform: none
     }
     .game-button {
         max-width: 100% !important; /* Botones ocupan todo el ancho en pantallas pequeñas */
@@ -346,17 +678,11 @@ section::-webkit-scrollbar{
         max-height: 100%;
     }
     .game-button img {
-        max-width: 100px; /* La imagen ocupa el ancho total disponible */
+        max-width: 75px; /* La imagen ocupa el ancho total disponible */
         min-height: 45px; /* Asegura que la imagen tenga al menos 100px de alto */
         min-width: 45px; /* Asegura que la imagen tenga al menos 100px de ancho */
-        height: 100px; /* Establece una altura fija para las imágenes */
+        height: 75px; /* Establece una altura fija para las imágenes */
         width: stretch; /* Ajusta el ancho automáticamente para mantener la proporción */
-    }
-    .col-md-3 {
-        max-width: 50%; /* Dos columnas por fila en pantallas pequeñas */
-    }
-    .col-md-4{
-        max-width: max-content
     }
     .game-button h2 {
         font-size: 10px; /* Reducir el tamaño de la fuente en pantallas pequeñas */

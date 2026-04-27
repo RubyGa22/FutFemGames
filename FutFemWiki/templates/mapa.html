@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
 
-    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="https://unpkg.com/maplibre-gl@5.18.0/dist/maplibre-gl.css" rel="stylesheet" media="print" onload="this.media='all'">
     <!--<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" media="print" onload="this.media='all'">-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" media="print" onload="this.media='all'">
 
@@ -22,6 +22,7 @@
       media="print" onload="this.media='all'">
     <link rel="preload" href="/api/equiposall" as="fetch" crossorigin="anonymous">
     <link rel="modulepreload" href="/static/FutFemWiki/js/mapa.js">
+    <link rel="preload" href="https://unpkg.com/maplibre-gl@5.18.0/dist/maplibre-gl.js">
     <link rel="modulepreload" href="/static/futfem/js/equipos.js">
 
 
@@ -48,7 +49,6 @@
     <!--<script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>-->
     <script src="https://unpkg.com/maplibre-gl@5.18.0/dist/maplibre-gl.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js" defer></script>
-    <script type="module" src="{% static 'FutFemWiki/mapstyles/capaControl.js' %}" defer></script>
     <script type="module" src="{% static 'FutFemWiki/js/mapa.js' %}" defer></script>
 <script type="module">
 import { inicializarMapaEquipos, añadirEquipoMapa, centrarMapaEnEquipos, map, actualizarMarkersZoom } from '{% static "FutFemWiki/js/mapa.js" %}';
