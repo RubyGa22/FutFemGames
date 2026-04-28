@@ -11,18 +11,41 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import os
+import os, mimetypes
+mimetypes.add_type("application/javascript", ".js", True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Carpeta donde Django buscará archivos subidos
 MEDIA_ROOT = BASE_DIR / 'futfem' / 'media'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# 2. Donde Compressor guardará sus archivos generados (normalmente lo mismo que STATIC_ROOT)
+COMPRESS_ROOT = STATIC_ROOT
 
 # URL pública para acceder a esos archivos
 MEDIA_URL = '/media/'
+STATIC_URL = '/static/'
+COMPRESS_URL = STATIC_URL # Esto le dice al compresor que use la misma ruta
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# Cache de larga duración (1 año) para archivos que no cambian
+WHITENOISE_MAX_AGE = 31536000 
+WHITENOISE_IMMUTABLE_FILE_SUPPORT = True
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_MANIFEST_STRICT = False # Evita errores si falta algún archivo
+WHITENOISE_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Esto asegura que si cambias el archivo, Django le cambie el nombre (hash)
+# para que el navegador descargue la versión nueva.
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-tylyd1o(l$na1k@hd!vw!6e767zw$$v5b_02p$$wbuv+f9wk7p'
@@ -30,8 +53,18 @@ SECRET_KEY = 'django-insecure-tylyd1o(l$na1k@hd!vw!6e767zw$$v5b_02p$$wbuv+f9wk7p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.236', '192.168.1.201']
+ALLOWED_HOSTS = ['*']
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "localhost",
+]
 
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': False,
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True, # Fuerza a que se muestre siempre en DEBUG
+    'RESULTS_CACHE_SIZE': 100,  # Aumenta el historial de resultados
+    'RENDER_PANELS': True,
+}
 
 # Application definition
 
@@ -41,21 +74,42 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
+    'django_browser_reload',
+    "debug_toolbar",
+    'compressor',
     'minijuegos',
     'futfem',
+    'FutFemWiki',
     'usuarios'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'FutFemGames.middleware.CustomWhiteNoiseMiddleware',
+    'django_browser_reload.middleware.BrowserReloadMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'django.middleware.locale.LocaleMiddleware', 
+    'django.middleware.common.CommonMiddleware',       # <--- SUBE AQUÍ
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder', # <--- Obligatorio
+)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = False 
 
 ROOT_URLCONF = 'FutFemGames.urls'
 
@@ -70,13 +124,23 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'usuarios.context_processors.usuario_sesion',
+                'django.template.context_processors.i18n',
             ],
         },
     },
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://futfemgames.gti-ia.upv.es',
+    'https://*.trycloudflare.com',
+    'http://*.trycloudflare.com',
+    'https://127.0.0.1:8000',
+]
+
 WSGI_APPLICATION = 'FutFemGames.wsgi.application'
 
+# settings.py
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -85,7 +149,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('DB_NAME', 'futfemgames'),
-        'USER': os.getenv('DB_USER', 'ruben'),
+        'USER': os.getenv('DB_USER', 'root'),
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'HOST': os.getenv('DB_HOST', '127.0.0.1'),
         'PORT': os.getenv('DB_PORT', '3306'),                    # puerto por defecto de MySQL
@@ -118,15 +182,24 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es'
+
+LANGUAGES = [
+    ('es', 'Español'),
+    ('ca', 'Valencià'), # Usamos 'ca' o 'ca-es-valencia' según tu preferencia
+    ('en', 'English'),
+    ('sv', 'Svenska'),
+    ('nl', 'Nederlands'),
+]
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
+USE_L10N = True
 
 USE_TZ = True
 
-
+LOCALE_PATHS = [BASE_DIR / 'locale']
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
@@ -136,3 +209,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # O smtp.gmail.com
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'valenciansports@gmail.com'
+EMAIL_HOST_PASSWORD = 'wgobxjonfilvupwp'

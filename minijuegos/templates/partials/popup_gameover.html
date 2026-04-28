@@ -1,0 +1,11 @@
+{% load i18n %}
+<div id="popup-gameover" class="popup-overlay" style="display: none;">
+    <div class="popup-content glass">
+        <h2>{% trans "¡Fin del Juego!" %}</h2>
+        <p>{% trans "Tu racha actual ha sido:" %} <span id="rfinal">0</span></p>
+        <div class="popup-buttons">
+            <button id="btn-reintentar" class="btn-popup">{% trans "Jugar" %}</button>
+            <button id="btn-salir" class="btn-popup btn-secondary">{% trans "Salir" %}</button>
+        </div>
+    </div>
+</div>

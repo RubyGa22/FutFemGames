@@ -1,0 +1,13 @@
+#nosotros-wrapper {
+  height: 100vh;
+  perspective: 1200px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}

@@ -1,0 +1,51 @@
+{% load i18n %}
+<div class="dropdown">
+
+<button class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
+    {% get_current_language as LANGUAGE_CODE %}
+    <span class="fi fi-{% if LANGUAGE_CODE == 'en' %}gb{% elif LANGUAGE_CODE == 'sv' %}se{% elif LANGUAGE_CODE == 'ca' %}cat{% else %}{{ LANGUAGE_CODE|slice:':2' }}{% endif %} me-1"></span>
+    {% if LANGUAGE_CODE == "ca" %}
+    VAL
+    {% else %}
+    {{ LANGUAGE_CODE|upper }}
+    {% endif %}
+</button>
+
+<ul class="dropdown-menu dropdown-menu-end shadow">
+
+{% get_available_languages as LANGUAGES %}
+{% for code,name in LANGUAGES %}
+<li>
+<form action="{% url 'set_language' %}" method="post">
+    {% csrf_token %}
+    <input name="next" type="hidden" value="{{ request.get_full_path }}">
+    <button class="dropdown-item d-flex align-items-center" name="language" value="{{ code }}">
+        <span class="fi fi-{% if code == 'en' %}gb{% elif code == 'sv' %}se{% elif code == 'ca' %}cat{% else %}{{ code }}{% endif %} me-2"></span>
+        {{ name }}
+    </button>
+</form>
+</li>
+{% endfor %}
+
+</ul>
+</div>
+
+<script>
+function changeLang(code) {
+    const form = document.getElementById('form-idioma-universal');
+    const input = document.getElementById('language-input-universal');
+
+    input.value = code;
+
+    fetch(form.action, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        body: new URLSearchParams(new FormData(form)),
+    })
+    .then(() => {
+        location.reload(true);   // ← recarga completa
+    });
+}
+</script>

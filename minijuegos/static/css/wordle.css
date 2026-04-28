@@ -1,5 +1,4 @@
 /*body{
-    /*background-image: url("../img/fondo cesped.jpg.png");
     background-size: cover;
     background-repeat: no-repeat;
     background-color: rgba(128, 0, 128, 0.5); /* Color negro con transparencia */
@@ -17,11 +16,10 @@
 
 .container-wordle h1{
     margin-top: 0;
-    font-family: "Bauhaus 93", sans-serif;
 }
 #board {
     display: grid;
-    grid-template-columns: repeat(5, 60px);
+    /*grid-template-columns: repeat(5, 60px);
     grid-gap: 0 10px;
     /*margin-bottom: 20px;*/
     justify-items: center;
@@ -41,26 +39,39 @@ input{
     text-align: center;
     font-size: 24px;
     text-transform: uppercase;
-    border: 2px solid #333;
+    border: 1px solid #333;
     border-radius: 8px;
     background-color: rgba(255,255,255,0.8); /* Color de fondo primario */
-    color: var(--color-texto); /* Color del texto */
+    color: var(--color-detalles); /* Color del texto */
     transition: transform 0.2s; /* Suavizar el efecto de transformación */
     box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(10px);
+    background: linear-gradient(to bottom, 
+    color-mix(in srgb, var(--color-primario) 30%, transparent), 
+    color-mix(in srgb, var(--color-secundario) 30%, transparent)) !important;
 }
 
 .tile.correct {
-    background-color: #6aaa64;
+    background: linear-gradient(to bottom, 
+    color-mix(in srgb, var(--color-success) 70%, transparent), 
+    color-mix(in srgb, var(--color-secundario) 50%, transparent)) !important;
+    border: 1px solid var(--color-success);
     color: #fff;
 }
 
 .tile.present {
-    background-color: #c9b458;
     color: #fff;
+    background: linear-gradient(to bottom, 
+    color-mix(in srgb, var(--color-warning) 60%, transparent), 
+    color-mix(in srgb, var(--color-secundario) 30%, transparent)) !important;
+    border: 1px solid var(--color-warning);
 }
 
 .tile.absent {
     background-color: #787c7e;
     color: #fff;
+    background: linear-gradient(to bottom, 
+    color-mix(in srgb, var(--color-gray-dark) 60%, transparent), 
+    color-mix(in srgb, var(--color-secundario) 30%, transparent)) !important;
+    border: 1px solid var(--color-gray-dark);
 }

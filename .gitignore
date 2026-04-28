@@ -1,0 +1,6 @@
+
+futfem/__pycache__/
+
+futfem/management/commands/__pycache__/
+
+*.pyc

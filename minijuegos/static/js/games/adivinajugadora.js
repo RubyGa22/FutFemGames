@@ -1,4 +1,4 @@
-import { updateRacha } from "../user/rachas.js";
+import { updateRacha } from "/static/usuarios/js/rachas.js";
 
 let jugadora;
 let preguntas = 10;

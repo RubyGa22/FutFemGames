@@ -1,15 +1,22 @@
-import { updateRacha, obtenerUltimaRespuesta } from "../user/rachas.js";
+import { updateRacha, obtenerUltimaRespuesta } from "/static/usuarios/js/rachas.js";
+import { Ganaste, crearPopupInicialJuego } from "./funciones-comunes.js";
+import { victory } from "../sounds.js";
 
 let answer = "";
 let currentRow = 0;
 let jugadora;
 const maxRows = 6;
+const celdasTd = document.querySelectorAll('input');
+
+
 async function iniciar() {
     jugadora = await fetchData(2);
     localStorage.setItem('res2', jugadora.idJugadora);
     const ultima = await obtenerUltimaRespuesta(2);
-    let ultimaArray = JSON.parse(ultima);   // ← AQUÍ sí
-    const usuarioAnswer = ultimaArray[ultimaArray.length - 1].answer;
+    let ultimaArray = JSON.parse(ultima);
+    let usuarioAnswer;
+    if(ultimaArray) usuarioAnswer= ultimaArray[ultimaArray.length - 1].answer;
+    console.log(usuarioAnswer, jugadora.idJugadora)
     if(usuarioAnswer === jugadora.idJugadora){
         console.log('Se ha guardado la respuesta'); 
         localStorage.setItem('Attr2', ultima);
@@ -42,19 +49,16 @@ async function iniciar() {
         localStorage.setItem('res2', jugadora.idJugadora);
         //stopCounter("wordle");  // ⬅️ Detenemos el temporizador si el usuario gana
         Ganaste('wordle');
-        displayMessage("¡Correcto! Has ganado.");
+        displayMessage(gettext("¡Has Ganado!"));
     } else {
         await loadJugadoraApodo(jugadora.idJugadora, false);
 
-        if (!userAnswer || userAnswer.trim() === '') {
+        if (!userAnswer || userAnswer === '') {
             console.log("El usuario no ha respondido aún.");
             return; // Esperar a que el usuario responda
 
-        } else if (userAnswer === 'loss') {
+        } else if (userAnswer === 'loss'+jugadora.idJugadora) {
             console.log("El usuario ya ha perdido anteriormente.");
-            await wordlePerder();
-        } else {
-            console.log("El usuario ha respondido incorrectamente.");
             await wordlePerder();
         }
     }   
@@ -83,14 +87,15 @@ async function loadJugadoraApodo(id, ganaste) {
         })
         .catch(error => {
             console.error('Error fetching word:', error);
-            displayMessage('Error loading word.');
+            displayMessage(gettext('Error loading word.'));
         });
 }
 
 function createBoard() {
     const board = document.getElementById("board");
+    board.style.gridTemplateColumns = `repeat(${answer.length}, 70px)`;
     for (let i = 0; i < maxRows; i++) {
-        for (let j = 0; j < 5; j++) {
+        for (let j = 0; j < answer.length; j++) {
             const input = document.createElement("input");
             input.type = "text";
             input.maxLength = 1; // Limitar a un solo carácter
@@ -109,10 +114,10 @@ function handleInputChange(event) {
     const currentTileId = input.getAttribute("id");
     const [_, row, __, tile] = currentTileId.split("-");
 
-    if (input.value.length === 1 && parseInt(tile) < 4) {
+    if (input.value.length === 1 && parseInt(tile) < answer.length-1) {
         const nextTile = document.getElementById(`row-${row}-tile-${parseInt(tile) + 1}`);
         nextTile.focus();
-    } else if (input.value.length === 1 && parseInt(tile) === 4) {
+    } else if (input.value.length === 1 && parseInt(tile) === answer.length-1) {
         // Automatically check the word if on the last tile
         checkWord();
     }
@@ -137,7 +142,7 @@ function quitarAcentos(str) {
 
 async function checkWord() {
     const guess = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < answer.length; i++) {
         const input = document.getElementById(`row-${currentRow}-tile-${i}`);
         guess.push(input.value.toLowerCase());
     }
@@ -146,9 +151,10 @@ async function checkWord() {
     const answerSanitized = quitarAcentos(answer.toLowerCase());
 
     if (guessSanitized === answerSanitized) {
-        displayMessage("¡Correcto! Has ganado.");
+        displayMessage(gettext("¡Has Ganado!"));
         if(localStorage.length>0){
             setTimeout(async () => {
+                victory.play()
                 await updateRacha(2, 1, localStorage.getItem('Attr2'));
             }, 0);
             //localStorage.setItem('Attr2', jugadora.idJugadora);
@@ -163,7 +169,8 @@ async function checkWord() {
         currentRow++;
 
         if (currentRow === maxRows) {
-            displayMessage(`¡Has perdido! La palabra era: ${answer}.`);
+            displayMessage(gettext(`¡Has perdido! La palabra era: ${answer}.`));
+            await updateRacha(2, 0, localStorage.getItem('Attr2'));
             lockAllRows();
         } else {
             updateActiveRow();
@@ -173,7 +180,7 @@ async function checkWord() {
 
 
 function fillRowWithAnswer() {
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < answer.length; i++) {
         const tile = document.getElementById(`row-${currentRow}-tile-${i}`);
         tile.value = answer[i]; // Rellenar la respuesta en la fila
     }
@@ -181,7 +188,7 @@ function fillRowWithAnswer() {
 
 function disableRowInputs(row) {
     for (let i = 0; i < maxRows; i++) {
-        for (let j = 0; j < 5; j++) {
+        for (let j = 0; j < answer.length; j++) {
             const tile = document.getElementById(`row-${i}-tile-${j}`);
             tile.disabled = i < row; // Desactivar todas las filas anteriores
         }
@@ -191,7 +198,7 @@ function disableRowInputs(row) {
 function updateActiveRow() {
     // Habilitar la fila actual y deshabilitar las demás
     for (let i = 0; i < maxRows; i++) {
-        for (let j = 0; j < 5; j++) {
+        for (let j = 0; j < answer.length; j++) {
             const tile = document.getElementById(`row-${i}-tile-${j}`);
             tile.disabled = i !== currentRow; // Solo habilitar la fila actual
         }
@@ -212,7 +219,7 @@ function colorTiles(guess) {
     }
 
     // Primero, marcar las letras correctas
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < answer.length; i++) {
         const tile = document.getElementById(`row-${currentRow}-tile-${i}`);
         const letter = guess[i];
 
@@ -224,7 +231,7 @@ function colorTiles(guess) {
     }
 
     // Luego, marcar las letras presentes
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < answer.length; i++) {
         const tile = document.getElementById(`row-${currentRow}-tile-${i}`);
         const letter = guess[i];
 
@@ -248,7 +255,7 @@ function displayMessage(message) {
 function lockAllRows() {
     // Bloquear todas las filas
     for (let i = 0; i < maxRows; i++) {
-        for (let j = 0; j < 5; j++) {
+        for (let j = 0; j < answer.length; j++) {
             const tile = document.getElementById(`row-${i}-tile-${j}`);
             tile.disabled = true;
         }
@@ -289,9 +296,13 @@ function saveWordleRow(guess, resultStates) {
 }
 
 function colocarRespuestas(palabra, results, row) {
+    let data = localStorage.getItem("Attr2");
+
+    // Si no existe, iniciar vacío
+    let arr = data ? JSON.parse(data) : [];
     disableRowInputs(row);
     // Rellenar cada letra
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < answer.length; i++) {
         const tile = document.getElementById(`row-${row}-tile-${i}`);
       
         tile.value = palabra[i];
@@ -305,36 +316,31 @@ function colocarRespuestas(palabra, results, row) {
     }
     currentRow = row + 1;
     updateActiveRow();
+
+    const valorLocal = localStorage.getItem('res2');
+    const respuestaCorrecta = arr[arr.length-1].answer;
     
-    if(localStorage.getItem('hasWon2')){
+    if (currentRow >= arr.length && (valorLocal === respuestaCorrecta || valorLocal === 'loss' + respuestaCorrecta)) {
         lockAllRows();
     }
 }
 
 async function wordlePerder() {
-    // Bloquear el botón y el input
-    //lockAllRows();
     
     const resultDiv = document.getElementById('message');
-    const player = await sacarJugadora(jugadora.idJugadora);
 
-    resultDiv.textContent = 'Has perdido, era: '+player.Nombre_Completo;
+    resultDiv.textContent = gettext('Has perdido');
     const div = document.getElementById('trayectoria');
-    /*const jugadora_id = 'loss';
-    localStorage.setItem('Attr2', jugadora_id);*/
-    //await loadJugadoraById(jugadoraId, true);
+    
     // Agregar un delay de 2 segundos (2000 ms)
     if(localStorage.length>0){
         await updateRacha(2, 0, localStorage.getItem('Attr2'));
     }
-    setTimeout(() => {
-        cambiarImagenConFlip();
-    }, 1000);
 }
 
 
-const texto = 'Adivina la Jugadora de Fútbol es un juego de trivia donde debes identificar a una futbolista según los equipos en los que ha jugado. Usa las pistas, demuestra tu conocimiento y compite para ver quién acierta más.';
-const imagen = "static/img/wordle.png";
+const texto = gettext('¡Bienvenida a Wordle! Adivina la palabra oculta en 6 intentos. Cada letra correcta en la posición correcta se marcará en verde, las letras correctas en la posición incorrecta se marcarán en amarillo, y las letras incorrectas se marcarán en gris. ¡Buena suerte!');
+const imagen = "static/img/wordle.webp";
 play().then(r => r);
 async function play() {
     const lastAnswer= localStorage.getItem('Attr2');

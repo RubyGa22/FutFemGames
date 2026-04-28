@@ -3,32 +3,28 @@ let jugadoraId;
 let nombreCompleto;
 
 // Componentes html usados recurrentemente
-let popup;
-let resultText;
-let trayectoriaDiv;
-let myst;
-let jugadoraInput;
-let boton;
-let answer;
+let popup, resultText, trayectoriaDiv, myst, jugadoraInput, boton, answer, textoInput;
 
-import { fetchJugadoraTrayectoriaById } from "../api/jugadora.js";
-import { updateRacha, obtenerUltimaRespuesta } from "../user/rachas.js";
 // Función principal que controla el flujo de carga
 async function iniciar(dificultad) {
-
-    // Componentes html usados recurrentemente
+    const {obtenerUltimaRespuesta} = await import("/static/usuarios/js/rachas.js");
+    const {Ganaste} = await import("./funciones-comunes.js");
+    const {inicializarCounter, startCounter, stopCounter } = await import('../utils/counter.js');
+    const {handleAutocompletePlayer} = await import("/static/futfem/js/jugadora.js");
     popup = document.getElementById('popup-ex');
     resultText =  document.getElementById('result');
     trayectoriaDiv = document.getElementById('trayectoria');
     myst = document.getElementById('jugadora');
     jugadoraInput = document.getElementById('jugadoraInput');
     boton = document.getElementById('botonVerificar');
+    textoInput = document.getElementById("jugadoraInput");
+    textoInput.addEventListener('input', debounce(handleAutocompletePlayer, 300)); // Debounce de 300ms
+
     const ultima = await obtenerUltimaRespuesta(1);
     const name = localStorage.getItem('nombre');
-    const btn = document.getElementById('botonVerificar');
     
-    if (btn) {
-        btn.addEventListener('click', checkAnswer); // Habilitar el botón al iniciar el juego
+    if (boton) {
+        boton.addEventListener('click', checkAnswer); // Habilitar el botón al iniciar el juego
     }
     
     if (popup) {
@@ -47,24 +43,11 @@ async function iniciar(dificultad) {
 
     if(ultima === 'loss'+jugadoraId){
         console.log('Se ha guardado la perdida'); 
-        localStorage.setItem('Attr1', 'loss');
+        localStorage.setItem('Attr1', 'loss'+idJugadora);
     }
 
     // Definir los segundos según la dificultad
-    let segundos;
-    switch (dificultad) {
-        case "facil":
-            segundos = 120;
-            break;
-        case "medio":
-            segundos = 60;
-            break;
-        case "dificil":
-            segundos = 30;
-            break;
-        default:
-            segundos = localStorage.getItem('trayectoria'); // Valor por defecto si la dificultad no es válida
-    }
+    let segundos = inicializarCounter(120000000000000000000000000000000000000000000000000000000000000000, 60, 30, 'trayectoria', dificultad);
 
     // Verificar si el usuario ha ganado
     answer = localStorage.getItem('Attr1');
@@ -85,7 +68,7 @@ async function iniciar(dificultad) {
                 console.log("El contador llegó a 0. Ejecutando acción...");
                 await trayectoriaPerder();
             });
-        } else if (answer === 'loss') {
+        } else if (answer === 'loss'+jugadoraId) {
             await trayectoriaPerder();
         } else {
             startCounter(segundos, "trayectoria", async () => {
@@ -96,7 +79,28 @@ async function iniciar(dificultad) {
     }
 }
 
+play().then(r => r);
+async function play() {
+    const lastAnswer= localStorage.getItem('Attr1');
+    let jugadora = await fetchData(1);
+    jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
+    const res = localStorage.getItem('res1');
+    const texto = gettext('Adivina la Jugadora de Fútbol es un juego de trivia donde debes identificar a una futbolista según los equipos en los que ha jugado. Usa las pistas, demuestra tu conocimiento y compite para ver quién acierta más.');
+    const imagen = '/static/img/trayectoria.webp';
+    const {crearPopupInicialJuego} = await import("./funciones-comunes.js");
+    if(res !== jugadoraId || !res){
+        /*if(lastAnswer !== res || !lastAnswer){
+            updateRacha(1, 0, 'loss'+jugadoraId);
+        }*/
+        localStorage.removeItem('Attr1');
+        crearPopupInicialJuego(gettext('Futfem Career'), texto, imagen, '', iniciar);
+    } else {       
+        await iniciar('');
+    }
+}
+
 export async function loadJugadoraById(id, ganaste) {
+    const { fetchJugadoraTrayectoriaById } = await import("/static/futfem/js/jugadora.js");
     const data = await fetchJugadoraTrayectoriaById(id);
     if (data.length > 0) {
         displayTrayectoria(data, ganaste);
@@ -108,7 +112,6 @@ export async function loadJugadoraById(id, ganaste) {
 function displayTrayectoria(data, acertaste) {
     trayectoriaDiv.setAttribute('Attr1', data[0].jugadora)
     trayectoriaDiv.innerHTML = ''; // Limpiar contenido previo
-    trayectoriaDiv.classList.add('glass');
 
     const maxPerRow = 5;
     let currentRow;
@@ -118,6 +121,10 @@ function displayTrayectoria(data, acertaste) {
             currentRow = document.createElement('div');
             currentRow.classList.add('trayectoria-row');
             trayectoriaDiv.appendChild(currentRow);
+        }
+
+        if(item.equipo === 83){
+            return
         }
 
         const flipContainer = document.createElement('div');
@@ -134,10 +141,19 @@ function displayTrayectoria(data, acertaste) {
             const escudoImg = document.createElement('img');
             escudoImg.src = item.escudo;
             escudoImg.alt = item.nombre;
+            escudoImg.classList.add('glass')
+            escudoImg.style.background = `
+                linear-gradient(
+                    to bottom,
+                    color-mix(in srgb, ${item.color} 30%, transparent),
+                    color-mix(in srgb, transparent 30%, transparent)
+                )
+            `;
+            escudoImg.style.borderColor = item.color;
             front.appendChild(escudoImg);
 
             const anyos = document.createElement('p');
-            anyos.textContent = item.años;
+            anyos.textContent = item.fecha_inicio ? (item.fecha_inicio.substring(0, 4) + (item.fecha_fin ? ' - ' + item.fecha_fin.substring(0, 4) : ' - Act.')) : null;
             anyos.style.textAlign = 'center';
             front.appendChild(anyos);
         }else{
@@ -160,10 +176,12 @@ function displayTrayectoria(data, acertaste) {
                 const jugadoraImg = document.createElement('img');
                 jugadoraImg.src = item.imagen;
                 jugadoraImg.alt = 'Imagen de la Jugadora';
+                jugadoraImg.className = 'glass';
+                jugadoraImg.style.borderColor = item.color;
                 back.appendChild(jugadoraImg);
 
                 const anyos = document.createElement('p');
-                anyos.textContent = item.años;
+                anyos.textContent = item.fecha_inicio ? (item.fecha_inicio.substring(0, 4) + (item.fecha_fin ? ' - ' + item.fecha_fin.substring(0, 4) : ' - Act.')) : null;
                 anyos.style.textAlign = 'center';
                 back.appendChild(anyos);
 
@@ -172,10 +190,12 @@ function displayTrayectoria(data, acertaste) {
                 const jugadoraImg = document.createElement('img');
                 jugadoraImg.src = data[0].ImagenJugadora;
                 jugadoraImg.alt = 'Imagen de la Jugadora';
+                jugadoraImg.className = 'glass';
+                jugadoraImg.style.borderColor = item.color;
                 back.appendChild(jugadoraImg);
 
                 const anyos = document.createElement('p');
-                anyos.textContent = item.años;
+                anyos.textContent = item.fecha_inicio ? (item.fecha_inicio.substring(0, 4) + (item.fecha_fin ? ' - ' + item.fecha_fin.substring(0, 4) : ' - Act.')) : null;
                 anyos.style.textAlign = 'center';
                 back.appendChild(anyos);
 
@@ -191,6 +211,10 @@ function displayTrayectoria(data, acertaste) {
 async function checkAnswer() {
     const nombreCompleto = jugadoraInput.value.trim();
     const idJugadora = jugadoraInput.getAttribute('data-id');
+    const {wrong, victory} = await import("../sounds.js");
+    const {updateRacha} = await import("/static/usuarios/js/rachas.js");
+    const {Ganaste} = await import("./funciones-comunes.js");
+    const {stopCounter} = await import('../utils/counter.js');
 
     if (!idJugadora) {
         console.warn('No se encontró data-id en el input.');
@@ -199,8 +223,9 @@ async function checkAnswer() {
         if(!localStorage.getItem('Attr1')){
             console.log('Actualizando racha con última respuesta:', idJugadora);
             await updateRacha(1, 1, idJugadora);
+            victory.play()
         }else{
-            //await updateRacha(1, 1);
+            //await updateRacha(1, 1, idJugadora);
     }
         resultText.textContent = nombreCompleto;
         localStorage.setItem('Attr1', idJugadora);
@@ -210,13 +235,15 @@ async function checkAnswer() {
         stopCounter('trayectoria');
         Ganaste('trayectoria');
     }else{
-        resultText.textContent = 'Sigue intentando!'
+        wrong.play()
+        resultText.textContent = gettext('Sigue intentando!');
     }
 }
 
 async function trayectoriaPerder() {
     // Bloquear el botón y el input
     const jugadora = await sacarJugadora(jugadoraId);
+    const {updateRacha} = await import("/static/usuarios/js/rachas.js");
 
     boton.disabled = true;
     jugadoraInput.disabled = true;
@@ -232,23 +259,4 @@ async function trayectoriaPerder() {
     setTimeout(() => {
         cambiarImagenConFlip();
     }, 1000);
-}
-
-const texto = 'Adivina la Jugadora de Fútbol es un juego de trivia donde debes identificar a una futbolista según los equipos en los que ha jugado. Usa las pistas, demuestra tu conocimiento y compite para ver quién acierta más.';
-const imagen = '/static/img/trayectoria.jpg';
-play().then(r => r);
-async function play() {
-    const lastAnswer= localStorage.getItem('Attr1');
-    let jugadora = await fetchData(1);
-    jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
-    const res = localStorage.getItem('res1');
-    if(res !== jugadoraId || !res){
-        /*if(lastAnswer !== res || !lastAnswer){
-            updateRacha(1, 0, 'loss'+jugadoraId);
-        }*/
-        localStorage.removeItem('Attr1');
-        crearPopupInicialJuego('Guess Trayectoria', texto, imagen, '', iniciar);
-    } else {       
-        await iniciar('');
-    }
 }

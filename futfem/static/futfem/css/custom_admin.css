@@ -1,0 +1,62 @@
+/* Sobrescribimos el header de Django con tu variable */
+:root {
+    /* Colores principales */
+    --color-primario: rgb(172, 0, 172);
+    --color-primario2: rgb(95, 0, 95);
+    --color-secundario: #480048;
+    --color-terciario: #009e79;
+
+    /* Colores neutrales */
+    --color-detalles: #ffffff;
+    --color-texto: #000000;
+    --color-gray-light: #ecf0f1;
+    --color-gray-dark: #7f8c8d;
+
+    /* Colores de alerta */
+    --color-danger: #e74c3c; /* Rojo */
+    --color-warning: #f39c12; /* Naranja */
+    --color-success: #2ecc71; /* Verde */
+    --gradient: conic-gradient( from 90deg at 50% 50%, rgb(251, 55, 60), 
+    rgba(252, 114, 28, 1), rgba(255, 220, 0, 1), 
+    rgba(27, 206, 255, 1), rgba(42, 107, 255, 1), 
+    rgba(217, 41, 255, 1), rgba(255, 10, 92, 1) );
+}
+body{
+    background-size: auto;
+    background-repeat: repeat-y;
+    background-color: rgba(37, 0, 37, 0.75); /* Color negro con transparencia */
+    background-blend-mode: color-dodge; /* Modo de mezcla */
+}
+#header {
+    background: var(--color-secundario) !important;
+    color: white !important;
+    padding: 10px 40px !important;
+}
+
+th a{
+    color: var(--color-primario) !important;
+}
+
+#header #site-name a{
+    color: white;
+}
+
+/* Cambiamos los títulos de los módulos (las cajas de las tablas) */
+.module h2, .module caption, .inline-group h2 {
+    background: var(--color-secundario, #27ae60) !important; 
+}
+
+/* Botones de acción (Guardar, Eliminar) */
+.button, .submit-row input {
+    background: var(--color-primario) !important;
+    border: none;
+    border-radius: 4px;
+}
+
+.current-model{
+    background: rgba(172, 0, 172, 0.25) !important;
+}
+
+#content th a{
+    color: var(--color-detalles) !important;
+}

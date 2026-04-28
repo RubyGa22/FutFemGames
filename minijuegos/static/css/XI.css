@@ -1,33 +1,68 @@
-table{
+
+.football-field {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position-y: bottom;
+            background-position-x: center;
+}
+
+.football-field table {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    margin-bottom: unset;
+}
+
+
+.football-field .football-field table tbody{
+    width: 100%;
+    height: 100%;
+}
+
+.football-field .football-field table tr {
+    width: 100%;
+    height: 20%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.football-field table{
     /*width: 80%;*/
     /*height: 560px;*/
     /*background-color: rgba(128,0,128,0.5);*/
-    background-image: url("../img/imagen_2024-09-17_194038826.png"),linear-gradient(rgba(128,0,128),rgba(128,0,128));
+    background-image: url("../img/Football_pitch.webp"),linear-gradient(color-mix(in srgb, var(--color-secundario) 100%, var(--color-secundario) 100%));
     background-blend-mode: luminosity;
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center bottom;
-    border: 1px solid #ddd;
-    border-radius: 25px;
+    border: none;
+    /*border-radius: 25px;*/
     border-collapse: unset;
     display: flex;
     align-items: center;
     margin-bottom: 20px;
 }
-tbody{
+.football-field tbody{
     width: -webkit-fill-available;
 }
-tr{
+.football-field tr{
     display: flex;
     justify-content: space-around;
 }
-td.activado{
+.football-field td.activado{
+    visibility: visible;
+    opacity: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
-td{
-    display: none;
+.football-field td{
+    opacity: 0;
+    visibility: hidden;
     width: 100px;
     height:  30px;
     margin: 30px 20px;
@@ -35,18 +70,21 @@ td{
     /*border: 1px solid #ddd;*/
     align-content: center;
 }
-td div{
+.football-field .oculto-total {
+    display: none !important;
+}
+.football-field td div{
     display: flex;
     flex-direction: column;
     align-items: center;
 }
-td div img{
+.football-field td div img{
     width: 50px;
     z-index: 3;
-    border-radius: 25px;
-    background: #ddd;
+    /*border-radius: 25px;
+    background: #ddd;*/
 }
-td div p{
+.football-field td div p{
     border: 2px solid #ddd;
     border-radius: 10px;
     width: 100%;
@@ -61,19 +99,19 @@ td div p{
     -1px  0 0 black,
     0 -1px 0 black;
 }
-.pista{
+.football-field .pista{
     display: flex;
     flex-direction: row;
     align-items: center;
     margin-bottom: 20px;
     justify-content: space-around;
 }
-.pista img{
+.football-field .pista img{
     width: 50px;
     height: 60px;
     display: block;
 }
-.pista p{
+.football-field .pista p{
     margin: 0;
 }
 #sugerencias{
@@ -84,23 +122,23 @@ td div p{
     color: var(--color-primario);
 }
 @media (max-width: 650px) {
-    table{
-        width: 80%;
-        height: 70%;
+    .football-field table{
+        /*width: 80%;
+        height: 70%;*/
         justify-content: center;
     }
-    td.activado{
+    .football-field td.activado{
         margin: 20px 10px;
         align-items: center;
         width: fit-content;
     }
-    td div p{
+    .football-field td div p{
         width: 130%;
     }
-    td div img{
+    .football-field td div img{
         width: 40px;
     }
-    tbody{
+    .football-field tbody{
         width: -webkit-fill-available;
     }
 }

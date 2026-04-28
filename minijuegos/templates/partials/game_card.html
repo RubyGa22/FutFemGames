@@ -1,9 +1,14 @@
 {% load static %}
 <div class="col-md-4">
-    <div id="{{ racha_id }}" class="fire"></div>
 
-    <div class="game-button glow" onclick="redireccionarA('{{ destino_js }}')">
-        <img src="{% static imagen %}" alt="{{ titulo }}">
-        <h4>{{ titulo }}</h4>
+    <div class="game-button glow-on-hover" id="boton-{{destino_js}}" onclick="redireccionarA('{{ destino_js }}')" data-bg="/static/img/bg-{{ destino_js }}.png" data-titulo="{{ titulo }}" data-descripcion="{{ descripcion }}" data-img="{% static imagen %}">
+        <div class="glow"></div>
+        <img src="{% static imagen %}" alt="{{ titulo }}" class="game-img base-img" fetchpriority="high">
+        <!--<img src="{% static imagen_hover %}" alt="Vista previa de {{ titulo }}" class="game-img hover-img">-->
+        <div id="game-title-container">
+                <div id="{{ racha_id }}" class="fire"></div>
+
+            <h2 class="game-title">{{ titulo }}</h2>
+        </div>
     </div>
 </div>

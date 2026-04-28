@@ -1,62 +1,83 @@
 {% load static %}
+{% load i18n %}
+{% load compress %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Adivina la jugadora a través de sus compañeras de equipo">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Futfem Relations</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="icon" href="{% static 'img/logo.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Montserrat:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Montserrat:wght@400;700&display=swap" media="print" onload="this.media='all'">
+
+    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" media="print" onload="this.media='all'">-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" media="print" onload="this.media='all'">
+
+    <link rel="preload" href="/api/juegoxid?id_juego=5" as="fetch" crossorigin="anonymous">
+    <link rel="modulepreload" href="/static/js/games/companyeras.js">
+    <link rel="modulepreload" href="/static/js/games/funciones-comunes.js">
+    <link rel="modulepreload" href="/static/futfem/js/jugadora.js">
+
+    {% compress css inline %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <link rel="stylesheet" href="{% static 'css/companyeras.css' %}">
     <link rel="stylesheet" href="{% static 'css/trayectoria.css' %}">
-    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}?v={% now 'U' %}">
     <link rel="stylesheet" href="{% static 'css/combo.css' %}">
+    {% endcompress %}
+    <noscript>
+        <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">-->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css">
+    </noscript>
 </head>
-<body>
+<body {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
     {% include 'partials/header.html' %}
-<h1>Compañeras</h1>
-<div id="reloj"></div>
-<div class="flip-container" id="foto-jug" style="height: 150px">
-    <div class="flipper">
-        <div class="front">
-            <img src="{% static 'img/mystery.jpg' %}" class="mystery" alt="mystery player">
-        </div>
-        <div class="back">
-            <img src="#" class="mystery" alt="mystery player" id="jugadora">
-        </div>
-    </div>
-</div>
-<p id="result"></p>
-
-<div class="juego">
-    <div class="compañeras" id="compañeras">
-        <div id="jugadora-1"></div>
-        <div id="jugadora-2"></div>
-        <div id="jugadora-3"></div>
-        <div id="jugadora-4"></div>
-        <div id="jugadora-5"></div>
-    </div>
-
-    <div id="respuesta" class="cont">
-        <label for="jugadoraInput">
-            <input type="text" id="jugadoraInput" placeholder="Escribe el nombre de la jugadora">
-            <div id="sugerencias-container">
-                <ul id="sugerencias"></ul>
+    <div class="mates-container">
+    <h1 style="margin-bottom: unset;">{% trans "Futfem Mates" %}</h1>
+    <div id="reloj">Tiempo</div>
+    <div class="flip-container" id="foto-jug" style="height: 180px">
+        <div class="flipper">
+            <div class="front">
+                <img src="{% static 'img/mystery.webp' %}" class="mystery" alt="mystery player" fetchpriority="high">
             </div>
-        </label>
-        <button id="botonVerificar">Verificar</button>
+            <div class="back">
+                <img src="#" class="mystery" alt="mystery player" id="jugadora">
+            </div>
+        </div>
+    </div>
+    <p id="resultado"></p>
+
+    <div class="juego">
+        <div class="compañeras" id="compañeras">
+            <div id="jugadora-1"></div>
+            <div id="jugadora-2"></div>
+            <div id="jugadora-3"></div>
+            <div id="jugadora-4"></div>
+            <div id="jugadora-5"></div>
+        </div>
+
+        <div id="respuesta" class="cont">
+            <label for="jugadoraInput">
+                <input type="search" id="jugadoraInput" placeholder="Escribe el nombre de la jugadora" autocorrect="off" autocomplete="off">
+                <div id="sugerencias-container">
+                    <ul id="sugerencias"></ul>
+                </div>
+            </label>
+            <button id="botonVerificar">Verificar</button>
+        </div>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="{% static 'js/admin.js' %}"></script>
-<script src="{% static 'js/funciones-tablas.js' %}"></script>
+<script src="{% url 'javascript-catalog' %}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous" defer></script>
+<script src="{% static 'js/animations/header.js' %}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js" defer></script>
+<script src="{% static 'js/admin.js' %}" defer></script>
 <script type="module" src="{% static 'js/games/companyeras.js' %}"></script>
-<script>
-    // Añadir el evento de input al campo de texto
-    const textoInput = document.getElementById("jugadoraInput");
-    textoInput.addEventListener('input', debounce(handleAutocompletePlayer, 1000)); // Debounce de 300ms
-</script>
 </body>
 </html>

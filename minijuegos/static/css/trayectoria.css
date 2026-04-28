@@ -1,9 +1,29 @@
+body{
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+}
 #game {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 20px;
+    /*margin: 20px;*/
     text-align: center;
+    width: 100%;
+}
+#game>.flip-container{
+    height: 120px;
+    max-height: 120px;
+}
+#game>.flip-container img{
+    height: 100% !important;
+    width: auto !important;
+    max-height: 120px !important;
+}
+#trayectoria-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
     height: 100%;
 }
@@ -15,17 +35,17 @@
     max-width: 90%;
     border-radius: 20px; /* Bordes redondeados */
     text-align: center; /* Centrar el contenido dentro del botón */
-    background-color: rgba(128,0,128,0.45); /* Color de fondo primario */
+    /*background-color: rgba(128,0,128,0.45); /* Color de fondo primario */
     color: white; /* Color del texto */
-    margin-bottom: 20px; /* Espaciado inferior entre botones */
+    /*margin-bottom: 20px; /* Espaciado inferior entre botones */
     transition: transform 0.2s; /* Suavizar el efecto de transformación */
-    border: 0.5px solid rgb(255, 255, 255);
-    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);
+    /*border: 0.5px solid rgb(128, 0, 128);
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);*/
 
-    backdrop-filter: blur(10px);
+    /*backdrop-filter: blur(10px);*/
 }
 #sugerencias{
-    max-height: 125px;
+    max-height: 222px;
     overflow-y: scroll;
 }
 #sugerencias::-webkit-scrollbar{
@@ -34,18 +54,23 @@
 h1{
     text-align: center;
     margin-top: unset;
-    font-family: "Bauhaus 93", sans-serif;
+    font-family: var(--font-titulos);
 }
 .mystery{
     width: 150px;
     border-radius: 20px;
-    background: var(--color-primario);
-    border: 1px solid white;
+    background: linear-gradient(to bottom, 
+    color-mix(in srgb, var(--color-primario) 30%, transparent), 
+    color-mix(in srgb, var(--color-secundario) 30%, transparent));
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--color-primario);
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25),
+                0 0 20px rgba(128, 0, 128, 0.3);
 }
 #foto-jug{
-    margin-bottom: 2.5%;
+    margin-bottom: 1%;
 }
-button{
+#trayectoria-container button{
     width: 30%;
 }
 /* Añade esto a tu archivo CSS o dentro de una etiqueta <style> en el HTML */
@@ -84,6 +109,7 @@ button{
     /*box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5); /* Sombra alrededor de la imagen */
     width: 100px;
     height: 100px;
+    max-height: 100px;
 }
 label{
     margin: 0;
@@ -104,6 +130,16 @@ p {
 .front{
     text-align: end;
     height: inherit;
+    gap: 10px;
+}
+.front img{
+    padding: 5%;
+}
+.back{
+    gap: 10px;
+}
+.back img{
+    padding: 0%;
 }
 #respuesta{
     display: flex;
@@ -114,10 +150,18 @@ p {
     display: flex;
     flex-direction: row;
     width: 100%;
-    justify-content: space-around;
+    justify-content: center;
 }
 #trayectoria .flip-container{
-    padding-top: 5px;
+    height: 100px !important;
+    width: 100px !important;
+}
+#trayectoria .flip-container img{
+    height: 75px !important;
+    width: 75px !important;
+}
+#trayectoria .flip-container p{
+    font-size: 14px;
 }
 /* Responsive: Ajustes para pantallas pequeñas */
 @media (max-width: 1350px) {
@@ -144,10 +188,6 @@ p {
         font-size: 14px;
     }
 
-    button {
-        padding: 8px;
-    }
-
     p {
         font-size: 16px;
     }
@@ -161,7 +201,7 @@ p {
         max-width: 100%;
     }
     #trayectoria {
-        width: 95%;
+        width: 100%;
         padding: 1rem;
         flex: 1 1 0;
         height: auto;
@@ -183,13 +223,12 @@ p {
         width: 150px;
     }
     input {
-        width: 90%;
+        width: 90% !important;
         font-size: 14px;
     }
 
-    button {
+    #trayectoria-container button {
         width: 30%;
-        padding: 8px;
     }
 
     p {
@@ -204,23 +243,39 @@ p {
     #game{
         width: 97%;
     }
+    #game>.flip-container img{
+        max-height: 75px !important;
+    }
+    #foto-jug{
+        height: 100px !important;
+    }
+    #sugerencias{
+        max-height: 130px;
+        overflow-y: scroll;
+    }
     #trayectoria {
-        max-width: 97%;
-        padding: 1rem 0.2rem;
+        min-width: 320px;
+        padding: 0.5rem 0.2rem;
+        padding-inline: 0;
         flex: 1 1 0;
         height: auto;
         /*display: grid;
         grid-template-columns: repeat(4, 25%);*/ /* Esto crea 3 columnas de igual tamaño */
-        gap: 1.5rem 0; /* Espacio entre los elementos, ajusta según tu preferencia */
+        gap: 0 0; /* Espacio entre los elementos, ajusta según tu preferencia */
         justify-items: center;
     }
+    
     .trayectoria-row{
         width: 100%;
-        justify-content: space-around;
+        /*justify-content: space-around;*/
+        height: fit-content;
     }
     .flip-container{
         max-width: 70px;
         min-height: 90px;
+    }
+    #trayectoria .flip-container p{
+        font-size: 10px;
     }
     #equipos div {
         margin: 15px 10px;
@@ -234,16 +289,15 @@ p {
         margin: 0;
     }
     .mystery{
-        width: 150px;
+        width: 90px;
     }
     input {
         width: 90%;
         font-size: 14px;
     }
 
-    button {
+    #trayectoria-container button {
         width: 30%;
-        padding: 8px;
     }
     p {
         font-size: 11px;
