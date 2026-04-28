@@ -1,0 +1,162 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-11 13:13+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ca\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\FutFemWiki\static\FutFemWiki\js\ficha-equipo.js:19
+msgid "Ganado"
+msgstr "Guanyat"
+
+#: .\FutFemWiki\static\FutFemWiki\js\ficha-equipo.js:19
+msgid "veces"
+msgstr "vegades"
+
+#: .\FutFemWiki\static\FutFemWiki\js\wiki.js:203
+msgid "JUGADORA"
+msgstr ""
+
+#: .\FutFemWiki\static\FutFemWiki\js\wiki.js:204
+msgid "EDAD"
+msgstr "EDAT"
+
+#: .\FutFemWiki\static\FutFemWiki\js\wiki.js:205
+msgid "CLUB"
+msgstr ""
+
+#: .\FutFemWiki\static\FutFemWiki\js\wiki.js:206
+msgid "VALOR"
+msgstr "Valor de mercat"
+
+#: .\minijuegos\static\js\games\adivina2.js:34
+#: .\minijuegos\static\js\games\adivina2.js:121
+#: .\minijuegos\static\js\games\adivina2.js:242
+msgid "Vidas restantes: "
+msgstr "Intents restants: "
+
+#: .\minijuegos\static\js\games\bingo.js:104
+msgid ""
+"¡Pon a prueba tu memoria en \"Futfem Bingo\"! En este juego recibirás "
+"jugadoras al azar y deberás colocarlas en las casillas de país, equipo o "
+"liga que coincidan con su trayectoria. Cada jugadora tiene varias "
+"características, y tu objetivo es encajarla correctamente en el tablero. "
+"Gana quien logre completar su tarjeta como en un bingo tradicional, ¡pero "
+"con fútbol femenino!"
+msgstr ""
+"Posa a prova la teua memòria en Futfem Bingo! En este joc rebràs jugadores a "
+"l'atzar i hauràs de col·locar-les en les caselles de país, equip o lliga que "
+"coincidisquen amb la seua trajectòria. Cada jugadora té diverses "
+"característiques, i el teu objectiu és encaixar-la correctament en el "
+"tauler. Gana qui aconseguisca completar la seua targeta com en un bingo "
+"tradicional, però amb futbol femení!"
+
+#: .\minijuegos\static\js\games\bingo.js:109
+msgid "Futfem Bingo"
+msgstr ""
+
+#: .\minijuegos\static\js\games\bingo.js:490
+#: .\minijuegos\static\js\games\grid.js:531
+#: .\minijuegos\static\js\games\wordle.js:334
+msgid "Has perdido"
+msgstr "Has perdut"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:195
+#: .\minijuegos\static\js\games\funciones-comunes.js:201
+#: .\minijuegos\static\js\games\funciones-comunes.js:205
+#: .\minijuegos\static\js\games\funciones-comunes.js:215
+#: .\minijuegos\static\js\games\funciones-comunes.js:219
+#: .\minijuegos\static\js\games\wordle.js:52
+#: .\minijuegos\static\js\games\wordle.js:154
+msgid "¡Has Ganado!"
+msgstr "¡Has Guanyat!"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:284
+msgid "Iniciar"
+msgstr "Iniciar"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:295
+msgid "Selecciona dificultad"
+msgstr "Selecciona dificultat"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:305
+msgid "Fácil"
+msgstr "Fàcil"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:309
+msgid "Medio"
+msgstr "Mitjana"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:313
+msgid "Difícil"
+msgstr ""
+
+#: .\minijuegos\static\js\games\grid.js:133
+msgid ""
+"¡Pon a prueba tu conocimiento! Rellena la cuadrícula con nombres de "
+"jugadoras que hayan militado en los dos equipos que coinciden en cada celda "
+"(fila y columna). ¡Completa el tablero y demuestra que eres quien más sabe "
+"de fútbol femenino!"
+msgstr ""
+"Posa a prova el teu coneixement! Emplena la quadrícula amb noms de jugadores "
+"que hagen militat en els dos equips que coincidixen en cada cel·la (fila i "
+"columna). Completa el tauler i demostra que eres qui més sap de futbol "
+"femení!"
+
+#: .\minijuegos\static\js\games\grid.js:135
+msgid "Futfem Grid"
+msgstr "FutFem Graella"
+
+#: .\minijuegos\static\js\games\grid.js:263
+msgid "No encontrada en las columnas."
+msgstr "No trobada a les columnes"
+
+#: .\minijuegos\static\js\games\grid.js:315
+msgid "No se han encontrado coincidencias."
+msgstr "No s'han trobat coincidències."
+
+#: .\minijuegos\static\js\games\guesstrayectoria.js:99
+msgid ""
+"Adivina la Jugadora de Fútbol es un juego de trivia donde debes identificar "
+"a una futbolista según los equipos en los que ha jugado. Usa las pistas, "
+"demuestra tu conocimiento y compite para ver quién acierta más."
+msgstr ""
+"Endevina la Jugadora de Futbol és un joc de *trivia on has d'identificar a "
+"una futbolista segons els equips en els quals ha jugat. Usa les pistes, "
+"demostra el teu coneixement i competix per a veure qui encerta més."
+
+#: .\minijuegos\static\js\games\guesstrayectoria.js:106
+msgid "Futfem Career"
+msgstr "FutFem Carrera"
+
+#: .\minijuegos\static\js\games\guesstrayectoria.js:242
+msgid "Sigue intentando!"
+msgstr "Continua intentant!"
+
+#: .\minijuegos\static\js\games\wordle.js:90
+msgid "Error loading word."
+msgstr "Error carregant la paraula"
+
+#: .\minijuegos\static\js\games\wordle.js:347
+msgid ""
+"¡Bienvenida a Wordle! Adivina la palabra oculta en 6 intentos. Cada letra "
+"correcta en la posición correcta se marcará en verde, las letras correctas "
+"en la posición incorrecta se marcarán en amarillo, y las letras incorrectas "
+"se marcarán en gris. ¡Buena suerte!"
+msgstr ""
+"Benviguda a Wordle! Endevina la paraula oculta en 6 intents. Cada lletra "
+"correcta en la posició correcta es marcarà en verd, les lletres correctes en "
+"la posició incorrecta es marcaran en groc, i les lletres incorrectes es "
+"marcaran en grisa. Bona sort!"

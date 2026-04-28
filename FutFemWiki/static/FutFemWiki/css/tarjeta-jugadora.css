@@ -1,14 +1,17 @@
 #mostrador-tarjetas{
-    width: fit-content;
+    /*width: fit-content;
     display: flex;
-    flex-direction: row;
+    flex-direction: row;*/
     /*gap: 30px;*/
 
-    overflow-x: hidden;     /* scroll horizontal */
-    padding: 40px 0px;
+    /*overflow-x: hidden;     /* scroll horizontal */
+    padding: 20px 0px;
 
     align-items: center;
-    overflow-y: hidden;
+    /*overflow-y: hidden;*/
+}
+.swiper-pagination span{
+    font-size: medium;
 }
 .imagen-jugadora{
     filter: contrast(1);
@@ -39,11 +42,12 @@
     flex: 0 0 auto;
     display: flex;
     flex-direction: column;
-    height: 400px;
-    width: 250px;
+    width: 200px;
     border-radius: 20px;
     text-align: center;
     padding-inline: unset;
+    backface-visibility: hidden;
+    contain: content;
 
     /* 3D */
     transform-style: preserve-3d;
@@ -52,9 +56,9 @@
     /* Glass / profundidad */
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
-    box-shadow:
+    /*box-shadow:
         0 20px 40px rgba(0,0,0,0.35),
-        inset 0 0 0 1px rgba(255,255,255,0.15);
+        inset 0 0 0 1px rgba(255,255,255,0.15);*/
 
     overflow: hidden;
 }
@@ -114,7 +118,7 @@
     align-items: center;
     justify-items: center;
     background: var(--color-terciario);
-    height: 100%;
+    height: max-content;
     border-radius: 0px 0px 20px 20px;
 }
 
@@ -124,7 +128,6 @@
     grid-template-columns: repeat(3, 1fr);
     align-items: center;
     justify-items: center;
-    height: 100%;
     border-radius: 0px 0px 20px 20px;
 }
 
@@ -142,8 +145,8 @@
 
 .tarjeta-wrapper {
     flex: 0 0 auto;
-    width: 250px;
-    height: 400px;
+    width: 200px;
+    height: 330px;
     perspective: 1200px;
 }
 
@@ -168,6 +171,7 @@
     padding-inline: unset;
     display: flex;
     flex-direction: column;
+    height: max-content;
 }
 
 .tarjeta-back {
@@ -180,14 +184,15 @@
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
     border-radius: 20px;
-    box-shadow:
+    /*box-shadow:
         0 20px 40px rgba(0,0,0,0.35),
-        inset 0 0 0 1px rgba(255,255,255,0.15);
+        inset 0 0 0 1px rgba(255,255,255,0.15);*/
 
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    height: 100%;
     gap: 12px;
 }
 
@@ -208,7 +213,14 @@
 
 @media (max-width: 768px){
     .tarjeta-jugadora{
-        height: 400px;
+        /*height: 400px;*/
         width: 250px;
+    }
+    .tarjeta-back{
+        max-height: 242.55px;
+    }
+    #mostrador-tarjetas{
+        padding-top: 0;
+        padding-bottom: 15px;
     }
 }

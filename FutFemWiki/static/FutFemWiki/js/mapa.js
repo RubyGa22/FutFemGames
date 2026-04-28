@@ -1,5 +1,3 @@
-import {CapaControl} from '../mapstyles/capaControl.js';
-
 export let map = null;
 let markersGroup = [];
 let bloqueado = false;
@@ -8,17 +6,16 @@ export function inicializarMapaEquipos() {
     if (map) {
         markersGroup.forEach(m => m.marker.remove());
         markersGroup = []; 
-        return
+        return map;
     };
 
     map = new maplibregl.Map({
         container: 'mapa-equipos',
         style: '/static/FutFemWiki/mapstyles/style-morado.json', // luego lo cambiamos por tu estilo
-        center: [-3.7, 40.4],
-        zoom: 6,
-        minZoom: 6,
-        bearing: -20,
-        pitch: 45,
+        projection: 'globe',
+        center: [7, 40],
+        zoom: 5,
+        minZoom: 4.5,
         antialias: true
     });
 
@@ -32,25 +29,30 @@ export function inicializarMapaEquipos() {
         bloqueado = false;
     });
 
+    map.on("zoomend", () => {
+        generarHeatmap();
+    });
+
     map.on("zoom", () => {
         const zoom = map.getZoom();
-
-        generarHeatmap();
 
         markersGroup.forEach(m => {
             const el = m.el;
 
             // 2. Tamaño según zoom
-            const scale = Math.min(1.3, Math.max(0.5, zoom / 7));
-            el.style.transform = `scale(${scale})`;
+            /*const scale = Math.min(1.3, Math.max(0.5, zoom / 7));
+            el.style.transform = `scale(${scale})`;*/
 
             // 3. Punto vs escudo
-            if (zoom < 6) {
-                el.classList.add("marker-punto");
-                el.classList.remove("marker-escudo");
+            const escudo = m.el.querySelector('.marker-escudo-img');
+            const punto = m.el.querySelector('.marker-punto');
+
+            if (zoom < 10) {
+                escudo.style.display = "none";
+                punto.style.display = "block";
             } else {
-                el.classList.add("marker-escudo");
-                el.classList.remove("marker-punto");
+                escudo.style.display = "block";
+                punto.style.display = "none";
             }
         });
     });
@@ -61,7 +63,6 @@ export function inicializarMapaEquipos() {
         const labelLayerId = layers.find(
             l => l.type === "symbol" && l.layout?.["text-field"]
         )?.id;
-
         /*map.addSource("terrain-dem", {
             type: "raster-dem",
             url: "https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=LYmhz1BKy6QniXWrxK2S",
@@ -78,13 +79,13 @@ export function inicializarMapaEquipos() {
         map.addSource("satellite", {
             type: "raster",
             tiles: [
-                "https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=LYmhz1BKy6QniXWrxK2S"
+                "https://api.maptiler.com/tiles/satellite-v2/tiles.json?key=LYmhz1BKy6QniXWrxK2S"
             ],
             tileSize: 256,
             attribution: "© MapTiler © OpenStreetMap contributors"
         });
 
-        map.addLayer({
+        /*map.addLayer({
             id: "satellite-layer",
             type: "raster",
             source: "satellite",
@@ -93,7 +94,7 @@ export function inicializarMapaEquipos() {
             }
         });
 
-        map.moveLayer("satellite-layer");
+        map.moveLayer("satellite-layer");*/
 
         map.addLayer({
             id: "3d-buildings",
@@ -115,7 +116,7 @@ export function inicializarMapaEquipos() {
             }
         }, labelLayerId);
 
-        map.addLayer({
+        /*map.addLayer({
             id: "sky",
             type: "sky",
             paint: {
@@ -123,7 +124,7 @@ export function inicializarMapaEquipos() {
                 "sky-atmosphere-sun": [0.0, 0.0],
                 "sky-atmosphere-sun-intensity": 15
             }
-        });
+        });*/
 
         map.setLight({
             anchor: "viewport",
@@ -133,22 +134,38 @@ export function inicializarMapaEquipos() {
         });
 
     });
-    map.addControl(new CapaControl(), "top-right");
+    //const { capaControl } = import("../mapstyles/capaControl.js");
+
+    //map.addControl(new CapaControl(), "top-right");
+    return map;
 }
 
 
 export function añadirEquipoMapa(id, nombre, lat, lng, escudoUrl, color) {
 
+    lat = parseFloat(lat);
+    lng = parseFloat(lng);
+
+    if (lat == null || lng == null) {
+        console.log(`Equipo sin coordenadas: ${nombre}`);
+        return;
+    }
+
+    const fotoUrl = escudoUrl.replace('/clubes/', '/clubes/mini/');
+
     const el = document.createElement('div');
     el.className = 'marker-escudo';
     el.innerHTML = `
-        <div class="marker-wrapper">
+        <div class="marker-wrapper" id="marker-${id}">
             <!--<div class="marker-pin"></div>-->
-            <img src="${escudoUrl}" class="marker-escudo-img" />
+            <div class="marker-punto"></div>
+            <img src="${fotoUrl}" class="marker-escudo-img" />
         </div>
     `;
 
     const img = el.querySelector('img');
+    const punto = el.querySelector('.marker-punto');
+    punto.style.background = color;
 
     img.style.background = `
             linear-gradient(
@@ -192,6 +209,32 @@ export function añadirEquipoMapa(id, nombre, lat, lng, escudoUrl, color) {
     //setTimeout(() => evitarColision(el, marker), 50);
 }
 
+export function actualizarMarkersZoom() {
+    const zoom = map.getZoom();
+
+    markersGroup.forEach(m => {
+
+        const escudo = m.el.querySelector('.marker-escudo-img');
+        const punto = m.el.querySelector('.marker-punto');
+
+        const scale = Math.min(1.3, Math.max(0.5, zoom / 7));
+        m.el.style.transform = `scale(${scale})`;
+
+        if (zoom < 10) {
+            escudo.style.display = "none";
+            punto.style.display = "block";
+        } else {
+            escudo.style.display = "block";
+            punto.style.display = "none";
+        }
+
+    });
+    map.easeTo({
+        zoom: zoom + 0.1,
+        duration: 600
+    });
+}
+
 let orbitando = false;
 let lastTime = null;
 
@@ -216,6 +259,7 @@ function rotarSuave(time) {
 
 
 function mostrarTooltipEquipo(id, nombre, lngLat) {
+    const slugNombre = nombre.toLowerCase().replace(/\s+/g, '-');
     const popup = new maplibregl.Popup({
         closeButton: true,
         offset: 25
@@ -236,7 +280,7 @@ function mostrarTooltipEquipo(id, nombre, lngLat) {
         document
           .getElementById('ver-equipo')
           .addEventListener('click', () => {
-              window.location.href = `/wiki/equipo/${id}/`;
+              window.location.href = `/equipo/${id}/${slugNombre}/`;
           });
     });
 

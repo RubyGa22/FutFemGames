@@ -1,0 +1,379 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-12 17:15+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\FutFemWiki\templates\equipo_ficha.html:31
+msgid "Palmarés"
+msgstr "Honours"
+
+#: .\FutFemWiki\templates\equipo_ficha.html:32
+#: .\FutFemWiki\templates\equipo_ficha.html:51
+#: .\FutFemWiki\templates\equipo_ficha.html:60
+msgid "Ver Más"
+msgstr "See More"
+
+#: .\FutFemWiki\templates\equipo_ficha.html:50
+msgid "Plantilla"
+msgstr "Squad"
+
+#: .\FutFemWiki\templates\equipo_ficha.html:59
+msgid "All Time"
+msgstr ""
+
+#: .\FutFemWiki\templates\index.html:8
+msgid "FutfemWiki"
+msgstr ""
+
+#: .\FutFemWiki\templates\index.html:43
+msgid "Seleccione un país"
+msgstr "Choose a country/region"
+
+#: .\FutFemWiki\templates\index.html:47 .\FutFemWiki\templates\index.html:69
+msgid "Buscar por país..."
+msgstr "Search by country..."
+
+#: .\FutFemWiki\templates\index.html:52 .\FutFemWiki\templates\index.html:82
+msgid "Confirmar"
+msgstr "Confirm"
+
+#: .\FutFemWiki\templates\index.html:61
+msgid "Equipo:"
+msgstr "Team:"
+
+#: .\FutFemWiki\templates\index.html:62 .\FutFemWiki\templates\mapa.html:26
+msgid "Buscar por equipo..."
+msgstr "Search by team..."
+
+#: .\FutFemWiki\templates\index.html:68
+msgid "Nacionalidad:"
+msgstr "Country/Region:"
+
+#: .\FutFemWiki\templates\index.html:75
+msgid "Posicion:"
+msgstr "Position:"
+
+#: .\FutFemWiki\templates\index.html:76
+msgid "Buscar por posicion..."
+msgstr "Search by position..."
+
+#: .\FutFemWiki\templates\jugadora_ficha.html:51
+msgid "Nacimiento"
+msgstr "Birthdate"
+
+#: .\FutFemWiki\templates\jugadora_ficha.html:54
+msgid "Altura"
+msgstr "Height"
+
+#: .\FutFemWiki\templates\jugadora_ficha.html:55
+msgid "Pie"
+msgstr "Foot"
+
+#: .\FutFemWiki\templates\jugadora_ficha.html:58
+msgid "Value"
+msgstr "Market value"
+
+#: .\FutFemWiki\templates\mapa.html:8
+msgid "Futfem Map"
+msgstr ""
+
+#: .\minijuegos\templates\minijuegos\adivina2.html:9
+#: .\minijuegos\templates\minijuegos\index.html:40
+#: .\minijuegos\templates\minijuegos\trayectoria.html:10
+#: .\usuarios\templates\ranking.html:31
+msgid "Futfem Guess"
+msgstr ""
+
+#: .\minijuegos\templates\minijuegos\adivina2.html:33
+#: .\minijuegos\templates\minijuegos\grid.html:60
+#: .\minijuegos\templates\minijuegos\trayectoria.html:50
+msgid "Verificar"
+msgstr "Verify"
+
+#: .\minijuegos\templates\minijuegos\bingo.html:28
+msgid "SKIP"
+msgstr ""
+
+#: .\minijuegos\templates\minijuegos\grid.html:22
+#: .\minijuegos\templates\minijuegos\index.html:28
+#: .\usuarios\templates\ranking.html:32
+msgid "Futfem Grid"
+msgstr ""
+
+#: .\minijuegos\templates\minijuegos\grid.html:55
+#: .\minijuegos\templates\minijuegos\trayectoria.html:45
+msgid "Escribe el nombre de la jugadora"
+msgstr "Enter player's name"
+
+#: .\minijuegos\templates\minijuegos\higher-lower.html:8
+msgid "Higher Or Lower"
+msgstr ""
+
+#: .\minijuegos\templates\minijuegos\index.html:27
+#: .\minijuegos\templates\minijuegos\trayectoria.html:22
+#: .\usuarios\templates\ranking.html:29
+msgid "Futfem Career"
+msgstr ""
+
+#: .\minijuegos\templates\minijuegos\index.html:29
+#: .\usuarios\templates\ranking.html:34
+msgid "Futfem Bingo"
+msgstr ""
+
+#: .\minijuegos\templates\minijuegos\index.html:39
+#: .\minijuegos\templates\minijuegos\wordle.html:10
+#: .\usuarios\templates\ranking.html:30
+msgid "Futfem Wordle"
+msgstr ""
+
+#: .\minijuegos\templates\minijuegos\index.html:41
+#: .\usuarios\templates\ranking.html:33
+msgid "Futfem Mates"
+msgstr ""
+
+#: .\minijuegos\templates\minijuegos\index.html:45
+msgid "Juegos Regulares"
+msgstr "Regular Games"
+
+#: .\minijuegos\templates\minijuegos\index.html:48
+#: .\usuarios\templates\ranking.html:35
+msgid "Higher or Lower"
+msgstr ""
+
+#: .\minijuegos\templates\minijuegos\wordle.html:20
+msgid "Wordle Game"
+msgstr ""
+
+#: .\minijuegos\templates\partials\header.html:12
+#: .\minijuegos\templates\partials\header.html:67
+msgid "Inicio"
+msgstr "Home"
+
+#: .\minijuegos\templates\partials\header.html:15
+#: .\minijuegos\templates\partials\header.html:70
+msgid "Wiki"
+msgstr ""
+
+#: .\minijuegos\templates\partials\header.html:20
+#: .\minijuegos\templates\partials\header.html:75
+msgid "Equipos"
+msgstr "Teams"
+
+#: .\minijuegos\templates\partials\header.html:25
+#: .\minijuegos\templates\partials\header.html:80
+msgid "Jugadoras"
+msgstr "Players"
+
+#: .\minijuegos\templates\partials\header.html:30
+#: .\minijuegos\templates\partials\header.html:85
+msgid "Mapa"
+msgstr "Map"
+
+#: .\minijuegos\templates\partials\header.html:35
+#: .\minijuegos\templates\partials\header.html:90
+msgid "Rankings"
+msgstr ""
+
+#: .\minijuegos\templates\partials\header.html:36
+#: .\minijuegos\templates\partials\header.html:91
+msgid "Nosotros"
+msgstr "Us"
+
+#: .\minijuegos\templates\partials\header.html:61
+msgid "Iniciar sesión"
+msgstr "Login"
+
+#: .\minijuegos\templates\partials\header.html:62
+msgid "Registrarse"
+msgstr "Sign Up"
+
+#: .\minijuegos\templates\partials\popup_gameover.html:4
+msgid "¡Fin del Juego!"
+msgstr "Game Over"
+
+#: .\minijuegos\templates\partials\popup_gameover.html:5
+msgid "Tu racha actual ha sido:"
+msgstr "Your actual streak:"
+
+#: .\minijuegos\templates\partials\popup_gameover.html:7
+msgid "Jugar"
+msgstr "Play"
+
+#: .\minijuegos\templates\partials\popup_gameover.html:8
+msgid "Salir"
+msgstr "Exit"
+
+#: .\usuarios\templates\findusers.html:21
+msgid "Buscar Usuarios"
+msgstr "Search Users"
+
+#: .\usuarios\templates\findusers.html:23
+msgid "Buscar por usuario..."
+msgstr "Search by user..."
+
+#: .\usuarios\templates\login.html:8 .\usuarios\templates\login.html:32
+msgid "Login"
+msgstr ""
+
+#: .\usuarios\templates\login.html:23 .\usuarios\templates\login.html:24
+#: .\usuarios\templates\ranking.html:47
+msgid "Usuario"
+msgstr "User"
+
+#: .\usuarios\templates\login.html:27 .\usuarios\templates\login.html:28
+msgid "Contraseña"
+msgstr "Password"
+
+#: .\usuarios\templates\login.html:30
+msgid "¿No tienes cuenta? Regístrate aquí"
+msgstr "Don't have an account?"
+
+#: .\usuarios\templates\login.html:31
+msgid "¿Olvidaste tu contraseña? Restablecela aquí"
+msgstr "Forgot your password?"
+
+#: .\usuarios\templates\nuevo_password_form.html:8
+#: .\usuarios\templates\nuevo_password_form.html:21
+#: .\usuarios\templates\nuevo_password_form.html:30
+msgid "Cambiar Contraseña"
+msgstr "Change Password"
+
+#: .\usuarios\templates\nuevo_password_form.html:23
+#: .\usuarios\templates\nuevo_password_form.html:24
+msgid "Nueva Contraseña"
+msgstr "New Password"
+
+#: .\usuarios\templates\nuevo_password_form.html:27
+#: .\usuarios\templates\nuevo_password_form.html:28
+msgid "Repetir Contraseña"
+msgstr "Repeat Password"
+
+#: .\usuarios\templates\partials\email.html:25
+msgid "Restablecer Contraseña"
+msgstr "Restore Password"
+
+#: .\usuarios\templates\partials\email.html:28
+msgid "Hola"
+msgstr "Hello"
+
+#: .\usuarios\templates\partials\email.html:32
+msgid ""
+"Has solicitado restablecer tu contraseña en FutFem Games. Haz clic en el "
+"botón de abajo para continuar:"
+msgstr "You have requested to reset your password on FutFem Games. Click the button below to continue:"
+
+#: .\usuarios\templates\partials\email.html:38
+msgid "Cambiar mi contraseña"
+msgstr "Change mi Password"
+
+#: .\usuarios\templates\partials\email.html:43
+msgid "Si no has sido tú, puedes ignorar este correo de forma segura."
+msgstr "If it wasn't you, you can safely ignore this email."
+
+#: .\usuarios\templates\perfil.html:29 .\usuarios\templates\ranking.html:111
+msgid "Miembro del equipo"
+msgstr "Member of the team"
+
+#: .\usuarios\templates\perfil.html:32
+msgid "Jugadora"
+msgstr "Players"
+
+#: .\usuarios\templates\perfil.html:44
+msgid "Nombre"
+msgstr "Name"
+
+#: .\usuarios\templates\perfil.html:56
+msgid "Apellidos"
+msgstr "Surname"
+
+#: .\usuarios\templates\perfil.html:68
+msgid "Jugadora favorita"
+msgstr "Players"
+
+#: .\usuarios\templates\perfil.html:69
+msgid "Ninguna"
+msgstr "None"
+
+#: .\usuarios\templates\perfil.html:82
+msgid "Rachas actuales"
+msgstr "Actual streaks"
+
+#: .\usuarios\templates\ranking.html:23
+msgid "Clasificación Global"
+msgstr "Global Qualification"
+
+#: .\usuarios\templates\ranking.html:27
+msgid "Filtrar por juego:"
+msgstr "Filter by game:"
+
+#: .\usuarios\templates\ranking.html:39
+msgid "Top 10 Jugadores"
+msgstr "Top 10 players"
+
+#: .\usuarios\templates\ranking.html:48
+msgid "Juego"
+msgstr "Game"
+
+#: .\usuarios\templates\ranking.html:49
+msgid "Racha"
+msgstr "Streak"
+
+#: .\usuarios\templates\ranking.html:66
+msgid "Cargando..."
+msgstr "Loading..."
+
+#: .\usuarios\templates\ranking.html:72
+msgid "Error al cargar los datos"
+msgstr ""
+
+#: .\usuarios\templates\ranking.html:87
+msgid "No hay puntuaciones para este juego"
+msgstr ""
+
+#: .\usuarios\templates\reset_password.html:8
+#: .\usuarios\templates\reset_password.html:21
+msgid "Reestablecer Contraseña"
+msgstr "Reset Password"
+
+#: .\usuarios\templates\reset_password.html:23
+#: .\usuarios\templates\reset_password.html:24
+msgid "Email"
+msgstr ""
+
+#: .\usuarios\templates\reset_password.html:26
+msgid "Enviar correo"
+msgstr "Send E-mail"
+
+#: .\usuarios\views.py:80
+msgid "Restablecer Contraseña - FutFem Games"
+msgstr "Restore Password - FutFem Games"
+
+#: .\usuarios\views.py:94
+msgid "Error al enviar el correo."
+msgstr "Ytouble sending the e-mail"
+
+#: .\usuarios\views.py:96
+msgid "No encontramos ese email."
+msgstr "E-mail not found"
+
+#: .\usuarios\views.py:107
+msgid "El enlace es inválido o ha expirado."
+msgstr "The link is not valid or has expirated"
+
+#: .\usuarios\views.py:116
+msgid "Las contraseñas no coinciden."
+msgstr "Passwords don't match"

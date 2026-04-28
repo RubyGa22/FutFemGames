@@ -30,6 +30,13 @@ export async function obtenerRacha(juego){
     
 }
 
+export async function obtenerRachaPerfil(user){
+    let rachaJuego = null;
+    rachaJuego = await obtenerRachaUser(user, null);
+    // displayRacha(rachaJuego.juego.racha_actual, juego);
+    return rachaJuego;
+}
+
 export async function updateRachaJuegoLineal(juego, racha){
 
     if (!usuario) {
@@ -201,9 +208,25 @@ export async function obtenerUltimaRespuesta(juego) {
 export function displayRacha(racha, juego){
     const displayJuego = document.getElementById('racha-'+juego)
     if(racha === 0 || !racha){
-        displayJuego.style.display = 'none';
+        displayJuego.classList.remove('fire')
+        displayJuego.style.display = '100%';
+        displayJuego.textContent = '0';
     }else{
         displayJuego.style.display = '100%';
         displayJuego.textContent = racha;
+    }
+}
+
+
+export async function cargarRanking(juegoId) {
+
+    try {
+        // Llamamos a tu API de rankings
+        const response = await fetch(`/api/rankings/?juego=${juegoId}`);
+        const data = await response.json();
+        return data
+    } catch (error) {
+        console.error('Error al cargar ranking:', error);
+        throw error;
     }
 }

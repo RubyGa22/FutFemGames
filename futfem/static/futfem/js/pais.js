@@ -1,4 +1,4 @@
-export async function handleAutocompletePais(event, id) {
+export async function handleAutocompletePais(event, id, funcion) {
     const input = event.target;
     const texto = input.value.trim();
     const suggestionsList = document.getElementById(id);
@@ -40,10 +40,36 @@ export async function handleAutocompletePais(event, id) {
                     `;
 
                     listItem.addEventListener('click', () => {
-                        // Insertar el nombre en el input al hacer clic
-                        input.value = nombre;
+                        // 1. Crear el "Chip" (el elemento visual que verá el usuario)
+                        const chip = document.createElement('div');
+                        chip.classList.add('input-chip');
+                        chip.innerHTML = `
+                            <span class="fi fi-${iso} fis"></span>
+                            <span class="chip-text">${nombre}</span>
+                            <span class="chip-cancel">&times;</span>
+                        `;
+
+                        // 2. Insertar el Chip y ocultar el input
+                        input.insertAdjacentElement('beforebegin', chip);
+                        input.style.display = 'none'; // Ocultamos el input real
+                        input.value = nombre; // Guardamos el nombre por si el form se envía
                         input.setAttribute('data-id', pais);
-                        suggestionsList.innerHTML = '';  // Limpiar las sugerencias
+                        
+                        suggestionsList.innerHTML = ''; // Limpiar sugerencias
+
+                        // 3. Lógica para el botón 'X' (Cancelar)
+                        chip.querySelector('.chip-cancel').addEventListener('click', () => {
+                            chip.remove(); // Quitamos el chip
+                            input.style.display = 'block'; // Mostramos el input
+                            input.value = ''; // Limpiamos el texto
+                            input.setAttribute('data-id', null);
+                            input.focus();
+                            if (funcion) funcion(null); // Avisar que se canceló
+                        });
+
+                        if (funcion) {
+                            funcion(pais);
+                        }
                     });
 
                     suggestionsList.appendChild(listItem);

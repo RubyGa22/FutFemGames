@@ -12,6 +12,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (finalUrl) {
         // Reemplaza el historial actual para que loading no quede en back
+        const prefetchLink = document.createElement('link');
+        prefetchLink.rel = 'prefetch'; // O 'prerender' para navegadores que lo soporten
+        prefetchLink.href = finalUrl;
+        document.head.appendChild(prefetchLink);
+
         history.replaceState(null, '', finalUrl);
 
         // Redirige después de 2 segundos

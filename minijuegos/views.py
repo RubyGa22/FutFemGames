@@ -10,11 +10,10 @@ from futfem.models import Equipo, Jugadora
 from .models import Pista  # Asegúrate de tener el modelo Pista
 
 
-@never_cache
 def index(request):
     return render(request, 'minijuegos/index.html')
 
-
+@login_required
 def loading(request):
     # Obtiene el parámetro ?url= que le pasas desde redirect.js
     url_final = request.GET.get('url', '')

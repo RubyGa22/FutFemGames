@@ -1,85 +1,288 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 {% load static %}
-<header class="navbar">
+{% load i18n %}
+<header class="navbar" role="banner">
   <div class="container">
 
     <!-- Logo de vSports -->
     <div id="header-izquierda"> 
-      <a href="{% url 'index' %}" class="navbar-brand1"><img src="{% static 'img/logo.png' %}" alt="logo futfem"></a>
-      <nav id="main-nav">
+          <a href="/#juegos" class="navbar-brand1"><img src="{% static 'img/logo.webp' %}" alt="logo futfem" fetchpriority="high" height="75" width="75"></a>
+      <!--<nav id="main-nav">
         <ul>
-          <li><a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
-          <li><a href="{% url 'wiki' %}" class="{% if request.resolver_match.url_name == 'wiki' %}active{% endif %}">Wiki</a></li>
-          <li><a href="{% url 'nosotros' %}" class="{% if request.resolver_match.url_name == 'nosotros' %}active{% endif %}">Nosotros</a></li>
+          <li><a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">{% trans "Inicio" %}</a></li>
+          <li class="dropdown">
+            <a href="#" class="{% if request.path|slice:":5" == "/wiki" %}active{% endif %}">
+                {% trans "Wiki" %} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+                                    </svg>
+            </a>
+            <ul class="submenu">
+                <li>
+                    <a href="{% url 'equipos' %}" class="{% if request.resolver_match.url_name == 'equipos' %}active{% endif %}">
+                        {% trans "Equipos" %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'players' %}" class="{% if request.resolver_match.url_name == 'players' %}active{% endif %}" data-active-section="{{ seccion }}">
+                        {% trans "Jugadoras" %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'mapa' %}" class="{% if request.resolver_match.url_name == 'mapa' %}active{% endif %}">
+                        {% trans "Mapa" %}
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li><a href="{% url 'rankings' %}" class="{% if request.resolver_match.url_name == 'rankings' %}active{% endif %}">{% trans "Rankings" %}</a></li>
+        <li><a href="{% url 'nosotros' %}" class="{% if request.resolver_match.url_name == 'nosotros' %}active{% endif %}">{% trans "Nosotros" %}</a></li>
         </ul>
-      </nav>
+      </nav>-->
     </div>
     <!-- Barra de navegación -->
-    <a href="{% url 'index' %}" class="navbar-brand"><img src="{% static 'img/logo 1.png' %}" alt="logo futfem"></a>
-    <!-- Botón de menú hamburguesa -->
-    <div class="hamburger-menu" onclick="toggleMenu()">
-      <div class="bar"></div>
-      <div class="bar"></div>
-      <div class="bar"></div>
-    </div>
+    <!--<a href="{% url 'index' %}" class="navbar-brand"><img src="{% static 'img/logo_1.webp' %}" alt="logo futfem" fetchpriority="high" style="height: 40px; width: 80px;"></a>-->
         <!-- Menú desplegable -->
-    <div class="dropdown-menu">
-      <nav>
-        <ul>
-          <li><a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
-          <li><a href="{% url 'wiki' %}" class="{% if request.resolver_match.url_name == 'wiki' %}active{% endif %}">Wiki</a></li>
-          <li><a href="#nosotros">Nosotros</a></li>
-          <li><a href="#contacto">Contacto</a></li>
-        </ul>
-      </nav>
-      <div>
-          {% if usuario_sesion %}
-              <span class="user-name">Hola, {{ usuario_sesion.username }}</span>
-              {% if usuario_sesion.jugadora_favorita %}
-                  <img src="/{{ usuario_sesion.jugadora_favorita.imagen }}" class="avatar">
-              {% endif %}
-              <a href="{% url 'logout' %}" class="logout-button"><i class="bi bi-power"></i></a>
-          {% else %}
-              <a href="{% url 'login' %}" class="iniciar-sesion-button">Iniciar sesión</a>
-              <a href="{% url 'registro' %}" class="registro-button">Registrarse</a>
-          {% endif %}
-      </div>
+    <div class="dropdown-menu1">
+        <!--<div class="header-images">
+            <div>
+                <img src="/static/img/trayectoria.png" alt="taryectoria" style="max-height: 400px;">
+                <img src="/static/img/grid1.png" alt="grid" style="max-height: 400px;">
+            </div>
+            <div></div>
+        </div>-->
+        <div id="header-menu">
+            {% include 'partials/language_selector.html' %}
+            <div id="perfil-header">
+            {% if usuario_sesion %}
+            <a href="{% url 'perfil' %}" class="user-profile-link">
+                <span class="user-name" style="color: white;">{{ usuario_sesion.username }}</span>
+                {% if usuario_sesion.jugadora_favorita %}
+                    <img src="/{{ usuario_sesion.jugadora_favorita.imagen }}" class="avatar">
+                {% endif %}
+                </a>
+                <a href="{% url 'logout' %}" class="logout-button" aria-label="Cerrar sesión">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-power" viewBox="0 0 16 16">
+                    <path d="M7.5 1v7h1V1z"/>
+                    <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812"/>
+                    </svg>
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}" class="iniciar-sesion-button">{% trans "Iniciar sesión" %}</a>
+                <a href="{% url 'registro' %}" class="registro-button">{% trans "Registrarse" %}</a>
+            {% endif %}
+            </div>
+            <nav>
+            <ul>
+            <li><a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">{% trans "Inicio" %}</a></li>
+            <li class="dropdown">
+                <a href="#" class="{% if request.resolver_match.url_name in 'wiki,equipos,players,mapa' %}active{% endif %}">
+                    {% trans "Wiki" %}
+                </a>
+                <ul class="submenu">
+                    <li>
+                        <a href="{% url 'equipos' %}" class="{% if request.resolver_match.url_name == 'equipos' %}active{% endif %}">
+                            {% trans "Equipos" %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'players' %}" class="{% if request.resolver_match.url_name == 'players' %}active{% endif %}" data-active-section="{{ seccion }}">
+                            {% trans "Jugadoras" %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'mapa' %}" class="{% if request.resolver_match.url_name == 'mapa' %}active{% endif %}">
+                            {% trans "Mapa" %}
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="{% url 'rankings' %}" class="{% if request.resolver_match.url_name == 'rankings' %}active{% endif %}">{% trans "Rankings" %}</a></li>
+            <li><a href="{% url 'nosotros' %}" class="{% if request.resolver_match.url_name == 'nosotros' %}active{% endif %}">{% trans "Nosotros" %}</a></li>
+            </ul>
+            </nav>
+            <div id="rrss">
+                <a href="#"><svg xmlns="http://www.w3.org/2000/svg" aria-label="twitter" width="16" height="16" fill="currentColor" class="bi bi-twitter-x" viewBox="0 0 16 16">
+                <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"/>
+                </svg></a>
+                <a href="https://www.instagram.com/valencian_sports/" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-instagram" viewBox="0 0 16 16">
+                    <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"/>
+                    </svg>
+                </a>
+                <a href="#" aria-label="YouTube"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-youtube" viewBox="0 0 16 16">
+                <path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.01 2.01 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31 31 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A100 100 0 0 1 7.858 2zM6.4 5.209v4.818l4.157-2.408z"/>
+                </svg></a>
+                <a href="" aria-label="rrss"></a>
+            </div>
+        </div>
+        <!--<div class="header-images">
+                <div>
+                    <img src="/static/img/Bingo.png" alt="Bingo" style="max-height: 400px;">
+                    <img src="/static/img/higher_lower.png" alt="hl" style="max-height: 400px;">
+                </div>
+                
+        </div>-->
     </div>
     <!-- Botones de inicio de sesión y registro -->
     <div class="botones">
+        <!--{% include 'partials/language_selector.html' %}-->
+
         {% if usuario_sesion %}
-          <a href="{% url 'perfil' %}" class="user-profile-link">
-              <span class="user-name">{{ usuario_sesion.username }}</span>
-              {% if usuario_sesion.jugadora_favorita %}
-                  <img src="/{{ usuario_sesion.jugadora_favorita.imagen }}" class="avatar">
-              {% endif %}
-          </a>
-              <a href="{% url 'logout' %}" class="logout-button"><i class="bi bi-power"></i></a>
-          {% else %}
-              <a href="{% url 'login' %}" class="iniciar-sesion-button">Iniciar sesión</a>
-              <a href="{% url 'registro' %}" class="registro-button">Registrarse</a>
-          {% endif %}
+            <a href="{% url 'perfil' %}" class="user-profile-link">
+                <span class="user-name">{{ usuario_sesion.username }}</span>
+
+                {% with usuario_sesion.equipo_favorito.color|default:"var(--color-primario)" as color_equipo %}
+                    {% if usuario_sesion.jugadora_favorita %}
+                        <img src="/{{ usuario_sesion.jugadora_favorita.imagen }}"
+                            class="avatar"
+                            style="--team-color: {{ color_equipo }};
+                            background: linear-gradient(
+                                to bottom,
+                                color-mix(in srgb, var(--team-color) 60%, transparent),
+                                color-mix(in srgb, var(--color-secundario) 30%, transparent)
+                            );">
+                    {% endif %}
+                {% endwith %}
+
+            </a>
+
+            <!--<a href="{% url 'logout' %}" class="logout-button" aria-label="Cerrar sesión">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-power" viewBox="0 0 16 16">
+                <path d="M7.5 1v7h1V1z"/>
+                <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812"/>
+                </svg>
+            </a>-->
+
+        {% else %}
+            <a href="{% url 'login' %}" class="iniciar-sesion-button">{% trans "Iniciar sesión" %}</a>
+            <a href="{% url 'registro' %}" class="registro-button">{% trans "Registrarse" %}</a>
+        {% endif %}
+
+        <div class="hamburger-menu" onclick="toggleMenu()">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
     </div>
   </div>
 </header>
-<script src="{% static 'js/animations/header.js' %}"></script>
-<script>
-  function toggleMenu() {
-    const menu = document.querySelector('.dropdown-menu');
-    const hamburger = document.querySelector('.hamburger-menu');
+<script defer>
     const header = document.querySelector('header');
-    hamburger.classList.toggle('open');
-    menu.classList.toggle('open');
-    header.style.background = menu.classList.contains('open') ?  'var(--color-secundario)' : 'transparent';
 
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 768) {
-        menu.classList.remove('open');
-        hamburger.classList.remove('open');
-        header.style.background = 'transparent';
-      }
-    });
+    const updateHeaderHeight = () => {
+        if (!header) return;
+        const height = header.offsetHeight;
+        document.documentElement.style.setProperty('--header-height', `${height}px`);
+    };
 
-  }
+    window.addEventListener('load', updateHeaderHeight);
+    window.addEventListener('resize', updateHeaderHeight);
+
+    function initSubmenuToggle() {
+        // Selectores corregidos y más específicos
+        const wikiToggleMobile = document.querySelector('.dropdown-menu1 .dropdown > a');
+        const submenuMobile = document.querySelector('.dropdown-menu1 .submenu');
+
+        const wikiTogglePc = document.querySelector('#main-nav .dropdown > a');
+        const submenuPc = document.querySelector('#main-nav .dropdown .submenu'); // Corregido: añadido .dropdown
+
+        const handleToggle = (e, toggleLink, submenu) => {
+        if (!submenu || !toggleLink) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Usamos setTimeout para que se ejecute después de cualquier otro evento de click
+        setTimeout(() => {
+            const isOpen = submenu.classList.contains('open');
+
+            // Limpiamos todos
+            document.querySelectorAll('.submenu').forEach(s => s.classList.remove('open'));
+            document.querySelectorAll('.dropdown > a').forEach(a => a.classList.remove('expanded'));
+
+            // Si no estaba abierto, lo abrimos
+            if (!isOpen) {
+                submenu.classList.add('open');
+                toggleLink.classList.add('expanded');
+                console.log("Clase forzada con éxito");
+            }
+        }, 10); // 10ms es suficiente para "saltarse la cola"
+    };
+        if (wikiToggleMobile) {
+            wikiToggleMobile.addEventListener('click', (e) => handleToggle(e, wikiToggleMobile, submenuMobile));
+        }
+
+        if (wikiTogglePc) {
+            wikiTogglePc.addEventListener('click', (e) => handleToggle(e, wikiTogglePc, submenuPc));
+        }
+
+        // Cerrar al hacer clic en cualquier otra parte de la pantalla
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown')) {
+                [submenuMobile, submenuPc].forEach(s => s?.classList.remove('open'));
+                [wikiToggleMobile, wikiTogglePc].forEach(t => t?.classList.remove('expanded'));
+            }
+        });
+    }
+
+    // Inicialización
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSubmenuToggle);
+    } else {
+        initSubmenuToggle();
+    }
+
+    // Función global para el botón hamburguesa
+    /* Reemplaza o actualiza tu función window.toggleMenu */
+
+// Asegúrate de incluir GSAP antes: <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js">
+    // 1. Creamos la animación del icono (fuera de la función para que persista)
+
+    window.toggleMenu = function() {
+        const menu = document.querySelector('.dropdown-menu1');
+        const hamburger = document.querySelector('.hamburger-menu');
+        
+        if (!menu || !hamburger) return;
+
+        const isOpening = !menu.classList.contains('open'); // Comprobamos el estado ANTES de añadir la clase
+
+        hamburger.classList.toggle('open');
+        document.body.style.overflow = isOpening ? 'hidden' : 'auto';
+
+        if (isOpening) {
+            menu.classList.add('open');
+
+            // 1. Animación de "Caída" del Header completo (Entrada)
+            gsap.to(menu, {
+                y: "0%", // Baja el translateY de -100% a 0%
+                duration: 0.8, // Duración total
+                /*ease: "back.out(1.6)" // Un pequeño rebote elegante al final (o usa "power3.out" para algo más suave)*/
+            });
+            
+            // 2. Escalona el contenido (stagger) del menú
+            // Las imágenes escalonadas
+            gsap.fromTo(".header-images img", 
+                { y: 60, opacity: 0, scale: 0.9 }, 
+                { y: 0, opacity: 1, scale: 1, duration: 0.7, stagger: 0.1, delay: 0.4, ease: "power2.out" }
+            );
+            
+            // Los enlaces del menú escalonados
+            gsap.fromTo("#header-menu nav ul>li", 
+                { x: -40, opacity: 0 }, 
+                { x: 0, opacity: 1, duration: 0.5, stagger: 0.1, delay: 0.4, ease: "power3.out" }
+            );
+
+        } else {
+            // La "Subida" del Header (Salida)
+            gsap.to(menu, {
+                y: "-100%", // Sube el translateY de 0% a -100%
+                duration: 0.6,
+                ease: "power3.in",
+                onComplete: () => {
+                    menu.classList.remove('open'); // Quitamos la clase al terminar la animación
+                }
+            });
+        }
+    };
 </script>
+{% load django_browser_reload %}
+{% django_browser_reload_script %}
 

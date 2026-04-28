@@ -1,23 +1,29 @@
 // static/js/api/jugadoras.js
-import { fetchEquipoPalmaresByTemporadas } from "./equipos.js";
 let min = 1;
 let max = 476;
+let debounceTimer;
 
 /**
  * Obtener jugadoras al escribir en un input
  * @param {event}
  * @returns {}
  */
-export async function handleAutocompletePlayer(event) {
+export async function handleAutocompletePlayer(event){
     const input = event.target;
     const texto = input.value.trim();
     const suggestionsList = document.getElementById("sugerencias");
 
-    // Limpiar sugerencias previas
-    suggestionsList.innerHTML = '';
+    // Limpiamos el temporizador previo cada vez que se pulsa una tecla
+    clearTimeout(debounceTimer);
 
-    if (texto.length > 2) { // Solo si hay más de 2 caracteres
-        const url = `../api/jugadoraxnombre?nombre=${encodeURIComponent(texto)}`;
+    // Si el texto es corto, vaciamos la lista y salimos
+    if (texto.length <= 2) {
+        suggestionsList.innerHTML = '';
+        return;
+    }
+
+    debounceTimer = setTimeout(async () => {
+        const url = `/api/jugadoraxnombre?nombre=${encodeURIComponent(texto)}`;
 
         try {
             const response = await fetch(url);
@@ -37,7 +43,7 @@ export async function handleAutocompletePlayer(event) {
                     listItem.classList.add('suggestion-item');
 
                     listItem.innerHTML = `
-                        <img src="${imagen}" alt="${Nombre_Completo}" class="jugadora-img">
+                        <img src="/${imagen}" alt="${Nombre_Completo}" class="jugadora-img">
                         <div class="jugadora-info">
                             <strong>${Nombre_Completo}</strong>
                             <!--<p>Nacimiento: ${Nacimiento}</p>-->
@@ -59,7 +65,7 @@ export async function handleAutocompletePlayer(event) {
         } catch (error) {
             console.error('Error al buscar la jugadora:', error);
         }
-    }
+    });
 }
 /**
  * Obtener nacionalidad de una jugadora por ID
@@ -111,9 +117,9 @@ try {
  * @param {number|string} id
  * @returns {Promise<Array>}
  */
-export async function fetchJugadoraCompanyerasById(id) {
+export async function fetchJugadoraCompanyerasById(id, limite) {
     try {
-        const response = await fetch(`../api/jugadora_companyeras?id_jugadora=${id}`);
+        const response = await fetch(`/api/jugadora_companyeras?id_jugadora=${id}&limite=${limite}`);
         
         if (!response.ok) {
             throw new Error(`Error en la solicitud: ${response.statusText}`);
@@ -202,7 +208,7 @@ export async function fetchRandomPlayer() {
  */
 export async function fetchAllJugadoras() {
     try{
-        const url = `../api/jugadoras`;
+        const url = `/api/jugadoras`;
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -240,6 +246,22 @@ export function calcularEdad(fechaNacimiento) {
     return edad;
 }
 
+export function formatearValorMercado(valor) {
+    if (!valor || isNaN(valor)) return 'N/A';
+    
+    const num = parseFloat(valor);
+    
+    if (num >= 1000000) {
+        // Millones: 1.5M (con 1 decimal si no es exacto)
+        return (num / 1000000).toFixed(num % 1000000 === 0 ? 0 : 1) + 'M €';
+    } else if (num >= 1000) {
+        // Miles: 250k
+        return (num / 1000).toFixed(num % 1000 === 0 ? 0 : 1) + 'k €';
+    }
+    
+    return num + ' €';
+};
+
 /** * Obtener trofeos individuales de una jugadora por ID
  * @param {*} id 
  * @return {Promise<Array>}
@@ -259,15 +281,26 @@ function fetchJugadoraTrofeosIndividualesById(id) {
  * @param {*} id 
  * @return {Promise<{equipo: Array, individual: Array}>}
  */
-export async function fetchJugadoraPalmaresById(id) {
+// Ahora recibe 'trayectoria' como segundo argumento
+export async function fetchJugadoraPalmaresById(id, trayectoria) {
     console.log('Fetching palmares for jugadora ID:', id);
-    const trayectoria = await fetchJugadoraTrayectoriaById(id);
-    const palmaresIndividual = await fetchJugadoraTrofeosIndividualesById(id);
-    let palmaresEquipo = [];
-    for(const etapa of trayectoria){
-        const palmares = await fetchEquipoPalmaresByTemporadas(etapa.equipo, etapa.años);
-        palmaresEquipo.push(palmares);
-    }
+    
+    // ELIMINADO: const trayectoria = await fetchJugadoraTrayectoriaById(id); <-- Esto sobraba
+    
+    const palmaresIndividualPromise = fetchJugadoraTrofeosIndividualesById(id);
+    const { fetchEquipoPalmaresByTemporadas } = await import("./equipos.js"); // Importar la función necesaria para el palmarés de equipo
+
+    const promesasPalmaresEquipo = trayectoria.map(etapa => {
+        const anioInicio = etapa.fecha_inicio.substring(0, 4);
+        const anioFin = etapa.fecha_fin ? etapa.fecha_fin.substring(0, 4) : 'act';
+        return fetchEquipoPalmaresByTemporadas(etapa.equipo, `${anioInicio}-${anioFin}`);
+    });
+
+    const [palmaresIndividual, palmaresEquipo] = await Promise.all([
+        palmaresIndividualPromise,
+        Promise.all(promesasPalmaresEquipo)
+    ]);
+
     return { 
         equipo: palmaresEquipo,
         individual: palmaresIndividual

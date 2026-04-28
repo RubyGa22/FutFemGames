@@ -1,6 +1,6 @@
 //gsap.registerPlugin(ScrollTrigger);
 
-gsap.from("#items-container", {
+/*gsap.from("#items-container", {
   scrollTrigger: {
     trigger: "#items-container",
     start: "top top",
@@ -9,4 +9,4 @@ gsap.from("#items-container", {
   },
   opacity: 0,
   y: 100
-});
+});*/

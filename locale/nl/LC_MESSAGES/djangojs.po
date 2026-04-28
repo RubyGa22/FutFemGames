@@ -1,0 +1,198 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-11 13:13+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\FutFemWiki\static\FutFemWiki\js\ficha-equipo.js:19
+msgid "Ganado"
+msgstr "Gewonnen"
+
+#: .\FutFemWiki\static\FutFemWiki\js\ficha-equipo.js:19
+msgid "veces"
+msgstr "keer"
+
+#: .\FutFemWiki\static\FutFemWiki\js\wiki.js:203
+msgid "JUGADORA"
+msgstr "Speler"
+
+#: .\FutFemWiki\static\FutFemWiki\js\wiki.js:204
+msgid "EDAD"
+msgstr "leeftijd"
+
+#: .\FutFemWiki\static\FutFemWiki\js\wiki.js:205
+msgid "CLUB"
+msgstr "Club"
+
+#: .\FutFemWiki\static\FutFemWiki\js\wiki.js:206
+msgid "VALOR"
+msgstr "Marktwaarde"
+
+#: .\minijuegos\static\js\games\adivina2.js:34
+#: .\minijuegos\static\js\games\adivina2.js:121
+#: .\minijuegos\static\js\games\adivina2.js:242
+msgid "Vidas restantes: "
+msgstr "Resterende levens: "
+
+#: .\minijuegos\static\js\games\bingo.js:104
+msgid ""
+"¡Pon a prueba tu memoria en \"Futfem Bingo\"! En este juego recibirás "
+"jugadoras al azar y deberás colocarlas en las casillas de país, equipo o "
+"liga que coincidan con su trayectoria. Cada jugadora tiene varias "
+"características, y tu objetivo es encajarla correctamente en el tablero. "
+"Gana quien logre completar su tarjeta como en un bingo tradicional, ¡pero "
+"con fútbol femenino!"
+msgstr ""
+"Test je geheugen in Futfem Bingo! In dit spel krijg je willekeurig spelers "
+"toegewezen en moet je ze in de vakjes van het land, team of de competitie "
+"plaatsen die bij hun carrière passen. Elke speler heeft verschillende "
+"kenmerken en het is jouw taak om ze op de juiste plek op het bord te "
+"plaatsen. Wie zijn kaart als eerste vol heeft, zoals bij traditionele bingo, "
+"maar dan met vrouwenvoetbal, wint!"
+
+#: .\minijuegos\static\js\games\bingo.js:109
+msgid "Futfem Bingo"
+msgstr ""
+
+#: .\minijuegos\static\js\games\bingo.js:490
+#: .\minijuegos\static\js\games\grid.js:531
+#: .\minijuegos\static\js\games\wordle.js:334
+msgid "Has perdido"
+msgstr "Je bent verloren."
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:195
+#: .\minijuegos\static\js\games\funciones-comunes.js:201
+#: .\minijuegos\static\js\games\funciones-comunes.js:205
+#: .\minijuegos\static\js\games\funciones-comunes.js:215
+#: .\minijuegos\static\js\games\funciones-comunes.js:219
+#: .\minijuegos\static\js\games\wordle.js:52
+#: .\minijuegos\static\js\games\wordle.js:154
+msgid "¡Has Ganado!"
+msgstr "Je hebt gewonnen!"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:284
+msgid "Iniciar"
+msgstr "Starten"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:295
+msgid "Selecciona dificultad"
+msgstr "Selecteer moeilijkheidsgraad"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:305
+msgid "Fácil"
+msgstr "Gemakkelijk"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:309
+msgid "Medio"
+msgstr "Gemiddeld"
+
+#: .\minijuegos\static\js\games\funciones-comunes.js:313
+msgid "Difícil"
+msgstr "Moeilijk"
+
+#: .\minijuegos\static\js\games\grid.js:133
+msgid ""
+"¡Pon a prueba tu conocimiento! Rellena la cuadrícula con nombres de "
+"jugadoras que hayan militado en los dos equipos que coinciden en cada celda "
+"(fila y columna). ¡Completa el tablero y demuestra que eres quien más sabe "
+"de fútbol femenino!"
+msgstr ""
+"Test je kennis! Vul het raster in met namen van speelsters die voor beide "
+"teams hebben gespeeld die in elke cel (rij en kolom) overeenkomen. Vul het "
+"bord in en laat zien dat jij het meest weet over vrouwenvoetbal!"
+
+#: .\minijuegos\static\js\games\grid.js:135
+msgid "Futfem Grid"
+msgstr "FutFem Raster"
+
+#: .\minijuegos\static\js\games\grid.js:263
+msgid "No encontrada en las columnas."
+msgstr "Niet gevonden in de kolommen."
+
+#: .\minijuegos\static\js\games\grid.js:315
+msgid "No se han encontrado coincidencias."
+msgstr "Er zijn geen overeenkomsten gevonden."
+
+#: .\minijuegos\static\js\games\guesstrayectoria.js:99
+msgid ""
+"Adivina la Jugadora de Fútbol es un juego de trivia donde debes identificar "
+"a una futbolista según los equipos en los que ha jugado. Usa las pistas, "
+"demuestra tu conocimiento y compite para ver quién acierta más."
+msgstr ""
+"Raad de voetbalster is een trivia-spel waarbij je een voetbalster moet "
+"identificeren aan de hand van de teams waarin ze heeft gespeeld. Gebruik de "
+"hints, laat je kennis zien en ga de strijd aan om te zien wie er het meest "
+"goed heeft."
+
+#: .\minijuegos\static\js\games\guesstrayectoria.js:106
+msgid "Futfem Career"
+msgstr "FutFem Carrière"
+
+#: .\minijuegos\static\js\games\guesstrayectoria.js:242
+msgid "Sigue intentando!"
+msgstr "Blijf het proberen!"
+
+#: .\minijuegos\static\js\games\wordle.js:90
+msgid "Error loading word."
+msgstr "Fout bij het laden van woord"
+
+#: .\minijuegos\static\js\games\wordle.js:347
+msgid ""
+"¡Bienvenida a Wordle! Adivina la palabra oculta en 6 intentos. Cada letra "
+"correcta en la posición correcta se marcará en verde, las letras correctas "
+"en la posición incorrecta se marcarán en amarillo, y las letras incorrectas "
+"se marcarán en gris. ¡Buena suerte!"
+msgstr ""
+"Welkom bij Wordle! Raad het verborgen woord in 6 pogingen. Elke juiste "
+"letter op de juiste plaats wordt groen gemarkeerd, juiste letters op een "
+"verkeerde plaats worden geel gemarkeerd en verkeerde letters worden grijs "
+"gemarkeerd. Veel succes!"
+
+ msgid "POR"
+ msgstr "GK"
+
+ msgid "LI"
+ msgstr "LA"
+
+ msgid "DFC"
+ msgstr "CV"
+
+ msgid "LD"
+ msgstr "RA"
+
+ msgid "MC"
+ msgstr "CM"
+
+ msgid "MCD"
+ msgstr "CVM"
+
+ msgid "MCO"
+ msgstr "CAM"
+
+ msgid "MI"
+ msgstr "LM"
+
+ msgid "MD"
+ msgstr "RM"
+
+ msgid "EI"
+ msgstr "LVA"
+
+ msgid "DC"
+ msgstr "SP"
+
+ msgid "ED"
+ msgstr "RVA"

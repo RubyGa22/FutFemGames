@@ -1,10 +1,18 @@
 {
   "version": 8,
   "name": "FIFA Purple Dark",
+  "projection": {
+            "type": "globe"
+        },
   "sources": {
     "openmaptiles": {
       "type": "vector",
       "url": "https://api.maptiler.com/tiles/v3/tiles.json?key=LYmhz1BKy6QniXWrxK2S"
+    },
+    "satellite_maptiler": {
+      "type": "raster",
+      "url": "https://api.maptiler.com/tiles/satellite-v2/tiles.json?key=LYmhz1BKy6QniXWrxK2S",
+      "tileSize": 256
     }
   },
   "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=LYmhz1BKy6QniXWrxK2S",
@@ -19,13 +27,13 @@
     },
 
     {
-      "id": "water",
-      "type": "fill",
-      "source": "openmaptiles",
-      "source-layer": "water",
+      "id": "satellite-layer",
+      "type": "raster",
+      "source": "satellite_maptiler",
       "paint": {
-        "fill-color": "#ac00ac",
-        "fill-opacity": 0.85
+        "raster-saturation": -0.5,
+        "raster-contrast": 0.2,
+        "raster-opacity": 0.8
       }
     },
 
@@ -56,45 +64,15 @@
       "type": "line",
       "source": "openmaptiles",
       "source-layer": "boundary",
-      "filter": ["==", "admin_level", 2],
+      "filter": [
+        "all",
+        ["==", "admin_level", 2],
+        ["!=", "maritime", 1]
+      ],
       "paint": {
         "line-color": "#ac00ac",
         "line-width": 1.2,
         "line-opacity": 0.8
-      }
-    },
-
-    {
-      "id": "roads",
-      "type": "line",
-      "source": "openmaptiles",
-      "source-layer": "transportation",
-      "paint": {
-        "line-color": "#ff33ff",
-        "line-width": [
-          "interpolate",
-          ["linear"],
-          ["zoom"],
-          5, 0.2,
-          12, 2
-        ]
-      }
-    },
-
-    {
-      "id": "roads-outline",
-      "type": "line",
-      "source": "openmaptiles",
-      "source-layer": "transportation",
-      "paint": {
-        "line-color": "#330033",
-        "line-width": [
-          "interpolate",
-          ["linear"],
-          ["zoom"],
-          5, 0.5,
-          12, 3
-        ]
       }
     },
 
@@ -165,14 +143,38 @@
     },
 
     {
-      "id": "remove-ferry-routes",
+      "id": "roads",
       "type": "line",
       "source": "openmaptiles",
       "source-layer": "transportation",
-      "filter": ["==", "class", "ferry"],
+      "filter": ["!=", "class", "ferry"],
       "paint": {
-        "line-color": "rgba(0,0,0,0)",
-        "line-width": 0
+        "line-color": "#ff33ff",
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          5, 0.2,
+          12, 2
+        ]
+      }
+    },
+
+    {
+      "id": "roads-outline",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["!=", "class", "ferry"],
+      "paint": {
+        "line-color": "#330033",
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          5, 0.5,
+          12, 3
+        ]
       }
     },
 

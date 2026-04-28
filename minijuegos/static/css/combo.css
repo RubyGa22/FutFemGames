@@ -3,35 +3,56 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
 }
 #sugerencias,
 #sugerenciasLiga,
 #sugerencias-pais,
 #sugerencias-equipo,
 #sugerencias-pais1,
-#sugerencias-pais2 {
+#sugerencias-pais2,
+#sugerencias-posicion,
+#sugerencias-user
+ {
     position: absolute;
     padding: unset;
     margin: unset;
-    width: max-content;
     z-index: 10;
     width: 100%;
+} 
+
+#sugerencias::-webkit-scrollbar,
+#sugerenciasLiga::-webkit-scrollbar,
+#sugerencias-pais::-webkit-scrollbar,
+#sugerencias-equipo::-webkit-scrollbar,
+#sugerencias-pais1::-webkit-scrollbar,
+#sugerencias-pais2::-webkit-scrollbar,
+#sugerencias-posicion::-webkit-scrollbar,
+#sugerencias-user::-webkit-scrollbar
+ {
+    display: none !important;   
+}
+
+#sugerencias-posicion li{
+    gap: 5px;
+}
+#sugerencias-posicion strong{
+    font-size: small;
 }
 .suggestion-item {
     display: flex;
     align-items: center;
     padding: 5px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--color-primario);
     cursor: pointer;
-    background: linear-gradient(
+    /*background: linear-gradient(
         to bottom,
         color-mix(in srgb, var(--color-primario) 30%, transparent),
         color-mix(in srgb, var(--color-secundario) 30%, transparent)
-    );
+    );*/
+    background: var(--color-secundario);
     border: 0.5px solid rgb(255, 255, 255);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
 
 }
 
@@ -53,7 +74,7 @@
 }
 
 .suggestion-item:hover {
-    background-color: #f0f0f0;
+    background-color: var(--color-texto);
     color: var(--color-primario);
 }
 
@@ -86,4 +107,10 @@ p{
 .equipo-info {
     display: flex;
     flex-direction: column;
+}
+
+@media (max-width:680px){
+    .jugadora-info strong{
+        font-size: x-small;
+    }
 }
