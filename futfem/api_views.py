@@ -1,4 +1,5 @@
 from webbrowser import get
+from django.core.cache import cache
 import json, random, pycountry
 from django.utils import timezone
 from django.http import JsonResponse
@@ -554,28 +555,36 @@ def jugadoras_por_equipo_y_temporada(request):
                 j.imagen,               -- 5
                 j.retiro,               -- 6
                 j.market_value,         -- 7
+                
+                -- Trayectoria de la etapa COMPARADA (tc)
                 tc.fecha_inicio,        -- 8
                 tc.fecha_fin,           -- 9
                 tc.equipo_actual,       -- 10
 
-                -- Equipo
-                e.id_equipo,            -- 11
-                e.nombre,               -- 12
-                e.escudo,               -- 13
-                e.color,                -- 14
+                -- Datos del equipo ACTUAL (tca / e_act)
+                e_act.id_equipo,        -- 11
+                e_act.nombre,           -- 12
+                e_act.escudo,           -- 13
+                e_act.color,            -- 14
+                e_act.liga,             -- 15
+                l.logo AS liga_logo,    -- 16
 
                 -- Nacionalidades
-                GROUP_CONCAT(DISTINCT jp.pais ORDER BY jp.es_primaria DESC) AS ids_paises, -- 16
-                GROUP_CONCAT(DISTINCT p.iso ORDER BY jp.es_primaria DESC) AS isos_paises,  -- 17
+                GROUP_CONCAT(DISTINCT jp.pais ORDER BY jp.es_primaria DESC) AS ids_paises, -- 17
+                GROUP_CONCAT(DISTINCT p.iso ORDER BY jp.es_primaria DESC) AS isos_paises,  -- 18
 
                 -- Posiciones
-                GROUP_CONCAT(DISTINCT pos.idPosicion ORDER BY jpos.es_primaria DESC) AS ids_posiciones, -- 18
-                GROUP_CONCAT(DISTINCT pos.abreviatura ORDER BY jpos.es_primaria DESC) AS abrev_posiciones, -- 19
-                GROUP_CONCAT(DISTINCT pos.nombre ORDER BY jpos.es_primaria DESC) AS nombres_posiciones -- 20
+                GROUP_CONCAT(DISTINCT pos.idPosicion ORDER BY jpos.es_primaria DESC) AS ids_posiciones, -- 19
+                GROUP_CONCAT(DISTINCT pos.abreviatura ORDER BY jpos.es_primaria DESC) AS abrev_posiciones, -- 20
+                GROUP_CONCAT(DISTINCT pos.nombre ORDER BY jpos.es_primaria DESC) AS nombres_posiciones -- 21
 
-            FROM trayectoria tc
+            FROM trayectoria tc 
             JOIN jugadoras j ON j.id_jugadora = tc.jugadora
-            JOIN equipos e ON tc.equipo = e.id_equipo
+            
+            -- LEFT JOIN permite que salgan jugadoras aunque tca.equipo_actual = 1 no exista (retiradas)
+            LEFT JOIN trayectoria tca ON tca.jugadora = j.id_jugadora AND tca.equipo_actual = 1
+            LEFT JOIN equipos e_act ON tca.equipo = e_act.id_equipo
+            LEFT JOIN ligas l ON e_act.liga = l.id_liga
 
             LEFT JOIN `jugadora-pais` jp ON jp.jugadora = j.id_jugadora
             LEFT JOIN `paises` p ON jp.pais = p.id_pais
@@ -587,68 +596,49 @@ def jugadoras_por_equipo_y_temporada(request):
             {query_filtro}
 
             GROUP BY j.id_jugadora, tc.fecha_inicio
-            ORDER BY tc.fecha_inicio ASC
+            ORDER BY j.market_value DESC
         """, params)
 
         filas = cursor.fetchall()
 
     resultado = []
-
     for fila in filas:
-        # Nacionalidades
-        lista_ids_paises = [int(x) for x in fila[15].split(',')] if fila[15] else []
-        lista_isos_paises = [x.lower() for x in fila[16].split(',')] if fila[16] else []
-
-        # Posiciones
-        lista_ids_posiciones = [int(x) for x in fila[17].split(',')] if fila[17] else []
-        lista_abrev_posiciones = fila[18].split(',') if fila[18] else []
-        lista_nombres_posiciones = fila[19].split(',') if fila[19] else []
-
-        posiciones_lista_obj = [
-            {
-                "id": lista_ids_posiciones[i],
-                "abreviatura": lista_abrev_posiciones[i] if i < len(lista_abrev_posiciones) else None,
-                "nombre": lista_nombres_posiciones[i] if i < len(lista_nombres_posiciones) else None,
-            }
-            for i in range(len(lista_ids_posiciones))
-        ]
-
-        # Equipo
-        equipo = {
+        # Procesamiento de listas (Nacionalidades y Posiciones)
+        lista_ids_paises = [int(x) for x in fila[17].split(',')] if fila[17] else []
+        lista_isos_paises = [x.lower() for x in fila[18].split(',')] if fila[18] else []
+        lista_ids_posiciones = [int(x) for x in fila[19].split(',')] if fila[19] else []
+        lista_abrev_posiciones = fila[20].split(',') if fila[20] else []
+        
+        # Lógica para Equipo y Liga (Si no hay equipo actual, es retirada)
+        es_retirada = fila[11] is None
+        escudo_path = fila[13] if fila[13] else 'static/img/equipo-predeterm.svg'
+        
+        equipo_obj = {
             "id": fila[11],
-            "nombre": fila[12],
-            "escudo": fila[13],
-            "color": fila[14],
-            "colorSecundario": fila[15],
+            "nombre": "Retirada" if es_retirada else fila[12],
+            "escudo": "static/img/retirada.svg" if es_retirada else escudo_path, # O un escudo por defecto
+            "color": fila[14] if fila[14] else "#808080", # Gris si no hay color
+             "liga_id": fila[15],
+            "liga_logo": "static/img/retirada.svg" if es_retirada else fila[16],
         }
-
-        # Nombre corto
-        n = fila[1] or ""
-        a = fila[2] or ""
 
         resultado.append({
             "id_jugadora": fila[0],
             "nombre": fila[1],
             "apellido": fila[2],
             "apodo": fila[3],
-            "nombre_completo": formatear_nombre_corto(n,a),
+            "nombre_completo": formatear_nombre_corto(fila[1], fila[2]),
             "nacimiento": fila[4].strftime("%Y-%m-%d") if fila[4] else None,
             "imagen": fila[5],
             "retiro": fila[6],
             "market_value": fila[7],
-
-            # 🔥 CLAVE (lo que elimina la otra API)
-            "equipo": equipo,
+            "equipo": equipo_obj,
             "PosicionesIds": lista_ids_posiciones,
-            "Posiciones": posiciones_lista_obj,
             "TodasNacionalidades": lista_ids_paises,
             "pais_iso": lista_isos_paises,
-            "pais_id": lista_ids_paises[0] if lista_ids_paises else None,
-
-            # lo que ya tenías
             "trayectoria": {
                 "inicio": str(fila[8]) if fila[8] else None,
-                "fin": str(fila[9]) if fila[9] else None,
+                "fin": str(fila[9]) if (fila[9] and fila[10] == 0) else "act",
                 "actual": bool(fila[10])
             },
             "nacionalidades_ids": lista_ids_paises,
@@ -888,7 +878,8 @@ def equipo_to_dict(equipo):
         "color": equipo.color,
         "liga": {
             "id": equipo.liga.id_liga,
-            "nombre": equipo.liga.nombre
+            "nombre": equipo.liga.nombre,
+            "logo": equipo.liga.logo
         } if equipo.liga else None
     }
 
@@ -939,12 +930,6 @@ def paisesall(request):
         })
     
     return JsonResponse({"success": paises})
-
-import json
-import pycountry
-from django.http import JsonResponse
-from django.db.models import Q
-from .models import Pais
 
 def paisxnombre(request):
     nombre_query = request.GET.get('nombre', '').strip().lower()

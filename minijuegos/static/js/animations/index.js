@@ -1,7 +1,10 @@
 const buttons = document.querySelectorAll('.game-button');
+const expo = document.getElementById('juego-expo');
+const expoTitulo = document.getElementById('juego-titulo');
+const expoParrafo = document.getElementById('juego-parrafo');
+const expoImagen = document.getElementById('juego-imagen');
 const webButtons = document.querySelectorAll('.web-button');
 const hoverSound = new Audio('/static/sounds/hover2.mp3');
-;
 
 webButtons.forEach(card => {
   // ENTRAR
@@ -11,43 +14,43 @@ webButtons.forEach(card => {
   })
 
 buttons.forEach(card => {
-  // ENTRAR
   card.addEventListener('mouseenter', () => {
+    // 1. Extraer datos del dataset del botón
+    const { bg, titulo, descripcion, img } = card.dataset;
+
+    // 2. Actualizar contenido de la expo
+    expoTitulo.textContent = titulo;
+    expoParrafo.textContent = descripcion;
+    expoImagen.src = img;
+
+    // 3. Cambiar fondo y mostrar contenedor con GSAP
+    gsap.to(expo, {
+      duration: 0.4,
+      autoAlpha: 1, // Esto maneja visibility y opacity a la vez
+      backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${bg})`,
+      display: 'flex', // Asegura que se vea si estaba en none
+      ease: "power2.out"
+    });
+
+    // --- Tu lógica previa de hoverSound y opacidad de otros botones ---
     hoverSound.currentTime = 0;
     hoverSound.play();
 
-    // Animamos las variables del body
-    /*gsap.to(document.body, {
-      "--bg-blur": "6px",
-      "--bg-brightness": 0.45,
-      "--bg-scale": 1.05,
-      duration: 0.5,
-      ease: "power2.out"
-    });*/
-
-    // Desvanecer los demás botones
     buttons.forEach(other => {
-      if (other !== card) {
-        gsap.to(other, { opacity: 0.3, duration: 0.3 });
-      }
+      if (other !== card) gsap.to(other, { opacity: 0.3, duration: 0.3 });
     });
-
     gsap.to(card, { scale: 1.05, duration: 0.3 });
   });
 
-  // SALIR
   card.addEventListener('mouseleave', () => {
-    // Restauramos las variables del body
-    /*gsap.to(document.body, {
-      "--bg-blur": "0px",
-      "--bg-brightness": 0.6,
-      "--bg-scale": 1.1,
-      duration: 0.5,
-      ease: "power2.out"
-    });*/
+    // Opcional: Ocultar la expo al salir del botón o dejar la última seleccionada
+    // Si quieres que desaparezca:
+    /*
+    gsap.to(expoContainer, { autoAlpha: 0, duration: 0.3 });
+    */
 
+    // Restaurar botones
     gsap.to(card, { scale: 1, duration: 0.3 });
-
     buttons.forEach(other => {
       gsap.to(other, { opacity: 1, duration: 0.3 });
     });

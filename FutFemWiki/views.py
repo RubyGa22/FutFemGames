@@ -1,7 +1,8 @@
 from django.shortcuts import redirect, render
 from futfem.api_views import formatear_nombre_corto
 from django.shortcuts import get_object_or_404
-import json
+from django.http import JsonResponse
+import json, requests
 from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
 from django.views.decorators.cache import never_cache

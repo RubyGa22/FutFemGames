@@ -422,7 +422,7 @@ input::placeholder{
         to bottom,
         #9d9d9d,#595959
     );
-    border-radius: 0 0 10px 10px;
+    border-radius: 10px 10px;
     background-size: cover;  /* Para que el GIF cubra completamente el área del div */
     background-position: bottom; /* Alinea el GIF al centro */    
     width: 40%;           /* Ancho del círculo */

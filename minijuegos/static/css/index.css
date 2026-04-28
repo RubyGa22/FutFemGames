@@ -207,6 +207,7 @@ section::-webkit-scrollbar{
     transition: 0.3s;
     position: absolute;
     top: 0;
+    left: 20px;
 }
 
 .btn-volver:hover {
@@ -219,10 +220,10 @@ section::-webkit-scrollbar{
     align-items: center;
 }
 
-#regular-games .row .col-md-4:nth-child(1), #regular-games .row .col-md-4:nth-child(3){
+/*#regular-games .row .col-md-4:nth-child(1), #regular-games .row .col-md-4:nth-child(3){
     opacity: 0;
     visibility: hidden;
-}
+}*/
 
 section#juegos .container{
     justify-content: flex-start;
@@ -346,7 +347,7 @@ section .container .web-button.type-2 img, section .container .web-button.type-2
 }
 
 section .container .web-button svg{
-    height: 70%;
+    height: 50%;
     bottom: 20px;
     right: 20px;
     /*left: 50%;
@@ -578,6 +579,83 @@ section .container .web-button .web-button-text{
     transition: scale 0.5s, background-color 0.2s, color 0.2s; /* Suavizar las transiciones */
 }
 
+@media (min-width: 768px){
+    #container-index{
+        padding-block: 5%;
+    }
+
+    #juego-expo{
+        background: green;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 20px;
+        background-size: cover;
+        background-position: center;
+    }
+
+    #juego-expo img{
+        width: 150px;
+        height: 150px;
+        object-fit: contain;
+    }
+
+    #container-index #juegos .container{
+        flex-direction: column !important;
+        height: 100%;
+    }
+
+    #container-index #daily-games, #container-index #regular-games{
+        display: flex;
+        flex-direction: row;
+        min-height: fit-content;
+        gap: 10px;
+    }
+
+    #container-index #daily-games .row{
+        min-width: max-content;
+        max-width: max-content;
+        min-height: fit-content;
+    }
+
+    .col-md-4{
+        width: fit-content;
+    }
+
+    .game-button{
+        display: flex;
+        flex-direction: row-reverse;
+        height: 100%;
+        width: 150px;
+    }
+
+    .game-button img{
+        position: absolute;
+        min-height: 30%;
+        min-width: auto;
+        max-width: auto;
+        max-height: 40%;
+        bottom: 0;
+    }
+
+    .game-button #game-title-container{
+        flex-direction: column-reverse;
+        width: 100%;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 5px;
+    }
+
+    .game-button #game-title-container h2{
+        text-align: left;
+        padding-top: 0;
+        height: fit-content;
+    }
+}
+
 
 @media (max-width: 1200px) {
     .game-button h2{
@@ -592,21 +670,31 @@ section .container .web-button .web-button-text{
         flex-direction: column;
         align-items: center;
     }
+    #daily-games{
+        max-height: 182px !important;
+        /*min-height: fit-content !important;*/
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+    }
     section .container .web-button img{
         left: 50%;
         transform: translateX(-50%);
     }
+    .row{
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
     .game-button{
-        min-width: 150px;
+        /*min-width: 150px;*/
         max-height: 214px;
     }
     .game-button h2 {
         font-size: 1.0rem; /* Ajustar el tamaño de la fuente en pantallas medianas */
     }
-    .game-button img{
+    /*.game-button img{
         max-height: 177px;
 
-    }
+    }*/
     .game-button {
         max-width: 100%; /* Botones ocupan todo el ancho en pantallas medianas */
     }
@@ -623,6 +711,9 @@ section .container .web-button .web-button-text{
     }
     #selector{
         order: 2;
+    }
+    #juego-expo{
+        display: none !important;
     }
     #container-index{
         display: flex;
@@ -650,6 +741,12 @@ section .container .web-button .web-button-text{
     section .container .column{
         width: 100%;
         min-height: 50%;
+    }
+    #daily-games, #regular-games{
+        max-height: unset !important;
+        height: max-content !important;
+        overflow: unset !important;
+        flex-direction: column !important;
     }
     .row{
         gap: 3px;

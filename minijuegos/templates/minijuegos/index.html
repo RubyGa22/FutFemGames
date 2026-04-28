@@ -122,13 +122,20 @@
                 </a>
             </div>
         </div>
-        
-        
+
+        <div id="juego-expo" style="display: none;">
+            <div>
+                <h2 id="juego-titulo">Game_Title</h2>
+                <p id="juego-parrafo">Game Description</p>
+            </div>
+            <img id="juego-imagen" src="{% static 'img/grid-logo.webp' %}" alt="Game Image" style="align-self: flex-end;">
+        </div>
+                
         <div id="daily-games" style="display: none;">
             <div class="row sibling-fade d-flex justify-content-center">
-                {% include 'partials/game_card.html' with racha_id="racha-1" destino_js="career" imagen="img/grid-logo.webp" titulo=_("Futfem Career") %}
-                {% include 'partials/game_card.html' with racha_id="racha-4" destino_js="grid" imagen="img/grid-logo.webp" imagen_hover="img/grid1.webp" titulo=_("Futfem Grid") %}
-                {% include 'partials/game_card.html' with racha_id="racha-6" destino_js="bingo" imagen="img/bingo-logo.webp" imagen_hover="img/Bingo.webp" titulo=_("Futfem Bingo") %}
+                {% include 'partials/game_card.html' with racha_id="racha-1" destino_js="career" imagen="img/grid-logo.webp" titulo=_("Futfem Career") descripcion=_("Descubre una jugadora por su trayectoria") %}
+                {% include 'partials/game_card.html' with racha_id="racha-4" destino_js="grid" imagen="img/grid-logo.webp" imagen_hover="img/grid1.webp" titulo=_("Futfem Grid") descripcion=_("Completa el grid de Futfem") %}
+                {% include 'partials/game_card.html' with racha_id="racha-6" destino_js="bingo" imagen="img/bingo-logo.webp" imagen_hover="img/Bingo.webp" titulo=_("Futfem Bingo") descripcion=_("Juega el bingo de Futfem") %}
                 <div class="col-md-4" style="display: none;">
                     <div class="game-button glow" onclick="redireccionarA('XI_Clubs')">
                         <img src="{% static 'img/ComingSoon.png' %}" alt="Game 3">
@@ -138,9 +145,9 @@
                 </div>
             </div>
             <div class="row sibling-fade d-flex justify-content-center">
-                {% include 'partials/game_card.html' with racha_id="racha-2" destino_js="wordle" imagen="img/wordle-logo.webp" imagen_hover="img/wordle.webp" titulo=_("Futfem Wordle") %}
-                {% include 'partials/game_card.html' with racha_id="racha-3" destino_js="guess" imagen="img/bingo-logo.webp" titulo=_("Futfem Guess") %}
-                {% include 'partials/game_card.html' with racha_id="racha-5" destino_js="mates" imagen="img/bingo-logo.webp" titulo=_("Futfem Mates") %}        
+                {% include 'partials/game_card.html' with racha_id="racha-2" destino_js="wordle" imagen="img/wordle-logo.webp" imagen_hover="img/wordle.webp" titulo=_("Futfem Wordle") descripcion=_("Adivina la palabra de Futfem") %}
+                {% include 'partials/game_card.html' with racha_id="racha-3" destino_js="guess" imagen="img/bingo-logo.webp" titulo=_("Futfem Guess") descripcion=_("Adivina el jugador de Futfem") %}
+                {% include 'partials/game_card.html' with racha_id="racha-5" destino_js="mates" imagen="img/bingo-logo.webp" titulo=_("Futfem Mates") descripcion=_("Descubre la jugadora por sus compañeras") %}        
             </div>
             <button class="btn-volver" onclick="volverAlMenu()">← Volver</button>
         </div>
@@ -149,9 +156,7 @@
             <!--<h2>{% trans "Juegos Regulares" %}</h2>-->
 
             <div class="row sibling-fade d-flex justify-content-center">
-                {% include 'partials/game_card.html' with racha_id="racha-tbd" destino_js="tbd" imagen="img/higher_lower.webp" titulo=_("Higher or Lower") %}
-                {% include 'partials/game_card.html' with racha_id="racha-7" destino_js="higher_lower" imagen="img/higher_lower1.webp" titulo=_("Higher or Lower") %}
-                {% include 'partials/game_card.html' with racha_id="racha-tdb1" destino_js="tbd" imagen="img/higher_lower.webp" titulo=_("Higher or Lower") %}
+                {% include 'partials/game_card.html' with racha_id="racha-7" destino_js="higher_lower" imagen="img/higher_lower1.webp" titulo=_("Higher or Lower") descripcion=_("Descubre que jugadora vale más") %}
             </div>
 
             <button class="btn-volver" onclick="volverAlMenu()">← Volver</button>
@@ -257,22 +262,87 @@
 <script src="{% static 'js/utils/selector.js' %}" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous" defer></script>
 <script defer>
+    const expoContainer = document.getElementById('juego-expo');
+    // --- Lógica de actualización compartida ---
+    function actualizarExpo(card) {
+        if (!card) return; // Seguridad por si no hay botones
+
+        const { bg, titulo, descripcion, img } = card.dataset;
+        const expoTitulo = document.getElementById('juego-titulo');
+        const expoParrafo = document.getElementById('juego-parrafo');
+        const expoImagen = document.getElementById('juego-imagen');
+
+        // Actualizar textos e imagen
+        expoTitulo.textContent = titulo;
+        expoParrafo.textContent = descripcion;
+        expoImagen.src = img;
+
+        // Animación con GSAP para el contenedor
+        gsap.to(expoContainer, {
+            duration: 0.5,
+            autoAlpha: 1,
+            backgroundImage: `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url(${bg})`,
+            display: 'flex',
+            ease: "power2.out"
+        });
+    }
+
+    // --- Modificación de activarSeccion ---
     function activarSeccion(tipo) {
         // 1. Ocultar el menú de botones
         document.getElementById('menu-seleccion').style.display = 'none';
 
+        let sectionId = (tipo === 'daily') ? 'daily-games' : 'regular-games';
+        const activeSection = document.getElementById(sectionId);
+
         // 2. Mostrar la sección elegida
-        if (tipo === 'daily') {
-            document.getElementById('daily-games').style.display = 'block';
-        } else if (tipo === 'regular') {
-            document.getElementById('regular-games').style.display = 'block';
+        activeSection.style.display = (tipo === 'daily') ? 'flex' : 'block';
+        expoContainer.style.display = 'flex';
+
+        // 3. BUSCAR EL PRIMER BOTÓN Y ACTIVARLO
+        const firstButton = activeSection.querySelector('.game-button');
+        if (firstButton) {
+            actualizarExpo(firstButton);
+            
+            // Opcional: darle un pequeño feedback visual al primer botón (escala)
+            gsap.to(firstButton, { scale: 1.05, duration: 0.3 });
+            
+            // Desvanecer los demás de esa sección (opcional, para coherencia)
+            const otherButtons = activeSection.querySelectorAll('.game-button');
+            otherButtons.forEach(btn => {
+                if (btn !== firstButton) gsap.to(btn, { opacity: 0.3, duration: 0.3 });
+            });
         }
     }
+
+    // --- Actualizar tus Event Listeners existentes ---
+    buttons.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            actualizarExpo(card); // Usamos la misma función aquí
+            
+            hoverSound.currentTime = 0;
+            hoverSound.play();
+
+            // Lógica de opacidad para el resto
+            buttons.forEach(other => {
+                if (other !== card) gsap.to(other, { opacity: 0.3, duration: 0.3 });
+            });
+            gsap.to(card, { scale: 1.05, duration: 0.3 });
+        });
+
+        card.addEventListener('mouseleave', () => {
+            gsap.to(card, { scale: 1, duration: 0.3 });
+            buttons.forEach(other => {
+                gsap.to(other, { opacity: 1, duration: 0.3 });
+            });
+        });
+    });
 
     function volverAlMenu() {
         // Ocultar ambas secciones de juegos
         document.getElementById('daily-games').style.display = 'none';
         document.getElementById('regular-games').style.display = 'none';
+        expoContainer.style.display = 'none';
         
         // Volver a mostrar los botones grandes
         document.getElementById('menu-seleccion').style.display = 'flex';

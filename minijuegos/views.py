@@ -10,8 +10,6 @@ from futfem.models import Equipo, Jugadora
 from .models import Pista  # Asegúrate de tener el modelo Pista
 
 
-@never_cache
-@login_required
 def index(request):
     return render(request, 'minijuegos/index.html')
 
@@ -29,52 +27,43 @@ def nosotros(request):
 
 
 @never_cache
-@login_required
 def futfemTrajectory(request):
         return render(request, 'minijuegos/trayectoria.html')
 
 
 @never_cache
-@login_required
 def futfemGrid(request):
         return render(request, 'minijuegos/grid.html')
 
 
 @never_cache
-@login_required
 def futfemBingo(request):
         return render(request, 'minijuegos/bingo.html')
 
 
 @never_cache
-@login_required
 def futfemWordle(request):
         return render(request, 'minijuegos/wordle.html')
 
 
 @never_cache
-@login_required
 def futfemMates(request):
         return render(request, 'minijuegos/companyeras.html')
 
 
 @never_cache
-@login_required
 def futfemGuess(request):
         return render(request, 'minijuegos/adivina2.html')
 
 @never_cache
-@login_required
 def futfemGuess2(request):
         return render(request, 'minijuegos/adivina2.html')
 
 @never_cache
-@login_required
 def futfemHigherLower(request):
         return render(request, 'minijuegos/higher-lower.html')
 
 @never_cache
-@login_required
 def futfemXIClubs(request):
         return render(request, 'minijuegos/XI_Clubs.html')
 
