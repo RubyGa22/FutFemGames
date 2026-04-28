@@ -1,5 +1,6 @@
 import { updateRacha, obtenerUltimaRespuesta } from "/static/usuarios/js/rachas.js";
 import { Ganaste, crearPopupInicialJuego } from "./funciones-comunes.js";
+import { victory } from "../sounds.js";
 
 let answer = "";
 let currentRow = 0;
@@ -48,7 +49,7 @@ async function iniciar() {
         localStorage.setItem('res2', jugadora.idJugadora);
         //stopCounter("wordle");  // ⬅️ Detenemos el temporizador si el usuario gana
         Ganaste('wordle');
-        displayMessage("¡Correcto! Has ganado.");
+        displayMessage(gettext("¡Has Ganado!"));
     } else {
         await loadJugadoraApodo(jugadora.idJugadora, false);
 
@@ -86,7 +87,7 @@ async function loadJugadoraApodo(id, ganaste) {
         })
         .catch(error => {
             console.error('Error fetching word:', error);
-            displayMessage('Error loading word.');
+            displayMessage(gettext('Error loading word.'));
         });
 }
 
@@ -150,9 +151,10 @@ async function checkWord() {
     const answerSanitized = quitarAcentos(answer.toLowerCase());
 
     if (guessSanitized === answerSanitized) {
-        displayMessage("¡Correcto! Has ganado.");
+        displayMessage(gettext("¡Has Ganado!"));
         if(localStorage.length>0){
             setTimeout(async () => {
+                victory.play()
                 await updateRacha(2, 1, localStorage.getItem('Attr2'));
             }, 0);
             //localStorage.setItem('Attr2', jugadora.idJugadora);
@@ -167,7 +169,7 @@ async function checkWord() {
         currentRow++;
 
         if (currentRow === maxRows) {
-            displayMessage(`¡Has perdido! La palabra era: ${answer}.`);
+            displayMessage(gettext(`¡Has perdido! La palabra era: ${answer}.`));
             await updateRacha(2, 0, localStorage.getItem('Attr2'));
             lockAllRows();
         } else {
@@ -324,29 +326,21 @@ function colocarRespuestas(palabra, results, row) {
 }
 
 async function wordlePerder() {
-    // Bloquear el botón y el input
-    //lockAllRows();
     
     const resultDiv = document.getElementById('message');
-    //const player = await sacarJugadora(jugadora.idJugadora);
 
-    resultDiv.textContent = 'Has perdido';
+    resultDiv.textContent = gettext('Has perdido');
     const div = document.getElementById('trayectoria');
-    /*const jugadora_id = 'loss';
-    localStorage.setItem('Attr2', jugadora_id);*/
-    //await loadJugadoraById(jugadoraId, true);
+    
     // Agregar un delay de 2 segundos (2000 ms)
     if(localStorage.length>0){
         await updateRacha(2, 0, localStorage.getItem('Attr2'));
     }
-    setTimeout(() => {
-        //cambiarImagenConFlip();
-    }, 1000);
 }
 
 
-const texto = 'Adivina la Jugadora de Fútbol es un juego de trivia donde debes identificar a una futbolista según los equipos en los que ha jugado. Usa las pistas, demuestra tu conocimiento y compite para ver quién acierta más.';
-const imagen = "static/img/wordle.png";
+const texto = gettext('¡Bienvenida a Wordle! Adivina la palabra oculta en 6 intentos. Cada letra correcta en la posición correcta se marcará en verde, las letras correctas en la posición incorrecta se marcarán en amarillo, y las letras incorrectas se marcarán en gris. ¡Buena suerte!');
+const imagen = "static/img/wordle.webp";
 play().then(r => r);
 async function play() {
     const lastAnswer= localStorage.getItem('Attr2');

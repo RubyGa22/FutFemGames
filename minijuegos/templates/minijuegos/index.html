@@ -1,70 +1,412 @@
 {% load static %}
+{% load i18n %}
+{% load compress %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#480048">
+    <meta name="description" content="FutFemGames es una plataforma de minijuegos inspirados en el fútbol femenino. Disfruta de juegos como Futfem Career, Futfem Grid, Futfem Bingo y más.">
     <title>FutFemGames</title>
+    
     <link rel="icon" href="{% static 'img/logo.png' %}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Montserrat:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@100..900&family=Oswald:wght@200..700&family=Plus+Jakarta+Sans:wght@200..800&family=Russo+One&display=swap" 
+      media="print" onload="this.media='all'"> 
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" media="print" onload="this.media='all'">
+
+    <link rel="modulepreload" href="{% static 'usuarios/js/rachas.js' %}">
+    <link rel="preload" href="{% static 'js/animations/header.js' %}" as="script">
+
+    <!--IMAGENES-->
+    <link rel="preload" as="image" href="/static/img/fondos-botones/mini/likita.webp" 
+      media="(max-width: 768px)" fetchpriority="high">
+
+    <link rel="preload" as="image" href="/static/img/fondos-botones/likita.webp" 
+        media="(min-width: 769px)" fetchpriority="high">
+
+    <link rel="preload" as="image" href="/static/img/fondos-botones/mini/mapa.webp" 
+      media="(max-width: 768px)" fetchpriority="high">
+
+    <link rel="preload" as="image" href="/static/img/fondos-botones/mapa.webp" 
+        media="(min-width: 769px)" fetchpriority="high">
+
+    <link rel="preload" as="image" href="/static/img/fondos-botones/mini/grada.webp" 
+      media="(max-width: 768px)" fetchpriority="high">
+
+    <link rel="preload" as="image" href="/static/img/fondos-botones/grada.webp" 
+        media="(min-width: 769px)" fetchpriority="high">
+
+    <link rel="preload" as="image" href="/static/img/fondos-botones/mini/ranking.webp" 
+      media="(max-width: 768px)" fetchpriority="high">
+
+    <link rel="preload" as="image" href="/static/img/fondos-botones/ranking.webp" 
+        media="(min-width: 769px)" fetchpriority="high">
+
+    {% compress css inline %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <link rel="stylesheet" href="{% static 'css/index.css' %}">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/combo.css' %}">
     <link rel="stylesheet" href="{% static 'css/glow-border.css' %}">
+    {% endcompress %}
+
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css">
+    </noscript>
 </head>
-<body class="loading">
-    <div id="bg-dynamic"></div>
+<body {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
 {% include 'partials/header.html' %}
-<section class="juegos">
-<div class="container mt-5 sibling-fade">
-    <div class="row sibling-fade d-flex justify-content-center">
-        {% include 'partials/game_card.html' with racha_id="racha-1" destino_js="career" imagen="img/trayectoria.png" titulo="Futfem Career" %}
-        {% include 'partials/game_card.html' with racha_id="racha-4" destino_js="grid" imagen="img/grid1.png" titulo="Futfem Grid" %}
-        {% include 'partials/game_card.html' with racha_id="racha-6" destino_js="bingo" imagen="img/Bingo.png" titulo="Futfem Bingo" %}
-        <div class="col-md-4" style="display: none;">
-            <div class="game-button glow" onclick="redireccionarA('XI_Clubs')">
-                <img src="{% static 'img/ComingSoon.png' %}" alt="Game 3">
-                <h4>Futfem Clubs</h4>
-                <button class="btn btn-primary btn-block" onclick="window.location.href='XI_Clubs.php'">PLAY</button>
+<div id="container-index" class="container">
+<div id="selector" role="main">
+    <a href="#juegos" class="active">Juegos</a><a href="#wiki">Wiki</a><a href="#online">Online</a>
+</div>
+<section class="juegos content-section" id="juegos">
+
+    <!--<h1>
+        {% with id=usuario_sesion.equipo_favorito.id_equipo user=usuario_sesion.username %}
+            {% if id == 2 %}
+                ¡Matxo {{ user }}!
+            {% elif id == 11 %}
+                ¡Amunt, {{ user }}!
+            {% elif id == 27 %}
+                ¡Endavant, {{ user }}!
+            {% else %}
+                ¡Hola, {{ user }}!
+            {% endif %}
+        {% endwith %}
+    </h1>-->
+    <div class="container mt-5 sibling-fade" style="flex-direction: row;">
+        <div id="menu-seleccion">
+            <a class="web-button" onclick="activarSeccion('daily')">
+                <div class="web-button-text">
+                    <h2>Diarios</h2>
+                    <p>Entra cada día y mantén tu racha</p>
+                </div>
+                <!--<picture>
+                    <source media="(max-width: 768px)" srcset="/static/img/fondos-botones/mini/likita.webp" height="500" width="500">
+                    
+                    <img src="/static/img/fondos-botones/likita.webp" 
+                        alt="likita" 
+                        fetchpriority="high"
+                        loading="eager" decoding="sync"
+                        height="1000"
+                        width="1000">
+                </picture>-->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-date-fill" viewBox="0 0 16 16">
+                <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4zm5.402 9.746c.625 0 1.184-.484 1.184-1.18 0-.832-.527-1.23-1.16-1.23-.586 0-1.168.387-1.168 1.21 0 .817.543 1.2 1.144 1.2"/>
+                <path d="M16 14V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2m-6.664-1.21c-1.11 0-1.656-.767-1.703-1.407h.683c.043.37.387.82 1.051.82.844 0 1.301-.848 1.305-2.164h-.027c-.153.414-.637.79-1.383.79-.852 0-1.676-.61-1.676-1.77 0-1.137.871-1.809 1.797-1.809 1.172 0 1.953.734 1.953 2.668 0 1.805-.742 2.871-2 2.871zm-2.89-5.435v5.332H5.77V8.079h-.012c-.29.156-.883.52-1.258.777V8.16a13 13 0 0 1 1.313-.805h.632z"/>
+                </svg>
+            </a>
+            <div class="column">
+                <a class="web-button" onclick="activarSeccion('regular')">
+                    <div class="web-button-text">
+                        <h2>Regulares</h2>
+                        <p>Entra y descubre hasta cuando puedes llegar</p>
+                    </div>
+                    <picture>
+                        <source media="(max-width: 768px)" srcset="/static/img/fondos-botones/mini/regular.webp" height="500" width="500">
+                        
+                        <img src="/static/img/fondos-botones/regular.webp" 
+                            alt="likita" 
+                            fetchpriority="high"
+                            loading="eager" decoding="sync"
+                            height="1000"
+                            width="1000">
+                    </picture>
+                </a>
+            </div>
+        </div>
+
+        <div id="juego-expo" style="display: none;">
+            <div>
+                <h2 id="juego-titulo">Game_Title</h2>
+                <p id="juego-parrafo">Game Description</p>
+            </div>
+            <img id="juego-imagen" src="{% static 'img/grid-logo.webp' %}" alt="Game Image" style="align-self: flex-end;">
+        </div>
+                
+        <div id="daily-games" style="display: none;">
+            <div class="row sibling-fade d-flex justify-content-center">
+                {% include 'partials/game_card.html' with racha_id="racha-1" destino_js="career" imagen="img/grid-logo.webp" titulo=_("Futfem Career") descripcion=_("Descubre una jugadora por su trayectoria") %}
+                {% include 'partials/game_card.html' with racha_id="racha-4" destino_js="grid" imagen="img/grid-logo.webp" imagen_hover="img/grid1.webp" titulo=_("Futfem Grid") descripcion=_("Completa el grid de Futfem") %}
+                {% include 'partials/game_card.html' with racha_id="racha-6" destino_js="bingo" imagen="img/bingo-logo.webp" imagen_hover="img/Bingo.webp" titulo=_("Futfem Bingo") descripcion=_("Juega el bingo de Futfem") %}
+                <div class="col-md-4" style="display: none;">
+                    <div class="game-button glow" onclick="redireccionarA('XI_Clubs')">
+                        <img src="{% static 'img/ComingSoon.png' %}" alt="Game 3">
+                        <h4>Futfem Clubs</h4>
+                        <button class="btn btn-primary btn-block" onclick="window.location.href='XI_Clubs.php'">PLAY</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row sibling-fade d-flex justify-content-center">
+                {% include 'partials/game_card.html' with racha_id="racha-2" destino_js="wordle" imagen="img/wordle-logo.webp" imagen_hover="img/wordle.webp" titulo=_("Futfem Wordle") descripcion=_("Adivina la palabra de Futfem") %}
+                {% include 'partials/game_card.html' with racha_id="racha-3" destino_js="guess" imagen="img/bingo-logo.webp" titulo=_("Futfem Guess") descripcion=_("Adivina el jugador de Futfem") %}
+                {% include 'partials/game_card.html' with racha_id="racha-5" destino_js="mates" imagen="img/bingo-logo.webp" titulo=_("Futfem Mates") descripcion=_("Descubre la jugadora por sus compañeras") %}        
+            </div>
+            <button class="btn-volver" onclick="volverAlMenu()">← Volver</button>
+        </div>
+
+        <div id="regular-games" style="display: none;">
+            <!--<h2>{% trans "Juegos Regulares" %}</h2>-->
+
+            <div class="row sibling-fade d-flex justify-content-center">
+                {% include 'partials/game_card.html' with racha_id="racha-7" destino_js="higher_lower" imagen="img/higher_lower1.webp" titulo=_("Higher or Lower") descripcion=_("Descubre que jugadora vale más") %}
+            </div>
+
+            <button class="btn-volver" onclick="volverAlMenu()">← Volver</button>
+        </div>
+    </div>
+</section>
+<section id="wiki" class="content-section">
+    <div class="container">
+        <a class="web-button" href="/jugadoras/">
+            <div class="web-button-text">
+                <h2>Jugadoras</h2>
+                <p>Descubre a las jugadoras</p>
+            </div>
+            <picture>
+                <source media="(max-width: 768px)" srcset="/static/img/fondos-botones/mini/likita.webp" height="500" width="500">
+                
+                <img src="/static/img/fondos-botones/likita.webp" 
+                    alt="likita" 
+                    fetchpriority="high"
+                    loading="eager" decoding="sync"
+                    height="1000"
+                    width="1000">
+            </picture>
+        </a>
+        <div class="column">
+            <a class="web-button type-2" href="/equipos/">
+                <div class="web-button-text">
+                    <h2>Equipos</h2>
+                    <p>Descubre a las jugadoras</p>
+                </div>
+                <picture>
+                    <source media="(max-width: 768px)" srcset="/static/img/fondos-botones/mini/grada.webp">
+                    
+                    <img src="/static/img/fondos-botones/grada.webp" 
+                        alt="grada" 
+                        fetchpriority="high">
+                </picture>
+            </a>
+            <a class="web-button type-2" href="/mapa/">
+                <div class="web-button-text">
+                    <h2>Mapa</h2>
+                    <p>Descubre a las jugadoras</p>
+                </div>
+                <picture>
+                    <source media="(max-width: 768px)" srcset="/static/img/fondos-botones/mini/mapa.webp">
+                
+                        <img src="/static/img/fondos-botones/mapa.webp" 
+                            alt="mapa" 
+                            fetchpriority="high">
+                </picture>
+            </a>   
+        </div>
+    </div>
+</section>
+<section id="online" class="content-section">
+    <div class="container">
+        <a class="web-button" href="/ranking/">
+            <div class="web-button-text">
+                <h2>Rankings</h2>
+                <p>Compite por la cima</p>
+            </div>
+            <picture>
+                <source media="(max-width: 768px)" srcset="/static/img/fondos-botones/mini/ranking.webp" height="300" width="300">
+                <img src="/static/img/fondos-botones/ranking.webp" alt="ranking" fetchpriority="high" loading="eager">
+            </picture>
+        </a>
+
+        <div class="column">
+            <a class="web-button" href="javascript:void(0)" onclick="abrirBuscador()">
+                <div class="web-button-text">
+                    <h2>Buscar Usuarios</h2>
+                    <p>Encuentra a tus amigos</p>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                </svg>
+            </a>   
+        </div>
+    </div>
+
+    <div id="search-overlay" class="search-overlay">
+        <div class="search-modal-content">
+            <button class="close-overlay" onclick="cerrarBuscador()">✕</button>
+            <div class="container">
+                <h1 class="modal-title">{% trans "Buscar Usuarios" %}</h1>
+                <div class="autocomplete-container">
+                    <input type="text" id="usuarioInput" placeholder="{% trans 'Buscar por usuario...' %}" autocomplete="off">
+                    <div id="sugerencias-container">
+                        <ul id="sugerencias"></ul>
+                    </div>
+                </div>
+                <div id="usuario-details"></div>
             </div>
         </div>
     </div>
-    <div class="row sibling-fade d-flex justify-content-center">
-        {% include 'partials/game_card.html' with racha_id="racha-2" destino_js="wordle" imagen="img/wordle.png" titulo="Futfem Wordle" %}
-        {% include 'partials/game_card.html' with racha_id="racha-3" destino_js="guess" imagen="img/ComingSoon.png" titulo="Futfem Guess" %}
-        {% include 'partials/game_card.html' with racha_id="racha-5" destino_js="mates" imagen="img/ComingSoon.png" titulo="Futfem Mates" %}        
-    </div>
-
-    <div id="regular-games">
-        <h2>Regular Games</h2>
-
-        <div class="row sibling-fade d-flex justify-content-center">
-            {% include 'partials/game_card.html' with racha_id="racha-7" destino_js="higher_lower" imagen="img/higher_lower.png" titulo="Higher or Lower" %}
-        </div>
-
-    </div>
-</div>
 </section>
-<link rel="" href="app/widgets/language.html">
-<script src="{% static 'js/redireccion.js' %}"></script>
-<script type="module" src="{% static 'js/games/funciones-comunes.js' %}"></script>
-<script type="module" src="{% static 'usuarios/js/rachas.js' %}"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
-<script type="module" src="{% static 'js/animations/index.js' %}"></script>
-<script type="module" id="control-acceso" src="{% static 'usuarios/js/control-acceso.js' %}" data-allowed-roles="1,2"></script>
+</div>
+<script src="{% static 'js/redireccion.js' %}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js" defer></script>
+<script src="{% static 'js/animations/header.js' %}" defer></script>
+<script src="{% static 'js/animations/index.js' %}" defer></script>
+<script type="module" src="{% static 'usuarios/js/rachas.js' %}" defer></script>
+<script src="{% static 'js/utils/selector.js' %}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous" defer></script>
+<script defer>
+    const expoContainer = document.getElementById('juego-expo');
+    // --- Lógica de actualización compartida ---
+    function actualizarExpo(card) {
+        if (!card) return; // Seguridad por si no hay botones
+
+        const { bg, titulo, descripcion, img } = card.dataset;
+        const expoTitulo = document.getElementById('juego-titulo');
+        const expoParrafo = document.getElementById('juego-parrafo');
+        const expoImagen = document.getElementById('juego-imagen');
+
+        // Actualizar textos e imagen
+        expoTitulo.textContent = titulo;
+        expoParrafo.textContent = descripcion;
+        expoImagen.src = img;
+
+        // Animación con GSAP para el contenedor
+        gsap.to(expoContainer, {
+            duration: 0.5,
+            autoAlpha: 1,
+            backgroundImage: `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url(${bg})`,
+            display: 'flex',
+            ease: "power2.out"
+        });
+    }
+
+    // --- Modificación de activarSeccion ---
+    function activarSeccion(tipo) {
+        // 1. Ocultar el menú de botones
+        document.getElementById('menu-seleccion').style.display = 'none';
+
+        let sectionId = (tipo === 'daily') ? 'daily-games' : 'regular-games';
+        const activeSection = document.getElementById(sectionId);
+
+        // 2. Mostrar la sección elegida
+        activeSection.style.display = (tipo === 'daily') ? 'flex' : 'block';
+        expoContainer.style.display = 'flex';
+
+        // 3. BUSCAR EL PRIMER BOTÓN Y ACTIVARLO
+        const firstButton = activeSection.querySelector('.game-button');
+        if (firstButton) {
+            actualizarExpo(firstButton);
+            
+            // Opcional: darle un pequeño feedback visual al primer botón (escala)
+            gsap.to(firstButton, { scale: 1.05, duration: 0.3 });
+            
+            // Desvanecer los demás de esa sección (opcional, para coherencia)
+            const otherButtons = activeSection.querySelectorAll('.game-button');
+            otherButtons.forEach(btn => {
+                if (btn !== firstButton) gsap.to(btn, { opacity: 0.3, duration: 0.3 });
+            });
+        }
+    }
+
+    // --- Actualizar tus Event Listeners existentes ---
+    buttons.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            actualizarExpo(card); // Usamos la misma función aquí
+            
+            hoverSound.currentTime = 0;
+            hoverSound.play();
+
+            // Lógica de opacidad para el resto
+            buttons.forEach(other => {
+                if (other !== card) gsap.to(other, { opacity: 0.3, duration: 0.3 });
+            });
+            gsap.to(card, { scale: 1.05, duration: 0.3 });
+        });
+
+        card.addEventListener('mouseleave', () => {
+            gsap.to(card, { scale: 1, duration: 0.3 });
+            buttons.forEach(other => {
+                gsap.to(other, { opacity: 1, duration: 0.3 });
+            });
+        });
+    });
+
+    function volverAlMenu() {
+        // Ocultar ambas secciones de juegos
+        document.getElementById('daily-games').style.display = 'none';
+        document.getElementById('regular-games').style.display = 'none';
+        expoContainer.style.display = 'none';
+        
+        // Volver a mostrar los botones grandes
+        document.getElementById('menu-seleccion').style.display = 'flex';
+    }
+
+    function abrirBuscador() {
+        const modal = document.getElementById('search-overlay');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Evita que la página de fondo se mueva
+
+        // Foco automático en el input
+        setTimeout(() => {
+            document.getElementById('usuarioInput').focus();
+        }, 100);
+    }
+
+    function cerrarBuscador() {
+        const modal = document.getElementById('search-overlay');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Devuelve el scroll
+        
+        // Limpiar campos al salir
+        document.getElementById('usuarioInput').value = '';
+        document.getElementById('sugerencias').innerHTML = '';
+    }
+
+    // Cerrar también si se pulsa la tecla ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === "Escape") cerrarBuscador();
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+        // Comprobar si el estado del historial dice que el buscador debe estar abierto
+        if (history.state && history.state.searchOpen) {
+            abrirBuscador();
+            
+            // Opcional: Limpiar el estado para que si recarga la página manualmente
+            // no se abra solo otra vez
+            history.replaceState(null, "");
+        }
+    });
+
+    // También detectamos si el usuario navega hacia atrás/adelante sin recargar (Popstate)
+    window.addEventListener('popstate', (event) => {
+        if (event.state && event.state.searchOpen) {
+            abrirBuscador();
+        } else {
+            cerrarBuscador();
+        }
+    });
+</script>
 <script type="module">
     import { obtenerRacha, displayRacha } from '{% static "usuarios/js/rachas.js" %}';
-    const racha1 = await obtenerRacha(1);
-    const racha2 = await obtenerRacha(2);
-    const racha3 = await obtenerRacha(3);
-    const racha4 = await obtenerRacha(4);  
-    const racha5 = await obtenerRacha(5);
-    const racha6 = await obtenerRacha(6);
-    const racha7 = await obtenerRacha(7);
+    import { handleAutocompleteUser } from "{% static 'usuarios/js/users.js' %}";
+    document.getElementById("usuarioInput").addEventListener("input", handleAutocompleteUser);
+
+    const  [racha1, racha2, racha3, racha4, racha5, racha6, racha7] = await Promise.all([
+        obtenerRacha(1),
+        obtenerRacha(2),
+        obtenerRacha(3),
+        obtenerRacha(4),
+        obtenerRacha(5),
+        obtenerRacha(6),
+        obtenerRacha(7)
+    ]);
     
     displayRacha(racha1[0].racha_actual, racha1[0].juego.id);
     displayRacha(racha2[0].racha_actual, racha2[0].juego.id);

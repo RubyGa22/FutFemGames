@@ -1,14 +1,20 @@
 import { handleAutocompletePais } from '/static/futfem/js/pais.js';
+import { handleAutocompletePosicion } from '/static/futfem/js/posiciones.js';
 import { equiposxliga, handleAutocompleteEquipo, fetchEquipoById } from '/static/futfem/js/equipos.js';
-import { fetchAllJugadoras } from '/static/futfem/js/jugadora.js';
+import { fetchAllJugadoras, formatearValorMercado } from '/static/futfem/js/jugadora.js';
+import { calcularEdad } from '/static/js/games/funciones-comunes.js';
 import { getDominantColors, rgbToRgba } from '/static/js/utils/color.thief.js';
-import { inicializarMapaEquipos, añadirEquipoMapa, centrarMapaEnEquipos, map } from './mapa.js';
+
 let jugadorasOriginal;
+let currentPage = 1;
+const itemsPerPage = 14;
+let totalPages = 1;
+let jugadorasGlobal = []; // Guardaremos todas las jugadoras aquí
 const btnMapa = document.getElementById("ver-mapa");
 const mapa = document.getElementById("mapa-equipos");
 const item = document.getElementById("items-container");
 
-btnMapa.addEventListener("click", () => {
+/*btnMapa.addEventListener("click", () => {
     const visible = mapa.style.display === 'block';
 
     
@@ -31,13 +37,22 @@ btnMapa.addEventListener("click", () => {
             }
         }, 50);
     }
-});
+});*/
 
-function inicializarWiki() {
+
+export async function inicializarWiki(arg) {
 
     const inputPaises = document.getElementsByClassName('input-pais');
 
+    const sectionWiki = document.getElementById('wiki-equipos');
+
+    const cabecera = document.getElementById('cabecera-wiki-equipos');
+
+    const inputPosiciones = document.getElementById('input-posicion');
+
     const cabeceraLigas = document.getElementById('cabecera-equipo');
+
+    const cabeceraJugadoras = document.getElementById('cabecera-jugadora');
 
     const ligasContainer = document.getElementById('ligas-container');
 
@@ -49,11 +64,33 @@ function inicializarWiki() {
 
     const botonFiltro = document.getElementById('jugadoras-filtros');
 
+    if(arg === 'jugadoras'){
+        cabeceraJugadoras.classList.add('active');
+        cabeceraLigas.classList.remove('active');
+        manejarJugadoras().then(cantidad => {
+            console.log(`Total jugadoras cargadas: ${cantidad}`);
+            displayJugadoras(jugadorasOriginal);
+        });
+    }else if(arg === 'equipos'){
+        sectionWiki.classList.add('equipos');
+        cabecera.classList.add('equipos');
+        cabeceraJugadoras.classList.remove('active');
+        cabeceraLigas.classList.add('active');
+        await ligasxpais(1).then(ligas => {
+            displayLigas(ligas.success);
+        });
+        await equiposxliga(1).then(equipos => {
+            displayEquipos(equipos.success);
+        });
+        console.log(ligasContainer.firstChild)
+        ligasContainer.firstChild.classList.add('selected');
+    }
+
     botonFiltro.addEventListener('click', () => {
         const paisInput = inputPaises[1];
         if (!paisInput) return;
         console.log(inputPaises)
-        filtroJugadoras(Number(inputEquipo.dataset.id), Number(paisInput.dataset.id), null);
+        filtroJugadoras(Number(inputEquipo.dataset.id), Number(paisInput.dataset.id), Number(inputPosiciones.dataset.id));
     });
 
     /*botonJugadoras.addEventListener('click', async (event) => {
@@ -64,9 +101,12 @@ function inicializarWiki() {
         handleAutocompleteEquipo(event, 'sugerencias-equipo');
     });
 
-    
+    inputPosiciones.addEventListener('input', async (event) => {
+        handleAutocompletePosicion(event);
+    });
+
         inputPaises[0].addEventListener('input', async (event) => {
-            handleAutocompletePais(event, 'sugerencias-pais1');
+            handleAutocompletePais(event, 'sugerencias-pais1', ligasxpais);
         });
         inputPaises[1].addEventListener('input', async (event) => {
             handleAutocompletePais(event, 'sugerencias-pais2');
@@ -84,19 +124,16 @@ function inicializarWiki() {
     });
 
     // default equipo display
-    ligasxpais(1).then(ligas => {
+    /*ligasxpais(1).then(ligas => {
         ligasContainer.firstElementChild.classList.add('selected');
         cabeceraLigas.style.display = 'flex';
     });
     equiposxliga(1).then(equipos => {
         displayEquipos(equipos.success);
-    });
+    });*/
 
     
 }
-
-
-inicializarWiki();
 
 
 export async function manejarJugadoras() {
@@ -104,45 +141,80 @@ export async function manejarJugadoras() {
         return;
     }
     jugadorasOriginal = await fetchAllJugadoras();
+    return jugadorasOriginal.length;
+}
 
-    // Usamos for...of para poder await dentro del loop
-    for (const jugadora of jugadorasOriginal) {
-        if (jugadora.equipo) {
-            jugadora.equipo = await fetchEquipoById(jugadora.equipo);
-        } else {
-            jugadora.equipo = null; // si no tiene equipo actual
+function filtroJugadoras(equipo, nacionalidad, posicion) {
+    
+    let nuevasJugadoras = jugadorasOriginal.filter(jugadora => {
+        // 1. Filtro de Equipo
+        // Comparamos el ID del equipo (o club) según cómo venga en tu JSON
+        if (equipo && jugadora.equipo.id !== parseInt(equipo)) return false;
+
+        // 2. Filtro de Nacionalidad
+        // Si hay una nacionalidad seleccionada, comprobamos si está en su lista de IDs
+        if (nacionalidad) {
+            const nacioId = parseInt(nacionalidad);
+            if (!jugadora.nacionalidades_ids.includes(nacioId)) {
+                return false;
+            }
         }
+
+        // 3. Filtro de Posición
+        if (posicion && !jugadora.posiciones_ids.includes(parseInt(posicion))) return false;
+
+        // Si sobrevive a todos los 'return false', la jugadora es válida
+        return true;
+    });
+
+    if (window.screen.width < 768) {
+        document.getElementById('cabecera-wiki-equipos').classList.remove('active');
     }
 
-    return jugadorasOriginal.length;
+    displayJugadoras(nuevasJugadoras);
 }
 
 
 function displayJugadoras(jugadoras){
+    console.log(jugadoras)
     jugadorasGlobal = jugadoras; // Guardar todas las jugadoras
     currentPage = 1;
     totalPages = Math.ceil(jugadorasGlobal.length / itemsPerPage);
     renderJugadorasPage(currentPage);
 }
 
-let currentPage = 1;
-const itemsPerPage = 10;
-let totalPages = 1;
-let jugadorasGlobal = []; // Guardaremos todas las jugadoras aquí
-
-
 function renderJugadorasPage(page = 1) {
     const container = document.getElementById('items-container');
+    const cabecera = document.getElementById('cabecera-wiki-equipos');
     const containerLigas = document.getElementById('ligas-container');
     container.innerHTML = '';
     containerLigas.innerHTML = '';
     container.className = '';
     container.className = 'jugadoras';
+    cabecera.classList.add('jugadoras');
+    cabecera.style.borderBottom = 'none';    
     const start = (page - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const jugadoras = jugadorasGlobal.slice(start, end);
-    jugadoras.forEach((jugadora, index) => { 
-        const nombreCompleto = jugadora.nombre + jugadora.apellido;
+    
+    container.innerHTML = ''; // Limpiamos
+    containerLigas.innerHTML = '';
+    container.className = 'jugadoras-grid-container'; // Clase para el contenedor padre
+
+    // --- CREACIÓN DEL ENCABEZADO ---
+    const header = document.createElement('div');
+    header.className = 'jugadora-item header-list'; // Usamos la misma clase para heredar el grid
+    header.innerHTML = `
+        <div class="jugadora-div1"><p><b>${gettext('JUGADORA')}</b></p></div>
+        <div class="header-label"><p><b>${gettext('EDAD')}</b></p></div>
+        <div class="header-label"><p><b>${gettext('CLUB')}</b></p></div>
+        <div class="header-label"><p><b>${gettext('VALOR')}</b></p></div>
+    `;
+    container.appendChild(header);
+
+    jugadoras.forEach((jugadora, index) => {
+        const nombreCompleto = jugadora.nombre_completo || 'Desconocida';
+        const slugNombre = nombreCompleto.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, ''); // Limpiamos caracteres especiales para el slug
         const div = document.createElement('div');
         div.classList.add('jugadora-item');
         div.classList.add('glass');
@@ -159,13 +231,23 @@ function renderJugadorasPage(page = 1) {
         div1.appendChild(img)
 
         const imgClub = document.createElement('img');
-        imgClub.src = '/' + jugadora.equipo.escudo;
+        const foto = "/"+jugadora.equipo.escudo;
+        const fotoMini = foto.replace('/clubes/', '/clubes/mini/');
+        imgClub.src = fotoMini;
         imgClub.className = 'equipo-imagen';
         imgClub.alt = jugadora.equipo.nombre;
 
         const pNombre = document.createElement('p');
-        pNombre.textContent = jugadora.apodo; 
+        pNombre.className = 'jugadora-nombre';
+        pNombre.textContent = nombreCompleto; 
         div1_2.appendChild(pNombre);
+
+        const pValor = document.createElement('p');
+        pValor.className = 'jugadora-valor';
+        pValor.textContent = formatearValorMercado(jugadora.market_value) || 'N/A';
+
+        const divBanderaYPosicion = document.createElement('div');
+        divBanderaYPosicion.className = 'jugadora-banderas-posicion';
 
         // Contenedor para las banderas
         const divBanderas = document.createElement('div');
@@ -175,6 +257,8 @@ function renderJugadorasPage(page = 1) {
         jugadora.nacionalidades_isos.forEach((iso, index) => {
             const icon = document.createElement('span');
             icon.className = `fi fi-${iso}`; 
+
+            icon.onclick = filtroJugadoras.bind(null, null, jugadora.nacionalidades_ids[index], null);
             
             // Si el index es 0, es la primaria. Si es mayor, es secundaria.
             if (index > 0) {
@@ -188,13 +272,23 @@ function renderJugadorasPage(page = 1) {
             icon.title = `País ID: ${jugadora.nacionalidades_ids[index]}`;
             divBanderas.appendChild(icon);
         });
-        div1_2.appendChild(divBanderas);
 
         const pNacimiento = document.createElement('p');
-        pNacimiento.textContent = jugadora.nacimiento;
+        pNacimiento.textContent = calcularEdad(jugadora.nacimiento);
 
-        const pPosicion = document.createElement('p');
-        pPosicion.textContent = jugadora.posicion;
+        const pPosicion = document.createElement('div');
+        pPosicion.className = 'jugadora-posicion';
+        jugadora.posiciones_abrev.forEach(pos => {
+            const span = document.createElement('span');
+            span.textContent = gettext(pos);
+            span.id = jugadora.posiciones_ids[jugadora.posiciones_abrev.indexOf(pos)];
+            span.className = 'pos-'+pos;
+            pPosicion.appendChild(span);
+        });
+        div1_2.appendChild(divBanderaYPosicion);
+        divBanderaYPosicion.appendChild(divBanderas);
+        divBanderaYPosicion.appendChild(pPosicion);
+        
         
         div1.appendChild(div1_2)
         const colorPrimario = jugadora.equipo.color || 'var(--color-primario)'; // fallback
@@ -203,20 +297,21 @@ function renderJugadorasPage(page = 1) {
         div.style.background = `
             linear-gradient(
                 to bottom,
-                color-mix(in srgb, ${colorPrimario} 30%, transparent),
-                color-mix(in srgb, ${colorSecundario} 30%, transparent)
+                color-mix(in srgb, ${colorPrimario} 70%, transparent),
+                color-mix(in srgb, ${colorSecundario} 70%, transparent)
             )
         `;
         }
 
-        div.addEventListener('click', () => {
-            window.location.href = `/wiki/jugadora/${jugadora.id_jugadora}/`;
-        });
+        div.style.border = `1px solid color-mix(in srgb, ${colorPrimario} 50%, transparent)`;
 
+        pNombre.addEventListener('click', () => {
+            window.location.href = `/jugadora/${jugadora.id_jugadora}/${slugNombre}/`;
+        });
         div.appendChild(div1);
-        div.appendChild(imgClub);
         div.appendChild(pNacimiento);
-        div.appendChild(pPosicion);
+        div.appendChild(imgClub);
+        div.appendChild(pValor);
         container.appendChild(div);
 
         // Retraso progresivo para efecto fade
@@ -270,13 +365,10 @@ function updatePaginationUI() {
     };
 }
 
-
-
 async function ligasxpais(id_pais) {
     try {
         const response = await fetch(`/api/ligasxpais?pais=${id_pais}`); 
         const data = await response.json();
-        console.log(data);
         if (data.success) {
             displayLigas(data.success);
         } 
@@ -305,11 +397,13 @@ function displayLigas(data) {
 
     data.forEach((liga, index) => {
         const ligaElement = document.createElement('div');
+        const foto = "/"+liga.logo;
+        const fotoMini = foto.replace('/ligas/', '/ligas/mini/');
         ligaElement.classList.add('liga-item');
         ligaElement.classList.add('glass');
         ligaElement.id = liga.liga;
         ligaElement.innerHTML = `
-            <img src="/${liga.logo}" alt="${liga.nombre} Logo" class="liga-logo">
+            <img src="${fotoMini}" alt="${liga.nombre} Logo" class="liga-logo">
             <div class="liga-info">
             <h3>${liga.nombre}</h3>
             <p>2025/2026</p>
@@ -324,8 +418,8 @@ function displayLigas(data) {
                 ligaElement.style.background = `
                     linear-gradient(
                         to bottom,
-                        color-mix(in srgb, ${rgbToRgba(colors[0], 0.5)} 50%, transparent),
-                        color-mix(in srgb, ${rgbToRgba(colors[1], 0.5)} 100%, transparent)
+                        color-mix(in srgb, ${rgbToRgba(colors[0], 1)} 50%, transparent),
+                        color-mix(in srgb, ${rgbToRgba(colors[1], 1)} 100%, transparent)
                     )
                 `;
                 ligaElement.style.borderColor = rgbToRgba(colors[2], 0.7);
@@ -339,10 +433,14 @@ function displayLigas(data) {
         ligaElement.addEventListener('click', async () => {
             seleccionarLiga(ligaElement);
             const equipos = await equiposxliga(liga.liga);
-            displayEquiposMapa(equipos.success)
+            /*displayEquiposMapa(equipos.success)*/
             displayEquipos(equipos.success);
         });
         container.appendChild(ligaElement);
+
+        if(index===0){
+            ligaElement.click();
+        }
 
 
         // Retraso progresivo para efecto fade
@@ -372,10 +470,13 @@ export function displayEquipos(equipos, container) {
         return;
     }
     equipos.forEach((equipo, index) => {
+        const equipoSlug = equipo.nombre.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
         const equipoElement = document.createElement('div');
+        const foto = "/"+equipo.escudo;
+        const fotoMini = foto.replace('/clubes/', '/clubes/mini/');
         equipoElement.className = 'equipo-item';
         equipoElement.innerHTML = `
-            <img src="/${equipo.escudo}" alt="${equipo.nombre} Escudo" class="equipo-escudo">
+            <img src="${fotoMini}" alt="${equipo.nombre} Escudo" class="equipo-escudo">
             <div class="equipo-info">
             <h4>${equipo.nombre}</h4>  
             </div>
@@ -387,8 +488,8 @@ export function displayEquipos(equipos, container) {
         equipoElement.style.background = `
             linear-gradient(
                 to bottom,
-                color-mix(in srgb, ${colorPrimario} 30%, transparent),
-                color-mix(in srgb, ${colorSecundario} 30%, transparent)
+                color-mix(in srgb, ${colorPrimario} 100%, transparent 20%),
+                color-mix(in srgb, ${colorSecundario} 100%, transparent)
             )
         `;
         equipoElement.style.setProperty('--equipo-shadow-color', colorPrimario);
@@ -396,7 +497,7 @@ export function displayEquipos(equipos, container) {
         container.appendChild(equipoElement);
 
         equipoElement.addEventListener('click', () => {
-            window.location.href = `/wiki/equipo/${equipo.id}/`;
+            window.location.href = `/equipo/${equipo.id}/${equipoSlug}/`;
         });
 
         // Retraso progresivo para efecto fade
@@ -406,7 +507,7 @@ export function displayEquipos(equipos, container) {
     });
 }
 
-export function displayEquiposMapa(equipos) {
+/*export function displayEquiposMapa(equipos) {
     inicializarMapaEquipos();
 
     // Guardamos los equipos para añadirlos cuando el mapa esté listo
@@ -433,31 +534,4 @@ export function displayEquiposMapa(equipos) {
         });
     });
 
-}
-
-
-function filtroJugadoras(equipo, nacionalidad, posicion) {
-    
-    let nuevasJugadoras = jugadorasOriginal.filter(jugadora => {
-        // 1. Filtro de Equipo
-        // Comparamos el ID del equipo (o club) según cómo venga en tu JSON
-        if (equipo && jugadora.equipo.club !== parseInt(equipo)) return false;
-
-        // 2. Filtro de Nacionalidad
-        // Si hay una nacionalidad seleccionada, comprobamos si está en su lista de IDs
-        if (nacionalidad) {
-            const nacioId = parseInt(nacionalidad);
-            if (!jugadora.nacionalidades_ids.includes(nacioId)) {
-                return false;
-            }
-        }
-
-        // 3. Filtro de Posición
-        if (posicion && jugadora.posicion !== posicion) return false;
-
-        // Si sobrevive a todos los 'return false', la jugadora es válida
-        return true;
-    });
-
-    displayJugadoras(nuevasJugadoras);
-}
+}*/

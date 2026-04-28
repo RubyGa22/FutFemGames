@@ -1,21 +1,13 @@
-import { fetchJugadoraNacionalidadById, fetchJugadoraTrayectoriaById, fetchJugadoraPalmaresById } from "/static/futfem/js/jugadora.js";
-import { updateRacha, obtenerUltimaRespuesta } from '/static/usuarios/js/rachas.js';
-import { getDominantColors, rgbToRgba } from '../utils/color.thief.js';
-import { inicializarCounter, startCounter, stopCounter } from '../utils/counter.js'; 
 import { victory, wrong, correct } from "../sounds.js";
-import { ponerBanderas, ponerLigas, ponerClubes, ponerTrofeos, ponerEdades, crearPopupInicialJuego, Ganaste } from "./funciones-comunes.js";
-let idres;
-let paises, equipos, ligas, trofeos;
-let lastPlayer;
-const texto = '¡Pon a prueba tu memoria en "Futfem Bingo"! En este juego recibirás jugadoras al azar y deberás colocarlas en las casillas de país, equipo o liga que coincidan con su trayectoria.\n' +
-    'Cada jugadora tiene varias características, y tu objetivo es encajarla correctamente en el tablero.\n' +
-    'Gana quien logre completar su tarjeta como en un bingo tradicional, ¡pero con fútbol femenino!\n';
-const imagen = '/static/img/Bingo.png';
+import { Ganaste, calcularEdad } from "./funciones-comunes.js";
+
+let idres, currentPlayerData, paises, equipos, ligas, trofeos, lastPlayer, jugadora;;
 
 
 async function iniciar(dificultad) {
     const popup = document.getElementById('popup-ex'); // Selecciona el primer elemento con la clase 'popup-ex'
     const btn = document.getElementsByClassName('skip-button')[0];
+    const {ponerBanderas, ponerLigas, ponerClubes, ponerTrofeos, ponerEdades} = await import('./funciones-comunes.js');
     lastPlayer = localStorage.getItem('last-player-bingo');
 
     if (btn) {
@@ -24,15 +16,9 @@ async function iniciar(dificultad) {
     if (popup) {
         popup.style.display = 'none'; // Cambia el estilo para ocultarlo
     }
-    let valor = await fetchData(6);
-    paises = valor.paises;
-    equipos = valor.equipos;
-    ligas = valor.ligas;
-    trofeos = valor.trofeos;
-    console.log('Paises:', trofeos);
-    idres = paises.map(String).concat(equipos.map(String), ligas.map(String), trofeos.map(String)).join('');
-    console.log('ID Respuesta:', idres);
 
+    const {obtenerUltimaRespuesta, updateRacha} = await import('/static/usuarios/js/rachas.js');
+    window.updateRacha = updateRacha; // Hacer updateRacha global para poder usarlo en Ganaste()
     const ultima = await obtenerUltimaRespuesta(6);
     let ultimaArray = JSON.parse(ultima);
     let usuarioAnswer = null;   // ← AQUÍ sí
@@ -54,17 +40,21 @@ async function iniciar(dificultad) {
         skipPlayer(paises, equipos, ligas, trofeos);
     }
     // Definir los segundos según la dificultad
+    const { inicializarCounter, startCounter, stopCounter } = await import('../utils/counter.js'); 
+    window.stopCounter = stopCounter; // Hacer stopCounter global para poder usarlo en Ganaste()
+
     let segundos = inicializarCounter(180000000000000000000000000000000000000000000000000000000000, 120 , 60, 'bingo', dificultad);
 
-    await ponerBanderas(paises, ["c21", "c32", "c33"]); // Asigna banderas a ciertos países por su ID.
-    await ponerLigas(ligas, ["c13", "c34",'c23']); // Asigna ligas a los países por su ID.
-    await ponerClubes(equipos, ["c12", "c14", "c31"]); // Asigna clubes a los países.
-    await ponerTrofeos(trofeos, ["c11"]); // Asigna trofeos a los países.
+    // Se ejecutan todas a la vez. El tiempo total es lo que tarde la más lenta.
+    await Promise.all([
+        ponerBanderas(paises, ["c21", "c32", "c33"]),
+        ponerLigas(ligas, ["c13", "c34", "c23"]),
+        ponerClubes(equipos, ["c12", "c14", "c31"]),
+        ponerTrofeos(trofeos, ["c11"])
+    ]);
     ponerEdades("c24", "c22", '/static/img/edades/mayor30.png', '/static/img/edades/igual25.png'); // Asigna imágenes basadas en las edades.
     localStorage.setItem('res6', idres);
-    
-
-            
+             
     let userAnswer = JSON.parse(localStorage.getItem('Attr6')) || [];
     let userRes = null;
     if(userAnswer.length > 0){
@@ -73,9 +63,11 @@ async function iniciar(dificultad) {
     const isAnswerTrue = (idres === userRes);
 
     setTimeout(async () => {
-        await pintarCeldas();
-        await colocarAciertos();
-        await iniciarHoverFondos();
+        //await pintarCeldas();
+        await Promise.all([
+            colocarAciertos(),   // Recupera el progreso guardado
+            iniciarHoverFondos() // Activa los efectos visuales
+        ]);
         //Asegurar que los <td> ya existen y están pintados 
         const celdas = comprobarFotosEnCeldas();
         console.log(celdas, userRes);
@@ -85,6 +77,7 @@ async function iniciar(dificultad) {
             Ganaste('bingo');
         }
         else{
+            initBingoEvents(paises, clubes, ligas, trofeos);
             if (!userRes || userRes.trim() === '') {
                 startCounter(segundos, "bingo", async () => {
                     console.log("El contador llegó a 0. Ejecutando acción...");
@@ -102,191 +95,106 @@ async function iniciar(dificultad) {
     }, 500); // espera 500m
 }
 
-function calcularEdad(fechaNacimiento) {
-    const hoy = new Date(); // Fecha actual
-    const nacimiento = new Date(fechaNacimiento); // Convertir la fecha de nacimiento a un objeto Date
-    let edad = hoy.getFullYear() - nacimiento.getFullYear(); // Calcular la diferencia de años
-    const mes = hoy.getMonth() - nacimiento.getMonth(); // Calcular la diferencia de meses
-
-    // Ajustar la edad si el cumpleaños de este año aún no ha ocurrido
-    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
-        edad--;
+play().then(r => r)
+async function play() {
+    jugadora = await fetchData(6);
+    paises = [jugadora.paises[0], jugadora.paises[1], jugadora.paises[2]];
+    equipos = [jugadora.equipos[0], jugadora.equipos[1], jugadora.equipos[2]];
+    ligas = [jugadora.ligas[0], jugadora.ligas[1], jugadora.ligas[2]];
+    trofeos = [jugadora.trofeos[0]];
+    idres = paises.map(String).concat(equipos.map(String), ligas.map(String), trofeos.map(String)).join('');
+    const res = localStorage.getItem('res6');
+    const texto = gettext('¡Pon a prueba tu memoria en "Futfem Bingo"! En este juego recibirás jugadoras al azar y deberás colocarlas en las casillas de país, equipo o liga que coincidan con su trayectoria. Cada jugadora tiene varias características, y tu objetivo es encajarla correctamente en el tablero. Gana quien logre completar su tarjeta como en un bingo tradicional, ¡pero con fútbol femenino!');
+    const imagen = '/static/img/Bingo.webp';
+    const {crearPopupInicialJuego} = await import('./funciones-comunes.js');
+    if(res !== idres || !res){
+        localStorage.removeItem('Attr6');
+        localStorage.removeItem('last-player-bingo');
+        crearPopupInicialJuego(gettext('Futfem Bingo'), texto, imagen, '', iniciar);
+    } else {
+        await iniciar('');
     }
-
-    return edad;
 }
-function handleCellClick(event, jugador) {
-    const cell = event.currentTarget;
+
+function handleCellClick(cell, jugador) {
     const cellId = cell.id;
-    const paisJugadora = jugador.pais;
-    let celdasLlenas = false;
-    // Obtener la imagen dentro de la celda clicada
-    const img = event.currentTarget.querySelector('img');
-    if (!img) {
+        const img = cell.querySelector('img');
+    
+        if (!img) {
         console.log("No hay imagen en esta celda.");
         return false;
     }
 
-    const imgClass = img.className; // Obtener la clase de la imagen
-    //console.log("Clase de la imagen:", imgClass);
-
+    const imgClass = img.className;
+    const lowerClass = imgClass.toLowerCase();
     let hasMatch = false;
 
-    // Verificar si es un país o un club según el atributo alt de la imagen
-    if (img.className.toLowerCase().includes("pais")) {
-        if (imgClass === `pais${paisJugadora.Pais}`) { // Compara con el campo de país del jugador
-            //console.log("¡Coincidencia de país encontrada!");
-            bloquearCeldaEstilo(cell, jugador.foto); // Usar la imagen correcta
-            gestionarAciertos(cellId, jugador.foto);
+    // 1. VERIFICACIÓN DE PAÍS
+    if (lowerClass.includes("pais") && jugador.pais) {
+        if (imgClass === `pais${jugador.pais.Pais}`) {
             hasMatch = true;
-            correct.play()
-            celdasLlenas = comprobarFotosEnCeldas();
-        } else {
-            console.log("No hay coincidencia de país.");
-        }
-    }
-    if (img.className.toLowerCase().includes("liga")) {
-        if (Array.isArray(jugador.liga)) { // Verificar que trayectoria sea un array
-            const ligaMatch = jugador.liga.some(liga => `liga${liga}` === imgClass);
-
-            if (ligaMatch) {
-                console.log("¡Coincidencia de liga encontrada!");
-                bloquearCeldaEstilo(cell, jugador.foto); // Usar la imagen correcta
-                gestionarAciertos(cellId, jugador.foto);
-                hasMatch = true;
-                correct.play()
-                celdasLlenas = comprobarFotosEnCeldas();
-            } else {
-                console.log("No hay coincidencia de liga.");
-            }
-        } else {
-            console.log("La trayectoria no es un array o está vacía.");
         }
     }
 
+    // 2. VERIFICACIÓN DE LIGA
+    if (lowerClass.includes("liga") && Array.isArray(jugador.liga)) {
+        hasMatch = jugador.liga.some(liga => `liga${liga}` === imgClass);
+    }
 
-    if (img.className.toLowerCase().includes("club")) {
-        if (Array.isArray(jugador.trayectoria)) { // Verificar que trayectoria sea un array
-            const clubMatch = jugador.trayectoria.some(club => `club${club}` === imgClass);
+    // 3. VERIFICACIÓN DE CLUB (Trayectoria)
+    if (lowerClass.includes("club") && Array.isArray(jugador.trayectoria)) {
+        hasMatch = jugador.trayectoria.some(club => `club${club}` === imgClass);
+    }
 
-            if (clubMatch) {
-                console.log("¡Coincidencia de club encontrada!");
-                bloquearCeldaEstilo(cell, jugador.foto); // Usar la imagen correcta
-                gestionarAciertos(cellId, jugador.foto);
-                hasMatch = true;
-                correct.play()
-                celdasLlenas = comprobarFotosEnCeldas();
-            } else {
-                console.log("No hay coincidencia de club.");
-            }
-        } else {
-            console.log("La trayectoria no es un array o está vacía.");
+    // 4. VERIFICACIÓN DE TROFEOS (Corregido)
+    if (lowerClass.includes("trofeo") && jugador.trofeos) {
+        let trofeoMatch = false;
+        
+        if (img.id === 'jugadora' && Array.isArray(jugador.trofeos.individual)) {
+            // Trofeos Individuales (Balón de Oro, MVP, etc.)
+            trofeoMatch = jugador.trofeos.individual.some(t => `trofeo${t.id}` === imgClass);
+        } else if (img.id === 'clubes' && Array.isArray(jugador.trofeos.equipo)) {
+            // Trofeos de Equipo (Champions, Liga, etc.)
+            // Aplanamos los arrays de 'success' para buscar el ID
+            const idsEquipo = jugador.trofeos.equipo.flatMap(item => item.success || []);
+            trofeoMatch = idsEquipo.some(idTrofeo => `trofeo${idTrofeo}` === imgClass);
+        }
+        
+        if (trofeoMatch) hasMatch = true;
+    }
+
+    // 5. VERIFICACIÓN DE EDAD (Más limpio)
+    if (lowerClass.includes("edad")) {
+        const edad = jugador.edad;
+        // Buscamos la clase específica que define la regla
+        const claseRegla = Array.from(img.classList).find(cls => 
+            cls.startsWith('EdadMenor') || cls.startsWith('EdadMayor') || cls.startsWith('EdadIgual')
+        );
+
+        if (claseRegla) {
+            const valorRegla = parseInt(claseRegla.replace(/\D/g, ''), 10); // Extrae solo los números
+            if (claseRegla.startsWith('EdadMenor')) hasMatch = (edad < valorRegla);
+            else if (claseRegla.startsWith('EdadMayor')) hasMatch = (edad > valorRegla);
+            else if (claseRegla.startsWith('EdadIgual')) hasMatch = (edad === valorRegla);
         }
     }
-    if (img.className.toLowerCase().includes("trofeo")) {
-        if (Array.isArray(jugador.trofeos.equipo && jugador.trofeos.equipo)) { // Verificar que trayectoria sea un array
-            let trofeoMatch = false;
-            let trofeosIndividuales = [];
-            let trofeosEquipo = [];
-
-            if(jugador.trofeos.individual){
-                jugador.trofeos.individual.forEach(item => {
-                    if (Array.isArray(item.success)) {
-                        trofeosIndividuales.push(...item.success);
-                    }
-                });
-            }
-            
-            if(jugador.trofeos.equipo){
-                jugador.trofeos.equipo.forEach(item => {
-                    if (Array.isArray(item.success)) {
-                        trofeosEquipo.push(...item.success);
-                    }
-                });
-            }
-
-            if(img.id === 'individual'){
-                trofeoMatch = trofeosIndividuales.some(trofeo => `trofeo${trofeo.id}` === imgClass);
-            } else if(img.id === 'clubes'){
-                trofeoMatch = trofeosEquipo.some(trofeo => `trofeo${trofeo.id}` === imgClass);
-            }
-            if (trofeoMatch) {
-                console.log("¡Coincidencia de trofeo encontrada!");
-                bloquearCeldaEstilo(cell, jugador.foto);
-                gestionarAciertos(cellId, jugador.foto);
-                hasMatch = true;
-                correct.play();
-                celdasLlenas = comprobarFotosEnCeldas();
-            } else {
-                console.log("No hay coincidencia de trofeo.");
-            }
-        } else {
-            console.log("La trayectoria no es un array o está vacía.");
+    // --- LÓGICA DE ACIERTO ---
+    if (hasMatch) {
+        bloquearCeldaEstilo(cell, jugador.foto);
+        gestionarAciertos(cellId, jugador.foto);
+        if (typeof correct !== 'undefined') correct.play();
+        
+        // Verificar si se ha completado el tablero
+        if (comprobarFotosEnCeldas()) {
+            window.stopCounter('bingo');
+            if (typeof victory !== 'undefined') victory.play();
+            window.updateRacha(6, 1, localStorage.getItem('Attr6'));
+            Ganaste('bingo');
         }
+    } else {
+        if (typeof wrong !== 'undefined') wrong.play();
     }
-    if (img.className.toLowerCase().includes("edad")) {
-        // Verificar si la clase contiene 'EdadMenor'
-        const claseEdadMenor = Array.from(img.classList).find(cls => cls.startsWith('EdadMenor'));
-        const claseEdadMayor = Array.from(img.classList).find(cls => cls.startsWith('EdadMayor'));
-        const claseEdad = Array.from(img.classList).find(cls => cls.startsWith('EdadIgual'));
-        if (claseEdadMenor) {
-            // Extraer el número después de 'EdadMenor'
-            const edadLimite = parseInt(claseEdadMenor.replace('EdadMenor', ''), 10);
 
-            if (jugador.edad < edadLimite) {
-                console.log(`¡Coincidencia de edad menor de ${edadLimite}!`);
-                bloquearCeldaEstilo(cell, jugador.foto); // Usar la imagen correcta
-                gestionarAciertos(cellId, jugador.foto);
-                hasMatch = true;
-                correct.play();
-                celdasLlenas = comprobarFotosEnCeldas();
-            } else {
-                console.log(`No hay coincidencia de edad menor de ${edadLimite}.`);
-                hasMatch = false;
-                celdasLlenas = comprobarFotosEnCeldas();
-            }
-        }
-        if (claseEdadMayor) {
-            // Extraer el número después de 'EdadMayor'
-            const edadLimite = parseInt(claseEdadMayor.replace('EdadMayor', ''), 10);
-
-            if (jugador.edad > edadLimite) {
-                console.log(`¡Coincidencia de edad mayor de ${edadLimite}!`);
-                bloquearCeldaEstilo(cell, jugador.foto); // Usar la imagen correcta
-                gestionarAciertos(cellId, jugador.foto)
-                hasMatch = true;
-                correct.play();
-                celdasLlenas = comprobarFotosEnCeldas();
-            } else {
-                console.log(`No hay coincidencia de edad mayor de ${edadLimite}.`);
-                hasMatch = false;
-            }
-        }
-        // Si no es 'EdadMenor', verificar las otras clases de edad
-        if (claseEdad) {
-            // Extraer el número después de 'EdadMenor'
-            const edadLimite = parseInt(claseEdad.replace('EdadIgual', ''), 10);
-
-            if (jugador.edad === edadLimite) {
-                console.log(`¡Coincidencia de edad igual a ${edadLimite}!`);
-                bloquearCeldaEstilo(cell, jugador.foto); // Usar la imagen correcta
-                gestionarAciertos(cellId, jugador.foto);
-                hasMatch = true;
-                correct.play();
-                celdasLlenas = comprobarFotosEnCeldas();
-            } else {
-                console.log(`No hay coincidencia de edad igual a ${edadLimite}.`);
-                hasMatch = false;
-            }
-        }
-
-    }
-    if(celdasLlenas){
-        stopCounter('bingo');
-        victory.play();
-        updateRacha(6, 1, localStorage.getItem('Attr6'));
-        Ganaste('bingo');
-    }
     return hasMatch;
 }
 
@@ -331,26 +239,53 @@ function skipPlayer(paises, clubes, ligas, trofeos) {
         });
 }
 
+// 2. Configura el evento de clic UNA SOLA VEZ al cargar el Bingo
+function initBingoEvents(paises, clubes, ligas, trofeos) {
+    const table = document.querySelector('table'); 
+    
+    table.addEventListener('click', function(event) {
+        // Buscamos la celda TD más cercana al clic (por si pulsas el texto de dentro)
+        const cell = event.target.closest('td');
+
+        // Si el clic no fue en una celda, o no hay jugadora, o ya está marcada: ignorar
+        if (!cell || !currentPlayerData || cell.classList.contains('correcto')) return;
+
+        console.log("Celda detectada:", cell); // Para depurar
+
+        // PASO CLAVE: Pasamos la 'cell' directamente, no el evento genérico
+        let esAcierto = handleCellClick(cell, currentPlayerData);
+        
+        if (esAcierto) {
+            cell.classList.add('correcto');
+            // Sonido de acierto si tienes uno
+            skipPlayer(paises, clubes, ligas, trofeos);
+        } else {
+            cell.classList.add('tremble');
+            wrong.currentTime = 0;
+            wrong.play();
+            setTimeout(() => cell.classList.remove('tremble'), 500);
+        }
+    });
+}
+
 
 async function mostrarJugadora(jugadora, paises, clubes, ligas, trofeos) {
-    document.getElementById("player-name").textContent = jugadora.nombre;
-    const img = document.getElementById("player-image");
-    localStorage.setItem('last-player-bingo', JSON.stringify(jugadora));
-    img.src = (!jugadora.imagen)
-        ? "/static/img/predeterm.jpg"
-        : jugadora.imagen;
-    img.className = jugadora.id;
+
 
     const edad = calcularEdad(jugadora.Nacimiento);
-    const pais = await fetchJugadoraNacionalidadById(jugadora.id);
-    const equipos = await fetchJugadoraTrayectoriaById(jugadora.id);
-    const palmares = await fetchJugadoraPalmaresById(jugadora.id);
-    console.log(palmares);
+    const { fetchJugadoraNacionalidadById, fetchJugadoraTrayectoriaById, fetchJugadoraPalmaresById } = await import("/static/futfem/js/jugadora.js");
+
+    // En lugar de 3 awaits secuenciales, haz esto:
+    const [pais, equipos, palmares] = await Promise.all([
+        fetchJugadoraNacionalidadById(jugadora.id),
+        fetchJugadoraTrayectoriaById(jugadora.id),
+        fetchJugadoraPalmaresById(jugadora.id)
+    ]);
 
     if (equipos && equipos.length > 0) {
         const nombresEquipos = equipos.map(e => e.equipo);
         const ligasEquipos = equipos.map(e => e.liga);
-        let data = {
+        currentPlayerData = {
             'pais': pais,
             'edad': edad,
             'trayectoria': nombresEquipos,
@@ -358,27 +293,11 @@ async function mostrarJugadora(jugadora, paises, clubes, ligas, trofeos) {
             'liga': ligasEquipos,
             'trofeos': palmares
         };
-
-        const cells = document.querySelectorAll('td');
-        cells.forEach(cell => {
-            let newCell = cell.cloneNode(true);
-            cell.parentNode.replaceChild(newCell, cell);
-
-            newCell.addEventListener('click', function (event) {
-                let click = handleCellClick(event, data);
-                console.log("¿Es acierto?:", click, "Tipo:", typeof click); // Mira esto en la consola
-                if (click) {
-                    newCell.removeEventListener('click', handleCellClick);
-                    newCell.classList.add('correcto');
-                    skipPlayer(paises, clubes, ligas, trofeos); // Avanza a la siguiente jugadora
-                } else {
-                    newCell.classList.add('tremble');
-                    wrong.currentTime = 0;
-                    wrong.play();
-                    setTimeout(() => newCell.classList.remove('tremble'), 500);
-                }
-            });
-        });
+        document.getElementById("player-name").textContent = jugadora.nombre;
+        const img = document.getElementById("player-image");
+        localStorage.setItem('last-player-bingo', JSON.stringify(jugadora));
+        img.src = (!jugadora.imagen) ? "/static/img/predeterm.jpg": jugadora.imagen;
+        img.className = jugadora.id;
     } else {
         console.error('No se encontraron equipos para la jugadora:', jugadora.nombre);
     }
@@ -480,6 +399,7 @@ function gestionarAciertos(celda, foto) {
 
 async function colocarAciertos() {
     let grid = localStorage.getItem('Attr6');
+    const {stopCounter} = await import('../utils/counter.js');
 
     // Asegurarse de que retrievedGrid es un array
     let retrievedGrid = grid ? JSON.parse(grid) : [];
@@ -503,100 +423,6 @@ async function colocarAciertos() {
     }
 }
 
-async function pintarCeldas() {
-    const cells = document.querySelectorAll('td'); 
-    let cellsToPaint = [];
-
-    // 1. Filtrar correctamente IMG visibles o SPAN (flag-icons)
-    cells.forEach(celda => {
-    const img = celda.querySelector('img');
-    const span = celda.querySelector('span');
-
-    if (img && img.offsetParent !== null) {
-        const cls = img.className.toLowerCase();
-        if (cls.includes("liga") || cls.includes("pais") || cls.includes("trofeo")) {
-            cellsToPaint.push(celda);
-        }
-        return;
-    }
-
-    if (span) {
-        cellsToPaint.push(celda);
-    }
-});
-
-
-    // 2. Pintar celdas
-    for (const celda of cellsToPaint) {
-    const img = celda.querySelector('img');
-    const span = celda.querySelector('span');
-    let colors = null;
-
-    // IMG visible tiene prioridad absoluta
-    if (img && img.offsetParent !== null) {
-        await img.decode();
-        colors = await getDominantColors(img, 3);
-    }
-
-    // SPAN (flag-icons)
-    else if (span) {
-        let bg = getComputedStyle(span).backgroundImage;
-
-        // fallback ::before
-        if (!bg || bg === 'none') {
-            bg = getComputedStyle(span, '::before').backgroundImage;
-        }
-
-        if (bg && bg !== 'none') {
-            const match = bg.match(/url\(["']?(.*?)["']?\)/);
-            if (match) {
-                const tempImg = new Image();
-                tempImg.crossOrigin = "anonymous";
-                tempImg.src = match[1];
-                await tempImg.decode();
-                colors = await getDominantColors(tempImg, 3);
-            }
-        }
-    }
-
-    if (!colors) continue;
-
-    celda.style.background = `
-        linear-gradient(
-            to bottom,
-            color-mix(in srgb, ${rgbToRgba(colors[0], 0.75)} 50%, transparent),
-            color-mix(in srgb, ${rgbToRgba(colors[1], 0.75)} 100%, transparent)
-        )
-    `;
-    celda.style.borderColor = rgbToRgba(colors[2], 0.7);
-    //celda.style.setProperty('--liga-shadow-color', rgbToRgba(colors[2], 1));
-    celda.style.setProperty('--gradient-primary', rgbToRgba(colors[0], 1));
-    celda.style.setProperty('--gradient-secondary', rgbToRgba(colors[1], 1));
-
-    }
-
-}
-
-
-
-play().then(r => r)
-async function play() {
-    let jugadora = await fetchData(6);
-    let paises = [jugadora.paises[0], jugadora.paises[1], jugadora.paises[2]];
-    let clubes = [jugadora.equipos[0], jugadora.equipos[1], jugadora.equipos[2]];
-    let ligas = [jugadora.ligas[0], jugadora.ligas[1], jugadora.ligas[2]];
-    let trofeos = [jugadora.trofeos[0]];
-    idres = paises.map(String).concat(clubes.map(String), ligas.map(String), trofeos.map(String)).join('');
-    const res = localStorage.getItem('res6');
-    if(res !== idres || !res){
-        localStorage.removeItem('Attr6');
-        localStorage.removeItem('last-player-bingo');
-        crearPopupInicialJuego('Futfem Bingo', texto, imagen, '', iniciar);
-    } else {
-        await iniciar('');
-    }
-}
-
 async function bingoPerder() {
     // Bloquear el botón y el input
     const boton = document.querySelector('.skip-button');
@@ -604,13 +430,13 @@ async function bingoPerder() {
     const celdas = document.querySelectorAll('td');
     celdas.disabled = true;
     boton.disabled = true;
-    resultDiv.textContent = 'Has perdido';
+    resultDiv.textContent = gettext('Has perdido');
     let grid = localStorage.getItem('Attr6');
     let retrievedGrid = grid ? JSON.parse(grid) : [];
     retrievedGrid[retrievedGrid.length - 1].answer = 'loss'+idres;
     // Guardar de nuevo 
     localStorage.setItem('Attr6', JSON.stringify(retrievedGrid));
     if(localStorage.length>0){
-        await updateRacha(6, 0, localStorage.getItem('Attr6'));
+        await window.updateRacha(6, 0, localStorage.getItem('Attr6'));
     }
 }

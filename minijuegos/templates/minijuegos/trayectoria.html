@@ -1,32 +1,50 @@
 {% load static %}
+{% load i18n %}
+{% load compress %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Adivina la Jugadora de Fútbol por su carrera">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Adivina la Jugadora</title>
+    <title>{% trans "Futfem Guess" %}</title>
     <link rel="icon" href="{% static 'img/logo.png' %}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Montserrat:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Montserrat:wght@400;700&display=swap" media="print" onload="this.media='all'">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" media="print" onload="this.media='all'">
+
+    <link rel="preload" href="/api/juegoxid?id_juego=1" as="fetch" crossorigin="anonymous">
+    <link rel="modulepreload" href="/static/js/games/guesstrayectoria.js">
+    <link rel="modulepreload" href="/static/js/games/funciones-comunes.js">
+    <link rel="modulepreload" href="/static/futfem/js/jugadora.js">
+    {% compress css inline %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
     <link rel="stylesheet" href="{% static 'css/trayectoria.css' %}">
-    <link rel="stylesheet" href="{% static 'css/fade.css' %}">
     <link rel="stylesheet" href="{% static 'css/combo.css' %}">
+    {% endcompress %}
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css">
+    </noscript>
 </head>
-<body>
+<body {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
     {% include 'partials/header.html' %}
-<div>
-<h1>Adivina la Jugadora</h1>
+<div id="trayectoria-container">
+<h1>{% trans "Futfem Career" %}</h1>
     <div id="racha-1" class="fire" style="display: none"></div>
 
-</div>
+
 <div id="game">
     <div id="reloj">Tiempo</div>
     <div class="flip-container" id="foto-jug" style="height: 150px">
         <div class="flipper">
             <div class="front">
-    <img src="{% static 'img/mystery.jpg' %}" class="mystery" alt="mystery player">
+    <img src="{% static 'img/mystery.webp' %}" class="mystery" alt="mystery player" fetchpriority="high">
             </div>
             <div class="back">
                 <img src="#" class="mystery" alt="mystery player" id="jugadora">
@@ -40,17 +58,20 @@
     <div id="respuesta" class="cont">
         <label for="jugadoraInput"> </label>
         <div>
-            <input type="text" id="jugadoraInput" placeholder="Escribe el nombre de la jugadora">     
+            <input type="search" id="jugadoraInput" name="j-search-clean" placeholder="{% trans 'Escribe el nombre de la jugadora' %}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="presentation"> 
             <div id="sugerencias-container">
                 <ul id="sugerencias"></ul>
             </div>
         </div>
-        <button id="botonVerificar">Verificar</button>
+        <button id="botonVerificar">{% trans "Verificar" %}</button>
   </div>
 </div>
-<script src="{% static 'js/admin.js' %}"></script>
-<script type="module" src="{% static 'js/games/guesstrayectoria.js' %}"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</div>
+<script src="{% static 'js/admin.js' %}" defer></script>
+<script src="{% url 'javascript-catalog' %}" defer></script>
+<script src="{% static 'js/animations/header.js' %}" defer></script>
+<script type="module" src="{% static 'js/games/guesstrayectoria.js' %}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous" defer></script>
 </body>
 </html>

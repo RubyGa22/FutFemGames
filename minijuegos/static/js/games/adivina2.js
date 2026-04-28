@@ -1,15 +1,16 @@
 import { updateRacha, obtenerUltimaRespuesta } from "/static/usuarios/js/rachas.js";
 import { handleAutocompletePlayer, cargarJugadoraDatos } from "/static/futfem/js/jugadora.js";
 import { Ganaste, crearPopupInicialJuego } from "./funciones-comunes.js";
+import { victory } from "../sounds.js";
 
 const texto = 'Guess Player" es un juego de trivia en el que los jugadores deben adivinar el nombre de una jugadora de fútbol basándose en los equipos en los que ha jugado a lo largo de su carrera. El juego presenta una serie de pistas sobre los clubes y selecciones nacionales en los que la jugadora ha jugado, y el objetivo es identificar correctamente a la jugadora lo más rápido posible. A medida que avanzas, las pistas se hacen más desafiantes y los jugadores deben demostrar su conocimiento sobre el fútbol femenino y sus estrellas. ¡Pon a prueba tus conocimientos y compite para ver quién adivina más jugadoras correctamente!';
-const imagen = '/static/img/ComingSoon.png';
+const imagen = '/static/img/ComingSoon.webp';
 const btn = document.getElementById('botonVerificar');
 const div = document.getElementById('game-results');
 const vidasContainer = document.getElementById('vidas');
 const input = document.getElementById('jugadoraInput');
 // Añadir el evento de input al campo de texto
-input.addEventListener('input', debounce(handleAutocompletePlayer, 300)); // Debounce de 300ms
+input.addEventListener('input', handleAutocompletePlayer); // Debounce de 300ms
 
 let jugadora;
 let answer;
@@ -30,9 +31,9 @@ async function iniciar(dificultad) {
     //jugadoraId = jugadora.idJugadora.toString(); // Convertir a string para comparación segura
     jugadora = jugadoraid.idJugadora;
     localStorage.setItem('res3', jugadora);
-    vidasContainer.textContent = 'Vidas restantes: '+vidas;
+    vidasContainer.textContent = gettext('Vidas restantes: ') + vidas;
 
-     if(ultimaObj.answer === jugadoraId){
+    if(ultimaObj.answer === jugadoraId){
         console.log('Se ha guardado la respuesta'); 
         localStorage.setItem('Attr3', ultima);
     }
@@ -87,41 +88,41 @@ async function play() {
 }
 
 async function verificar(){
-    if(vidas===0){
+    if(vidas<=0){
         updateRacha(3, 0, localStorage.getItem('Attr3'))
+        return;
     }
     // 1. Validar entrada
     const nombreJugadora = validarEntrada();
     if (!nombreJugadora) return;
 
     const jugadoraAnswer = await obtenerJugadora(nombreJugadora)
-    const edad = compararMayorMenorIgual(jugadora.edad, jugadoraAnswer.edad, "edad")
-    const altura = compararMayorMenorIgual(jugadora.altura, jugadoraAnswer.altura, "altura");
-    const equipo = compararIgualONo(jugadora.equipo, jugadoraAnswer.equipo, "equipo");
-    const pais = compararIgualONo(jugadora.pais, jugadoraAnswer.pais, "pais");
-    const pie = compararIgualONo(jugadora.pie, jugadoraAnswer.pie, "pie");
-    const posicion = compararIgualONo(jugadora.posicionObj, jugadoraAnswer.posicionObj, "posicion");
-    jugadoraAnswer.pie = pie
-    jugadoraAnswer.edad = edad
-    jugadoraAnswer.altura = altura
-    jugadoraAnswer.equipo = equipo
-    jugadoraAnswer.pais = pais
-    jugadoraAnswer.posicion = posicion
-    
+
+    const stats = {
+        edad: compararMayorMenorIgual(jugadora.edad, jugadoraAnswer.edad, "edad"),
+        altura: compararMayorMenorIgual(jugadora.altura, jugadoraAnswer.altura, "altura"),
+        equipo: compararIgualONo(jugadora.equipo, jugadoraAnswer.equipo, "equipo"),
+        pais: compararIgualONo(jugadora.pais, jugadoraAnswer.pais, "pais"),
+        pie: compararIgualONo(jugadora.pie, jugadoraAnswer.pie, "pie"),
+        posicion: compararIgualONo(jugadora.Posiciones[0].id, jugadoraAnswer.Posiciones[0].id, "posicion")
+    }
+
+    Object.assign(jugadoraAnswer, stats);
 
     displayRespuesta(jugadoraAnswer)
-
     if(nombreJugadora === jugadoraId){
+        victory.play()
         updateRacha(3, 1, localStorage.getItem('Attr3'))
     }else{
         vidas--;
-        vidasContainer.textContent = 'Vidas restantes: '+vidas;
+        gestionarAciertos(nombreJugadora)
+        vidasContainer.textContent = gettext('Vidas restantes: ') + vidas;
         if(vidas===0){
             //ponerBanderas()
             console.log('perdiste')
         }
     }
-    gestionarAciertos(nombreJugadora)
+
 
 }
 
@@ -147,35 +148,53 @@ async function verificar(){
         return jugadora;
     }
 
-    function displayRespuesta(jugadora){
-
+    function displayRespuesta(jugadora, insertarDirecto = true) {
+        console.log(jugadora)   
         const template = document.getElementById("jugadora-template");
         const clone = template.content.cloneNode(true);
-        const container = clone.querySelector(".jugadora-item");
-        console.log(jugadora.id)
-
-        jugadorasProhibidas.push(jugadora.id)
-
-        clone.querySelector(".player-img").src = jugadora.imagen || "/static/img/predeterm.jpg";
-        clone.querySelector(".equipo").classList.add(jugadora.equipo.res);
-        clone.querySelector(".equipo-escudo").src = jugadora.equipo.equipo.escudo;
-        clone.querySelector(".nombre").textContent = jugadora.nombre;
-        clone.querySelector(".edad").classList.add(jugadora.edad.res);
-        clone.querySelector(".edad-texto").textContent = jugadora.edad.edad;
-        clone.querySelector(".pie").classList.add(jugadora.pie.res);
-        clone.querySelector(".pie-texto").textContent = jugadora.pie.pie;
-        clone.querySelector(".altura").classList.add(jugadora.altura.res);
-        clone.querySelector(".altura-texto").textContent = jugadora.altura.altura+" cm";
-        clone.querySelector(".fi").classList.add(`fi-${jugadora.pais_iso}`);
-        clone.querySelector(".pais").classList.add(jugadora.pais.res);
-
-        if (jugadora.nacionalidad?.iso) {
-            clone.querySelector(".flag").classList.add(`fi-${jugadora.nacionalidad.iso.toLowerCase()}`);
+        
+        // Side effect: registrar que esta jugadora ya salió
+        if (!jugadorasProhibidas.includes(jugadora.id)) {
+            jugadorasProhibidas.push(jugadora.id);
         }
-        clone.querySelector(".posicion").classList.add(jugadora.posicion.res);
-        clone.querySelector(".posicion-texto").textContent = jugadora.posicion.posicion.abreviatura;
 
-        div.prepend(clone);
+        // Poblamos el clon (tu lógica impecable)
+        clone.querySelector(".player-img").src = jugadora.imagen || "/static/img/predeterm.jpg";
+        clone.querySelector(".equipo-escudo").src = jugadora.equipo?.equipo.escudo || "/static/img/predeterm.jpg";
+        clone.querySelector(".nombre").textContent = jugadora.nombre_completo;
+        
+        // Clases de acierto/error y textos
+        const campos = ['equipo', 'edad', 'pie', 'altura', 'pais', 'posicion'];
+        campos.forEach(campo => {
+            const el = clone.querySelector(`.${campo}`);
+            if (el) {
+                el.classList.add(jugadora[campo].res); // 'correct', 'partial', 'incorrect'
+                
+                // Lógica específica para textos si existen
+                const txt = clone.querySelector(`.${campo}-texto`);
+                if (txt) {
+                    if (campo === 'altura') txt.textContent = `${jugadora.altura.altura} cm`;
+                    else if (campo === 'posicion') txt.textContent = jugadora.Posiciones[0].abreviatura;
+                    else txt.textContent = jugadora[campo][campo]; 
+                }
+            }
+        });
+
+        // Iconos de banderas
+        const iso = jugadora.nacionalidad?.iso || jugadora.pais_iso;
+        if (iso) {
+            const flagEl = clone.querySelector(".fi") || clone.querySelector(".flag");
+            if (flagEl) flagEl.classList.add(`fi-${iso[0].toLowerCase()}`);
+        }
+
+        // SI estamos cargando una sola (jugada actual)
+        if (insertarDirecto) {
+            const contenedorPrincipal = document.getElementById("game-results");
+            contenedorPrincipal.prepend(clone);
+        }
+
+        // Devolvemos el clon por si queremos usarlo en un Fragment
+        return clone;
     }
 
     function compararMayorMenorIgual(item1, item2, tipo){
@@ -217,28 +236,54 @@ async function verificar(){
             answer: null
         };
 
+        vidas = gameState.vidas;
+
         let jugadoras = gameState.jugadoras;
-        vidasContainer.textContent = "Vidas restantes: "+gameState.vidas;
+        vidasContainer.textContent = gettext("Vidas restantes: ") + gameState.vidas;
 
-        for (const nombreJugadora of jugadoras) {
-            const jugadoraAnswer = await obtenerJugadora(nombreJugadora);
-            console.log(jugadora.posicionObj, jugadoraAnswer.posicionObj)
+        try{
 
-            const edad = compararMayorMenorIgual(jugadora.edad, jugadoraAnswer.edad, "edad");
-            const altura = compararMayorMenorIgual(jugadora.altura, jugadoraAnswer.altura, "altura");
-            const equipo = compararIgualONo(jugadora.equipo, jugadoraAnswer.equipo, "equipo");
-            const pais = compararIgualONo(jugadora.pais, jugadoraAnswer.pais, "pais");
-            const pie = compararIgualONo(jugadora.pie, jugadoraAnswer.pie, "pie");
-            const posicion = compararIgualONo(jugadora.posicionObj, jugadoraAnswer.posicionObj, "posicion");
+            // 1. LANZAMOS TODAS LAS PETICIONES AL MISMO TIEMPO
+            // Map crea un array de promesas, y Promise.all las resuelve todas juntas
+            const jugadorasData = await Promise.all(
+                jugadoras.map(nombre => obtenerJugadora(nombre))
+            );
 
-            jugadoraAnswer.pie = pie;
-            jugadoraAnswer.edad = edad;
-            jugadoraAnswer.altura = altura;
-            jugadoraAnswer.equipo = equipo;
-            jugadoraAnswer.pais = pais;
-            jugadoraAnswer.posicion = posicion;
+            // 2. DOCUMENT FRAGMENT: Para no "machacar" el DOM en cada iteración
+            const fragmento = document.createDocumentFragment();
 
-            displayRespuesta(jugadoraAnswer);
+            // 3. PROCESAMIENTO SÍNCRONO: 
+            // Como ya tenemos todos los datos en respuestasJugadoras, 
+            // el forEach aquí es instantáneo y seguro.
+            jugadorasData.forEach(jugadoraAnswer => {
+                console.log(jugadora.Posiciones[0], jugadoraAnswer.Posiciones[0])
+
+                // Realizamos las comparaciones (que son síncronas)
+                const stats = {
+                    edad: compararMayorMenorIgual(jugadora.edad, jugadoraAnswer.edad, "edad"),
+                    altura: compararMayorMenorIgual(jugadora.altura, jugadoraAnswer.altura, "altura"),
+                    equipo: compararIgualONo(jugadora.equipo, jugadoraAnswer.equipo, "equipo"),
+                    pais: compararIgualONo(jugadora.pais, jugadoraAnswer.pais, "pais"),
+                    pie: compararIgualONo(jugadora.pie, jugadoraAnswer.pie, "pie"),
+                    posicion: compararIgualONo(jugadora.Posiciones[0].id, jugadoraAnswer.Posiciones[0].id, "posicion")
+                };
+
+                // Inyectamos los resultados en el objeto
+                Object.assign(jugadoraAnswer, stats);
+
+                // Generamos el elemento visual y lo añadimos al fragmento
+                // Nota: Aquí podrías usar tu función displayRespuesta adaptada para devolver un elemento
+                const fila = displayRespuesta(jugadoraAnswer, false); 
+                fragmento.prepend(fila);
+
+            });
+
+            // 4. UN SOLO PINTADO: El navegador solo trabaja una vez
+            const contenedor = document.getElementById('game-results');
+            contenedor.prepend(fragmento);
+        }
+        catch (error) {
+            console.error("Error al cargar las jugadoras anteriores:", error);
         }
     }
 

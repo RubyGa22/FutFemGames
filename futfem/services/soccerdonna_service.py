@@ -29,6 +29,87 @@ def _parse_market_value_from_soup(soup):
 
     return int(''.join(filter(str.isdigit, raw_value)))
 
+def obtener_transfers_desde_url(url_profil):
+    """
+    Recibe una URL tipo:
+    https://www.soccerdonna.de/en/nombre/profil/spieler_123.html
+
+    Devuelve el contenido HTML de:
+    https://www.soccerdonna.de/en/nombre/transfers/spieler_123.html
+    """
+
+    if not url_profil or "/profil/" not in url_profil:
+        raise ValueError("URL no válida de Soccerdonna (debe contener '/profil/')")
+
+    # Cambiar profil por transfers
+    url_transfers = url_profil.replace("/profil/", "/transfers/")
+
+    response = requests.get(url_transfers, headers=HEADERS)
+    response.raise_for_status()
+
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    return {
+        "url": url_transfers,
+        "soup": soup,
+        "html": response.text
+    }
+
+def obtener_transfer_history_desde_url(url_profil):
+    if not url_profil or "/profil/" not in url_profil:
+        raise ValueError("URL no válida de Soccerdonna")
+
+    url_transfers = url_profil.replace("/profil/", "/transfers/")
+
+    response = requests.get(url_transfers, headers=HEADERS, timeout=10)
+    response.raise_for_status()
+
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    transfer_data = []
+
+    # Buscar el h2 que dice "Transfer history"
+    header = soup.find("h2", string=lambda t: t and "Transfer history" in t)
+
+    if not header:
+        return {
+            "url": url_transfers,
+            "transfers": [],
+            "error": "No se encontró sección Transfer history"
+        }
+
+    # La tabla está justo después
+    table = header.find_next("table")
+
+    if not table:
+        return {
+            "url": url_transfers,
+            "transfers": [],
+            "error": "No se encontró tabla de transfers"
+        }
+
+    rows = table.find_all("tr")[1:]  # saltar cabecera
+
+    for row in rows:
+        cols = row.find_all("td")
+
+        # Saltar fila de "Total transfer revenues"
+        if len(cols) < 6:
+            continue
+
+        transfer_data.append({
+            "season": cols[0].get_text(strip=True),
+            "date": cols[1].get_text(strip=True),
+            "from": cols[2].get_text(strip=True),
+            "to": cols[3].get_text(strip=True),
+            "on_loan": cols[4].get_text(strip=True),
+            "transfer_fee": cols[5].get_text(strip=True),
+        })
+
+    return {
+        "url": url_transfers,
+        "transfers": transfer_data
+    }
 
 # =========================
 # FUNCIONES PÚBLICAS

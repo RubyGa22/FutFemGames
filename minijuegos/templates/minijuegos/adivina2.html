@@ -1,26 +1,55 @@
 {% load static %}
+{% load i18n %}
+{% load compress %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guess Player</title>
+    <meta name="description" content="Adivina la jugadora a través de sus características, como su equipo, posición, nacionalidad y más. ¡Pon a prueba tus conocimientos sobre el fútbol femenino!">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% trans "Futfem Guess" %}</title>
     <link rel="icon" href="{% static 'img/logo.png' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" />
+
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Montserrat:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Montserrat:wght@400;700&display=swap" media="print" onload="this.media='all'">
+
+    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" media="print" onload="this.media='all'">-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" media="print" onload="this.media='all'">
+
+    <link rel="preload" href="/api/juegoxid?id_juego=3" as="fetch" crossorigin="anonymous">
+    <link rel="modulepreload" href="/static/js/games/adivina2.js">
+    <link rel="modulepreload" href="/static/js/games/funciones-comunes.js">
+    <link rel="modulepreload" href="/static/futfem/js/jugadora.js">
+
+    {% compress css inline %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/adivina2.css' %}">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
     <link rel="stylesheet" href="{% static 'css/combo.css' %}">
-    <link rel="stylesheet" href="{% static 'css/adivina2.css' %}">
     <link rel="stylesheet" href="{% static 'css/glow-border.css' %}">
+    {% endcompress %}
+    <noscript>
+        <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">-->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css">
+    </noscript>
 </head>
-<body>
+<body {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
     {% include 'partials/header.html' %}
     <div id="game">
         <div id="resultado"></div>
         <p id="vidas"></p>
+        <div id="game-header">
+            <div>
+                <input type="search" name="jugadora" id="jugadoraInput">
+                <div id="sugerencias-container">
+                    <ul id="sugerencias"></ul>
+                </div>
+            </div>
+            <button id="botonVerificar">{% trans "Verificar" %}</button>
+        </div>
         <div id="game-results">
             <template id="jugadora-template">
             <div class="jugadora-item">
@@ -53,20 +82,12 @@
             </div>
             </template>
         </div>
-        <div id="game-header">
-            <div>
-                <input type="text" name="jugadora" id="jugadoraInput">
-                <div id="sugerencias-container">
-                    <ul id="sugerencias"></ul>
-                </div>
-            </div>
-            <button id="botonVerificar">Confirmar</button>
-        </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="{% static 'js/admin.js' %}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
-    <script type="module" src="{% static 'js/games/adivina2.js' %}"></script>
+    <script src="{% url 'javascript-catalog' %}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous" defer></script>
+    <script src="{% static 'js/admin.js' %}" defer></script>
+    <script src="{% static 'js/animations/header.js' %}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js" defer></script>
+    <script type="module" src="{% static 'js/games/adivina2.js' %}" defer></script>
 </body>
 </html>

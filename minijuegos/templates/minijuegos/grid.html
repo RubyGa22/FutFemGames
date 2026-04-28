@@ -1,21 +1,43 @@
 {% load static %}
+{% load i18n %}
+{% load compress %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Completa la cuadrícula con las jugadoras correctas según sus equipos">
     <title>Futfem Grid</title>
     <link rel="icon" href="{% static 'img/logo.png' %}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Montserrat:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Montserrat:wght@400;700&display=swap" media="print" onload="this.media='all'">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css" media="print" onload="this.media='all'">
+
+    <link rel="preload" href="/api/juegoxid?id_juego=4" as="fetch" crossorigin="anonymous">
+    <link rel="modulepreload" href="/static/js/games/grid.js">
+    <link rel="modulepreload" href="/static/js/games/funciones-comunes.js">
+    <link rel="modulepreload" href="/static/futfem/js/jugadora.js">
+
+    {% compress css inline %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <link rel="stylesheet" href="{% static 'css/grid.css' %}">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
     <link rel="stylesheet" href="{% static 'css/combo.css' %}">
+    {% endcompress %}
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css">
+    </noscript>
 </head>
-<body>
+<body {% if usuario_sesion.equipo_favorito.id_equipo %}data-team="{{ usuario_sesion.equipo_favorito.id_equipo }}"{% endif %}>
     {% include 'partials/header.html' %}
-<h1>Futfem Grid</h1>
+<!--<h1>{% trans "Futfem Grid" %}</h1>-->
+<!--<img src="{% static 'img/grid-logo.webp' %}" alt="Futfem Grid Logo" class="logo-game" style="height: 75px; width: 75px;" fetchpriority="high">-->
 <table id="grid">
     <thead>
     <tr id="columnas">
@@ -47,20 +69,33 @@
     </tbody>
 </table>
 <div class="cont">
-<label for="input">
-    <input type="text" id="jugadoraInput" placeholder="Escribe el nombre de la jugadora">
+<label for="jugadoraInput">
+    <input type="search" id="jugadoraInput" placeholder="{% trans 'Escribe el nombre de la jugadora' %}">
     <div id="sugerencias-container">
         <ul id="sugerencias"></ul>
     </div>
 </label>
-<button id="botonVerificar">Verificar</button>
+<button id="botonVerificar">{% trans 'Verificar' %}</button>
 </div>
 <div id="resultado"></div>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
-<script src="{% static 'js/admin.js' %}"></script>
+<script src="{% static 'js/admin.js' %}" defer></script>
+<script src="{% static 'js/animations/header.js' %}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js" defer></script>
 <script type="module" src="{% static 'js/games/grid.js' %}"></script>
-<script src="{% static 'js/animations/grid.js' %}"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script type="module">
+    import { play } from "{% static 'js/games/grid.js' %}";
+
+    async function start() {
+        // Esperamos a que el catálogo de Django cargue de verdad
+        while (typeof django === 'undefined' || !django.catalog) {
+            await new Promise(resolve => setTimeout(resolve, 50));
+        }
+        play();
+    }
+    start();
+</script>
+<script src="{% url 'javascript-catalog' %}" defer></script>
+<script src="{% static 'js/animations/grid.js' %}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous" defer></script>
 </body>
 </html>

@@ -8,6 +8,17 @@ export async function equiposxliga(ligaId) {
         });
 }
 
+export async function fetchAllEquipos() {
+    return fetch(`/api/equiposall`)
+        .then(response => response.json())
+        .then(data => data)
+        .catch(error => {
+            console.error('Error fetching all equipos:', error);
+            throw error;
+        }
+    );
+}
+
 
 export async function jugadorasxTemporadaYEquipo(equipo, temporada) {
     return fetch(`/api/jugadorasxequipo_temporada?equipo=${equipo}&temporada=${temporada}`)
@@ -52,7 +63,7 @@ export async function handleAutocompleteEquipo(event, id) {
     suggestionsList.innerHTML = '';
 
     if (texto.length > 2) { // Solo si hay más de 2 caracteres
-        const url = `../api/equipoxnombre?nombre=${encodeURIComponent(texto)}`;
+        const url = `/api/equipoxnombre?nombre=${encodeURIComponent(texto)}`;
 
         try {
             const response = await fetch(url);
@@ -90,6 +101,7 @@ export async function handleAutocompleteEquipo(event, id) {
 }
 
 export async function fetchEquipoPalmaresByTemporadas(id_equipo, temporadas) {
+    console.log(`Fetching palmares for equipo ID: ${id_equipo} and temporadas: ${temporadas}`);
     try {
         const url = `/api/equipo_palmares?equipo=${encodeURIComponent(id_equipo)}&temporadas=${encodeURIComponent(temporadas)}`;
         const response = await fetch(url);

@@ -1,5 +1,4 @@
 /*body{
-    /*background-image: url("../img/fondo cesped.jpg.png");
     background-size: cover;
     background-repeat: no-repeat;
     background-color: rgba(128, 0, 128, 0.5); /* Color negro con transparencia */
@@ -17,7 +16,6 @@
 
 .container-wordle h1{
     margin-top: 0;
-    font-family: "Bauhaus 93", sans-serif;
 }
 #board {
     display: grid;
@@ -44,7 +42,7 @@ input{
     border: 1px solid #333;
     border-radius: 8px;
     background-color: rgba(255,255,255,0.8); /* Color de fondo primario */
-    color: var(--color-texto); /* Color del texto */
+    color: var(--color-detalles); /* Color del texto */
     transition: transform 0.2s; /* Suavizar el efecto de transformación */
     box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(10px);

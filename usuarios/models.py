@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from futfem.models import Jugadora, Juego
+from futfem.models import Equipo, Jugadora, Juego
 
 # Create your models here.
 class Usuario(AbstractUser):
@@ -31,6 +31,10 @@ class Usuario(AbstractUser):
         blank=True, 
         on_delete=models.SET_NULL
     )
+
+    equipo_favorito = models.ForeignKey(Equipo, db_column='equipo_favorito', null=True, blank=True, on_delete=models.SET_NULL)
+
+    es_jugadora = models.IntegerField(default=None, blank=True, null=True)  # Nuevo campo para indicar si el usuario es jugadora
 
     class Meta:
         db_table = 'usuarios'
