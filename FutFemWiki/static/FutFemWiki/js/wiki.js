@@ -202,7 +202,7 @@ function renderJugadorasPage(page = 1) {
     container.className = 'jugadoras-grid-container'; // Clase para el contenedor padre
 
     // --- CREACIÓN DEL ENCABEZADO ---
-    const header = document.createElement('div');
+    /*const header = document.createElement('div');
     header.className = 'jugadora-item header-list'; // Usamos la misma clase para heredar el grid
     header.innerHTML = `
         <div class="jugadora-div1"><p><b>${gettext('JUGADORA')}</b></p></div>
@@ -210,7 +210,7 @@ function renderJugadorasPage(page = 1) {
         <div class="header-label"><p><b>${gettext('CLUB')}</b></p></div>
         <div class="header-label"><p><b>${gettext('VALOR')}</b></p></div>
     `;
-    container.appendChild(header);
+    container.appendChild(header);*/
 
     jugadoras.forEach((jugadora, index) => {
         const nombreCompleto = jugadora.nombre_completo || 'Desconocida';
@@ -488,10 +488,11 @@ export function displayEquipos(equipos, container) {
         equipoElement.style.background = `
             linear-gradient(
                 to bottom,
-                color-mix(in srgb, ${colorPrimario} 100%, transparent 20%),
-                color-mix(in srgb, ${colorSecundario} 100%, transparent)
+                color-mix(in srgb, ${colorPrimario} 70%, transparent 0%),
+                color-mix(in srgb, ${colorSecundario} 70%, transparent)
             )
         `;
+        
         equipoElement.style.setProperty('--equipo-shadow-color', colorPrimario);
 
         container.appendChild(equipoElement);

@@ -251,6 +251,12 @@ input {
     color: white;
 }
 
+@media (max-width: 750px) {
+    input {
+        height: 35px;
+    }
+}
+
 input:focus {
     outline: none;
     border-color: var(--color-primario);

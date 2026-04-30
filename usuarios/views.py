@@ -175,7 +175,7 @@ def registro_view(request):
             Usuario.objects.create(
                 username=usuario, 
                 email=email,
-                password=make_password(password), # Django lo mapeará a 'Contrasena'
+                password=make_password(password),
                 rol=2,
                 is_active=True,
                 is_staff=False,

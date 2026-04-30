@@ -6,69 +6,8 @@ body{
     overflow: hidden !important;
     overflow-y: hidden !important;
 }
-summary, details{
-    display: none;
-}
-.selector {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 18px;
-    margin-bottom: 10px;
-    position: absolute;
-    top: 0;
-    z-index: 10;
-    background: inherit;
-}
 #ver-mapa{
     display: none;
-}
-/* Texto */
-#selector-text {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 6px;
-    transition: opacity 0.35s ease, transform 0.35s ease;
-}
-
-/* Flechas */
-.arrow {
-    font-size: 1.4rem;
-    cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.arrow:hover:not(.disabled) {
-    opacity: 1;
-    transform: scale(1.15);
-}
-
-/* Flecha desactivada */
-.arrow.disabled {
-    opacity: 0.15;
-    pointer-events: none;
-    transform: none;
-}
-
-/* Puntitos */
-.dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #aaa;
-    opacity: 0.35;
-    cursor: pointer;
-    transition: 
-        background-color 0.3s ease,
-        transform 0.3s ease,
-        opacity 0.3s ease;
-}
-
-.dot.active {
-    background: var(--color-primario, #5cffb0);
-    opacity: 1;
-    transform: scale(1.3);
 }
 
 .panel {
@@ -166,13 +105,13 @@ summary, details{
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    max-width: 1000px !important;
+    gap: 1px;
     width: 100%;
     height: stretch;
     max-height: 100% !important;
     overflow-y: scroll;
-    border-radius: 0 20px 20px 0;
-    margin-bottom: 42px;
+    background: color-mix(in srgb, var(--color-secundario) 30%, transparent 70%);
 }
 
 .ver-filtros{
@@ -180,14 +119,14 @@ summary, details{
     visibility: hidden;
     position: absolute;
     z-index: 499;
-    right: 0px;
+    top: 20px;
     height: fit-content;
     width: fit-content;
 }
 
 /* Estilo específico para el Header */
 .jugadora-item.header-list {
-    background: rgba(0, 0, 0, 1); /* Fondo sólido u oscuro */
+    /*background: rgba(0, 0, 0, 1); /* Fondo sólido u oscuro */
     border-bottom: 2px solid var(--color-primario);
     height: 40px !important; /* Más bajo que las filas */
     min-height: 40px !important;
@@ -196,9 +135,10 @@ summary, details{
     z-index: 50;
     cursor: default;
     box-shadow: none;
+    color: var(--color-detalles);
     pointer-events: none; /* No clickable */
     text-align: center;
-    background: var(--color-secundario);
+    background: color-mix(in srgb, var(--color-secundario) 100%, transparent 0%);
 }
 
 .jugadora-item.header-list .jugadora-div1{
@@ -211,7 +151,7 @@ summary, details{
 }
 
 .jugadora-item.header-list p {
-    color: var(--color-texto);
+    color: var(--color-detalles);
     text-transform: uppercase;
     font-weight: 800;
     letter-spacing: 1px;
@@ -239,12 +179,12 @@ summary, details{
     padding-inline: 2%;
     /*height: stretch;*/
     max-height: 100%;
-    overflow-y: auto;
+    overflow-y: overlay;
     width: 100%;
     max-height: 100%;
     /*border-radius: 0 20px 20px 0;*/
     border-radius: 0;
-    /*background: color-mix(in srgb, var(--color-secundario) 100%, transparent 20%);*/
+    background: color-mix(in srgb, var(--color-secundario) 30%, transparent 70%);
     /*border: 2px solid color-mix(in srgb, var(--color-secundario) 100%, transparent 0%);
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.45);*/
 }
@@ -254,19 +194,20 @@ summary, details{
     width: 8px;               /* Ancho de la barra vertical */
     height: 8px;              /* Alto de la barra horizontal (si hubiera) */
     background-color: transparent; /* Fondo oscuro (estilo Discord) para que el lila resalte */
+    display: none;
 }
 
 /* 2. La pieza que se mueve (el "dedo") */
-*::-webkit-scrollbar-thumb {
+/**::-webkit-scrollbar-thumb {
     background-color: color-mix(in srgb, var(--color-primario) 100%, transparent 20%);
     border-radius: 10px;       /* Bordes totalmente redondeados */
-    border: 2px solid var(--color-primario); /* Crea un efecto de separación muy elegante */
-}
+    /*border: 2px solid var(--color-primario); /* Crea un efecto de separación muy elegante */
+/*}*/
 
 /* 3. Efecto al pasar el ratón por encima del scroll */
-*::-webkit-scrollbar-thumb:hover {
+/**::-webkit-scrollbar-thumb:hover {
     background-color: var(--color-primario); /* Un lila más brillante al interactuar */
-}
+/*}*/
 
 .jugadora-item{
     display: grid;
@@ -282,6 +223,7 @@ summary, details{
     align-items: center;
     justify-items: center;
     margin-bottom: 0;
+    border-radius: 0;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
@@ -377,10 +319,8 @@ summary, details{
 .pagination{
     align-items: center;
     justify-content: center;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 70%;
+    width: 100%;
+    background: color-mix(in srgb, var(--color-secundario) 30%, transparent 70%);
 }
 
 .pagination span{
@@ -395,12 +335,21 @@ summary, details{
     flex: 1;
     height: 100%;
     max-height: calc(100dvh - var(--header-height));
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding-block: 2.5%;
+    max-width: 1320px;
 }
 
 #wiki-equipos.equipos{
     justify-content: center;
     max-width: 100vw;
     width: 100vw;
+}
+
+#wiki-equipos.equipos .header-list{
+    display: none;
 }
 
 #wiki-equipos.equipos #cabecera-wiki-equipos #cabecera-jugadora{
@@ -412,15 +361,18 @@ summary, details{
 }
 
 #wiki-equipos #wiki-container{
-    width: 100%;
     max-height: 100%;
-    min-width: 90vw;
+    max-width: 1000px;
+    min-width: fit-content;
     height: 100%;
     border-radius: 0px;
     display: flex;
     
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+    border: 1px solid var(--color-secundario);
+    
 }
 
 @media (min-width: 750px){
@@ -442,32 +394,37 @@ summary, details{
     border-right: none;
     /*box-shadow: 0 0 40px rgba(0, 0, 0, 0.45);*/
     /*backdrop-filter: blur(6px);*/
-    border-radius: 20px 0 0 20px;
 }
 
 #cabecera-wiki-equipos.jugadoras{
     /*height: 126px !important;*/
+    width: 100% !important;
+    max-width: 100% !important;
     min-height: 140px !important;
-    width: 30%;
     min-height: 400px;
-    min-width: 30%;
+    min-width: 100%;
+    justify-content: flex-start;
+    max-height: fit-content;
+    border: 1px solid var(--color-secundario);
+    padding-block: 5px;
+    border-radius: 0;
+    background: color-mix(in srgb, var(--color-secundario) 100%, transparent 0%);
 }
 
 #cabecera-wiki-equipos.equipos{
-    min-width: 30%;
-    width: 30%;
-    min-height: 200px;
+    min-width: 100%;
+    width: 100%;
+    /*min-height: 200px;*/
     /*border-radius: 20px 0 0 20px;*/
     border-radius: 0;
-    justify-content: center;
+    justify-content: start;
     border: none;
+    height: fit-content;
     /*box-shadow: 0 0 40px rgba(0, 0, 0, 0.45);*/
+    background: color-mix(in srgb, var(--color-secundario) 100%, transparent 0%);
 }
 
 @media (min-width:750px){
-    #cabecera-wiki-equipos.equipos{
-        height: stretch;
-    }
 }
 
 #cabecera-wiki-equipos #cabecera-equipo button{
@@ -569,10 +526,6 @@ display: flex;
     gap: 5px;
 }
 
-#cabecera-equipo{
-    padding: 10px;
-}
-
 #cabecera-jugadora{
     justify-content: center;
     width: 100%;
@@ -580,7 +533,7 @@ display: flex;
 
 #cabecera-jugadora #filtros{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 10px;
 }
 
@@ -654,11 +607,13 @@ display: flex;
 
 #ligas-container{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: space-around;
     gap: 15px; /* espacio entre items */
     flex-wrap: nowrap; /* no se envuelven */
-    max-width: 90%;
+    max-width: 100%;
+    padding: 15px;
+    overflow-x: auto;
 }
 
 #ligas-container::-webkit-scrollbar{
@@ -808,12 +763,6 @@ display: flex;
     flex: 1 1 auto;
 }
 
-@media (max-width: 1280px) {
-    .jugadora-item{
-        width: 95%;
-    }
-}
-
 @media (max-width: 912px) {
     #items-container.equipos{
         grid-template-rows: repeat(auto-fill, minmax(100px, 100px)); /* filas de altura automática */
@@ -823,9 +772,6 @@ display: flex;
 @media (max-width: 992px) {
     #equipos-container {
         grid-template-columns: repeat(3, 1fr); /* 2 columnas en pantallas medianas */
-    }
-    .jugadoras-grid-container .jugadora-item{
-        width: 95%;
     }
 }
 
@@ -847,9 +793,9 @@ display: flex;
 
     .jugadoras-grid-container {
         /*height: 100% !important;*/
-        width: 95% !important;
-        max-width: 95% !important;
-        margin-bottom: 10vh !important;
+        border-radius: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     .jugadoras-grid-container{
@@ -899,7 +845,7 @@ display: flex;
     }
 
     #wiki-equipos #wiki-container{
-        width: 100%;
+        width: 95%;
     }
 
     #wiki-equipos.equipos #wiki-container{
@@ -916,8 +862,8 @@ display: flex;
         width: 100%;
         height: 200px !important;
         align-items: flex-start;
-        border-radius: 20px 20px 0 0 !important;
         padding-block: 15px;
+        padding-bottom: 0;
         max-width: 100% !important;
     }
 
@@ -960,7 +906,6 @@ display: flex;
 
     #cabecera-wiki-equipos.equipos #cabecera-equipo{
         gap: 0;
-        border-bottom: 0.5px solid var(--color-primario);
         /*background: linear-gradient(to bottom, color-mix(in srgb, transparent 30%, transparent), color-mix(in srgb, var(--color-secundario) 100%, transparent));*/
         height: 100% !important;
         padding-top: 0;
@@ -990,7 +935,7 @@ display: flex;
     #items-container.equipos{
         gap: 8px;
         padding-top: 0px;
-        border-radius: 0 0 20px 20px;
+        height: 100%;
         max-width: 100% !important;
         grid-template-columns: repeat(3, 1fr);
         grid-template-rows: repeat(5, max-content) !important;
@@ -1011,7 +956,6 @@ display: flex;
     }
 
     .jugadora-item{
-        width: 95% !important;
         height: 50px;
         min-height: 50px;
         padding-inline: 0px;

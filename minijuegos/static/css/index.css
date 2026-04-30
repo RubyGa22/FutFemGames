@@ -63,6 +63,26 @@ body::before {
     width: max-content;
 }
 
+@media (max-width: 768px) {
+    #selector{
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+    }
+
+    #selector a{
+        width: 100%;
+        text-align: center;
+    }
+
+    #selector a p{
+        display: none;
+    }
+    header .botones{
+        display: none !important;
+    }
+}
+
 /*------------------MODAL------------------*/
 /* El contenedor que ocupa toda la pantalla */
 .search-overlay {
@@ -235,7 +255,7 @@ section#juegos .container #daily-games{
 }
 
 section .container{
-    height: 95%;
+    height: 100%;
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -340,10 +360,9 @@ section .container .web-button img, section .container .web-button svg  {
 section .container .web-button.type-2 img, section .container .web-button.type-2 svg{
     left: unset;
     right: 0;
-    height: 100%;
-    width: 50%;
     object-fit: cover;
     transform: none;
+    height: 75%;
 }
 
 section .container .web-button svg{
@@ -581,7 +600,19 @@ section .container .web-button .web-button-text{
 
 @media (min-width: 768px){
     #container-index{
-        padding-block: 5%;
+        padding-block: 2.5%;
+    }
+
+    #selector{
+        position: absolute;
+        top: var(--header-height);
+        left: 50%;
+        transform: translateX(-50%);
+    
+    }
+
+    #selector svg{
+        display: none;
     }
 
     #juego-expo{
@@ -592,15 +623,23 @@ section .container .web-button .web-button-text{
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        padding-left: 20px;
         background-size: cover;
         background-position: center;
+    }
+
+    #juego-expo>div{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
     }
 
     #juego-expo img{
         width: 150px;
         height: 150px;
         object-fit: contain;
+        align-self: center !important;
     }
 
     #container-index #juegos .container{
