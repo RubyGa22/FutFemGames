@@ -1,9 +1,9 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractBaseUser
 from futfem.models import Equipo, Jugadora, Juego
 
 # Create your models here.
-class Usuario(AbstractUser):
+class Usuario(AbstractBaseUser):
     # Usamos db_column para mapear tus nombres de columna actuales 
     id = models.AutoField(primary_key=True)
     # a los campos que Django ya entiende internamente.
@@ -38,7 +38,7 @@ class Usuario(AbstractUser):
 
     class Meta:
         db_table = 'usuarios'
-        #managed = True  # Mantenlo en False si no quieres que Django modifique la tabla
+        managed = False  # Mantenlo en False si no quieres que Django modifique la tabla
 
     def __str__(self):
         return self.username # Corregido: antes tenías self.Usuario (con U mayúscula)
