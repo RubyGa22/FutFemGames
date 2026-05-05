@@ -36,6 +36,12 @@ class Usuario(AbstractBaseUser):
 
     es_jugadora = models.IntegerField(default=None, blank=True, null=True)  # Nuevo campo para indicar si el usuario es jugadora
 
+    is_superuser = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    date_joined = models.DateTimeField(auto_now_add=True, null=True)
+    last_login = models.DateTimeField(null=True, blank=True)
+
     USERNAME_FIELD = 'username'      # ← obligatorio
     REQUIRED_FIELDS = ['first_name'] # ← obligatorio (puede estar vacío: [])
 
