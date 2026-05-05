@@ -36,6 +36,9 @@ class Usuario(AbstractBaseUser):
 
     es_jugadora = models.IntegerField(default=None, blank=True, null=True)  # Nuevo campo para indicar si el usuario es jugadora
 
+    USERNAME_FIELD = 'username'      # ← obligatorio
+    REQUIRED_FIELDS = ['first_name'] # ← obligatorio (puede estar vacío: [])
+
     class Meta:
         db_table = 'usuarios'
         managed = False  # Mantenlo en False si no quieres que Django modifique la tabla
