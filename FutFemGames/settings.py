@@ -77,7 +77,7 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'django_browser_reload',
-    "debug_toolbar",
+    #"debug_toolbar",
     'compressor',
     'minijuegos',
     'futfem',

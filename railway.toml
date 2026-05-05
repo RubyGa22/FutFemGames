@@ -1,5 +1,5 @@
 [deploy]
-startCommand = "python manage.py migrate futfem && python manage.py migrate --fake-initial && gunicorn FutFemGames.wsgi:application --bind 0.0.0.0:${PORT:-8000}"
+startCommand = "python manage.py migrate futfem && python manage.py migrate --fake-initial && gunicorn FutFemGames.wsgi:application --bind 0.0.0.0:$PORT --workers 2"
 
 [build.nixpacks]
 # Instalamos las librerías de sistema necesarias para Cairo y MySQL
