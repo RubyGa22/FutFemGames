@@ -135,6 +135,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.trycloudflare.com',
     'http://*.trycloudflare.com',
     'https://127.0.0.1:8000',
+    'https://futfemgames-production.up.railway.app',
 ]
 
 WSGI_APPLICATION = 'FutFemGames.wsgi.application'
