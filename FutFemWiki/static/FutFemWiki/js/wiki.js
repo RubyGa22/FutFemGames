@@ -406,7 +406,7 @@ function displayLigas(data) {
             <img src="${fotoMini}" alt="${liga.nombre} Logo" class="liga-logo">
             <div class="liga-info">
             <h3>${liga.nombre}</h3>
-            <p>2025/2026</p>
+            <!--<p>2025/2026</p>-->
             </div>
         `;
 

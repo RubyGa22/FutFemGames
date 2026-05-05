@@ -39,7 +39,7 @@
         <input type="hidden" id="perfil-usuario-id" value="{{ usuario.id }}">
 
     <div id="datos-personales">
-        <img src="{% if jugadora_favorita %}/{{ jugadora_favorita.imagen }}{% else %}{% static 'img/default-avatar.png' %}{% endif %}" class="glass profile-img" alt="Avatar" style="width:150px; height:auto; padding-inline: unset;">
+        <img src="{% if jugadora_favorita %}/{{ jugadora_favorita.imagen }}{% else %}{% static 'img/default-avatar.png' %}{% endif %}" class="glass profile-img" alt="Avatar" style="width:120px; height:auto; padding-inline: unset;">
         <div class="field-container editable-group" data-field="username" id="username-container">
             <h1 class="d-inline display-value">{{ usuario.username }}</h1>
             {% if miembro %}

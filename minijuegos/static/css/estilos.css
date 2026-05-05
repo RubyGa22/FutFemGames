@@ -33,6 +33,26 @@
     --glass-border: rgba(255, 255, 255, 0.1);
     --footer-bg: rgba(0, 83, 156, 0.9); /* El azul de tu diseño pero con transparencia */
 }
+/* Filtro Grises */
+.grayscale {
+    filter: grayscale(100%);
+}
+
+/* Simulación básica de Daltonismo */
+/* Protanopia (Rojo débil) */
+.protanopia {
+    filter: sepia(0.5) hue-rotate(-30deg) saturate(1.2);
+}
+
+/* Deuteranopia (Verde débil) */
+.deuteranopia {
+    filter: sepia(0.5) hue-rotate(30deg) saturate(1.2);
+}
+
+/* Tritanopia (Azul débil) */
+.tritanopia {
+    filter: sepia(0.5) hue-rotate(180deg) saturate(1.2);
+}
 html, body {
     margin: 0;
     padding: 0;
@@ -238,7 +258,7 @@ button:hover{
     transition: background 0.3s ease;
 }
 
-input {
+input:not([type='checkbox']), input:not([type='range']) {
     padding: 10px;
     font-size: 16px;
     width: 200px;
@@ -252,7 +272,7 @@ input {
 }
 
 @media (max-width: 750px) {
-    input {
+    input:not([type='range']) {
         height: 35px;
     }
 }
