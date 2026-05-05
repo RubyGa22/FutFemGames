@@ -148,11 +148,11 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME', 'futfemgames'),
-        'USER': os.getenv('DB_USER', 'root'),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
-        'PORT': os.getenv('DB_PORT', '3306'),                    # puerto por defecto de MySQL
+        'NAME': os.getenv('MYSQLDATABASE', 'futfemgames'), # Railway usa MYSQLDATABASE
+        'USER': os.getenv('MYSQLUSER', 'root'),           # Railway usa MYSQLUSER
+        'PASSWORD': os.getenv('MYSQLPASSWORD', ''),       # Railway usa MYSQLPASSWORD
+        'HOST': os.getenv('MYSQLHOST', '127.0.0.1'),       # Railway usa MYSQLHOST
+        'PORT': os.getenv('MYSQLPORT', '3306'),           # Railway usa MYSQLPORT
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
