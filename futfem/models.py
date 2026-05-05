@@ -161,6 +161,7 @@ class JugadoraPosicion(models.Model):
 
     class Meta:
         db_table = 'jugadora-posicion' # O el nombre que prefieras
+        managed = False
 
     def __str__(self):
         tipo = "Primaria" if self.es_primaria else "Secundaria"

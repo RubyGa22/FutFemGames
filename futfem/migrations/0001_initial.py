@@ -194,6 +194,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'jugadora-posicion',
+                'managed': False,
             },
         ),
     ]
